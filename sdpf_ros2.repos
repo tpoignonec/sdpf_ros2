@@ -1,11 +1,7 @@
 repositories:
-  external/ethercat_driver_ros2:
+  external/vic_python_controllers_ros2:
     type: git
-    url: https://github.com/ICube-Robotics/ethercat_driver_ros2.git
-    version: jazzy
-  external/ethercat_driver_ros2:
-    type: git
-    url: https://github.com/ICube-Robotics/ethercat_driver_ros2.git
+    url: https://github.com/tpoignonec/vic_python_controllers_ros2.git
     version: jazzy
   external/fd_sdk_vendor:
     type: git
@@ -15,9 +11,13 @@ repositories:
     type: git
     url: https://github.com/ICube-Robotics/forcedimension_ros2.git
     version: main
+  external/ethercat_driver_ros2:
+    type: git
+    url: https://github.com/ICube-Robotics/ethercat_driver_ros2.git
+    version: jazzy
   external/acados_vendor_ros2:
     type: git
-    url: https://github.com/tpoignonec/acados_vendor_ros2.git
+    url: https://github.com/ICube-Robotics/acados_vendor_ros2.git
     version: main
   external/cartesian_controllers_ros2:
     type: git

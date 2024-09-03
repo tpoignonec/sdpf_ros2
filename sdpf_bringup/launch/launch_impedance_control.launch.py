@@ -118,7 +118,7 @@ def generate_launch_description():
 
     load_impedance_controller = ExecuteProcess(
         cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'cartesian_impedance_controller'],
+             'cartesian_vic_controller'],
         output='screen'
     )
 
