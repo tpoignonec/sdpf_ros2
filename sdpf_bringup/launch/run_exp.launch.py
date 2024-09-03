@@ -3,8 +3,8 @@
 
 from launch import LaunchDescription
 from launch.actions import ExecuteProcess, DeclareLaunchArgument
-from launch.conditions import LaunchConfigurationEquals, IfCondition
-from launch.substitutions import LaunchConfiguration
+from launch.conditions import IfCondition
+from launch.substitutions import EqualsSubstitution, LaunchConfiguration
 from launch_ros.actions import Node
 
 
@@ -75,7 +75,7 @@ def generate_launch_description():
     # Launch Maciej SIDP (using V2 storage)
     # ---------------------------------------
     nodes += Node(
-        package='vic_ppf_python',
+        package='sdpf_nodes',
         executable='bednarczyk_node',
         name='SIPF_W2_node',
         remappings=[],
@@ -85,13 +85,13 @@ def generate_launch_description():
                 'passivation_function': 'bednarczyk_W2'
             },
         ],
-        condition=LaunchConfigurationEquals('pf_method', 'SIPF')
+        condition=IfCondition(EqualsSubstitution(LaunchConfiguration('pf_method'), 'SIPF'))
     ),
 
     # Launch Maciej SIDP+ (using V4 storage)
     # ---------------------------------------
     nodes += Node(
-        package='vic_ppf_python',
+        package='sdpf_nodes',
         executable='bednarczyk_node',
         name='SIPF_W2_node',
         remappings=[],
@@ -101,26 +101,26 @@ def generate_launch_description():
                 'passivation_function': 'bednarczyk_W4'
             },
         ],
-        condition=LaunchConfigurationEquals('pf_method', 'SIPF+')
+        condition=IfCondition(EqualsSubstitution(LaunchConfiguration('pf_method'), 'SIPF+'))
     ),
 
     # Launch QP SDDF
     # ---------------------------------------
     nodes += Node(
-        package='vic_ppf_python',
+        package='sdpf_nodes',
         executable='qp_pf_node',
         name='SDPF_QP_node',
         remappings=[],
         parameters=[
             global_setting,
         ],
-        condition=LaunchConfigurationEquals('pf_method', 'SDPF-QP')
+        condition=IfCondition(EqualsSubstitution(LaunchConfiguration('pf_method'), 'SDPF-QP'))
     ),
 
     # Launch PPF SDDF, z_min = 0
     # ---------------------------------------
     nodes += Node(
-        package='vic_ppf_python',
+        package='sdpf_nodes',
         executable='ppf_node',
         name='SDPF_PPF_node',
         remappings=[],
@@ -130,13 +130,13 @@ def generate_launch_description():
                 'passivation_method': 'z_lower_bound'
             },
         ],
-        condition=LaunchConfigurationEquals('pf_method', 'SDPF-PPF')
+        condition=IfCondition(EqualsSubstitution(LaunchConfiguration('pf_method'), 'SDPF-PPF'))
     ),
 
     # Launch PPF SDDF, z_min adaptive
     # ---------------------------------------
     nodes += Node(
-        package='vic_ppf_python',
+        package='sdpf_nodes',
         executable='ppf_node',
         name='SDPF_PPF_adaptive_node',
         remappings=[],
@@ -147,7 +147,7 @@ def generate_launch_description():
                 'tau_delay_adaptive_z_min': 3.0,
             },
         ],
-        condition=LaunchConfigurationEquals('pf_method', 'SDPF-PPF-adaptive')
+        condition=IfCondition(EqualsSubstitution(LaunchConfiguration('pf_method'), 'SDPF-PPF-adaptive'))
     ),
 
     # ========================================
