@@ -1,0 +1,35 @@
+repositories:
+  external/ethercat_driver_ros2:
+    type: git
+    url: https://github.com/ICube-Robotics/ethercat_driver_ros2.git
+    version: jazzy
+  external/ethercat_driver_ros2:
+    type: git
+    url: https://github.com/ICube-Robotics/ethercat_driver_ros2.git
+    version: jazzy
+  external/fd_sdk_vendor:
+    type: git
+    url: https://github.com/ICube-Robotics/fd_sdk_vendor.git
+    version: main
+  external/forcedimension_ros2:
+    type: git
+    url: https://github.com/ICube-Robotics/forcedimension_ros2.git
+    version: main
+  external/acados_vendor_ros2:
+    type: git
+    url: https://github.com/tpoignonec/acados_vendor_ros2.git
+    version: main
+  external/cartesian_controllers_ros2:
+    type: git
+    url: https://github.com/ICube-Robotics/cartesian_controllers_ros2.git
+    version: main
+  external/dynamics_interface:
+      type: git
+      url: https://github.com/tpoignonec/dynamics_interface.git
+      version: main
+
+
+  external-pip/nml_bag:
+    type: git
+    url: https://github.com/ricmua/nml_bag.git
+    version: main

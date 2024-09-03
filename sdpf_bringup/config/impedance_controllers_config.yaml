@@ -1,0 +1,104 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 1000  # Hz
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    force_torque_sensor_broadcaster:
+      type: force_torque_sensor_broadcaster/ForceTorqueSensorBroadcaster
+
+    cartesian_impedance_controller:
+      type: cartesian_vic_controller/CartesianVicController
+
+    fd_ee_broadcaster:
+      type: ee_pose_broadcaster/EePoseBroadcaster
+
+    fd_inertia_broadcaster:
+      type: fd_inertia_broadcaster/FdInertiaBroadcaster
+
+force_torque_sensor_broadcaster:
+  ros__parameters:
+    sensor_name: fd_ft_sensor
+    frame_id: fd_interaction_point
+
+cartesian_impedance_controller:
+  ros__parameters:
+    command_interfaces:
+      - effort
+    state_interfaces:
+      - position
+      - velocity
+    joints:
+      - fd_x
+      - fd_y
+      - fd_z
+      - fd_roll
+      - fd_pitch
+      - fd_yaw
+
+    filters:
+      state_position_filter_cuttoff_freq: -1.0
+      state_velocity_filter_cuttoff_freq: -100.0
+      command_filter_cuttoff_freq: -1.0
+      ft_sensor_filter_cuttoff_freq: 30.0
+
+    dynamics:
+      plugin_name: dynamics_interface_fd/DynamicsInterfaceFd
+      plugin_package: dynamics_interface
+      base: fd_base # Assumed to be stationary
+      tip: fd_interaction_point
+      alpha: 0.0005
+      gravity: [0.0, 0.0, -9.81]
+
+    ft_sensor:
+      is_enabled: true
+      name: "fd_ft_sensor"
+      frame:
+        id: fd_interaction_point
+
+    external_torque_sensor:
+      is_enabled: false
+      name: ""
+
+    end_effector_frame:
+      frame:
+        id: fd_interaction_point
+        external: false # control frame exists within URDF kinematic chain
+
+    fixed_world_frame:   # Gravity points down (neg. Z) in this frame (Usually: world or base_link)
+      frame:
+        id: fd_base
+        external: false
+
+    gravity_compensation:
+      frame:
+        id: fd_interaction_point
+        external: false
+      CoG:
+        pos: [0.0, 0.0, 0.0]
+        force: 0.0  # weight * 10
+
+    vic:
+      frame:
+        id: fd_base # Admittance calcs (displacement etc) are done in this frame. Usually the tool or end-effector
+        external: false # control frame exists within URDF kinematic chain
+      # Admittance rule
+      plugin_package: cartesian_vic_controller
+      plugin_name: cartesian_vic_controller/VanillaCartesianImpedanceRule  # As nominal controller rule
+
+      # Misc. control parameters
+      activate_nullspace_control: false
+      activate_gravity_compensation: false
+      use_natural_robot_inertia: false
+
+      selected_axes: [true, true, true, true, true, true]
+      inertia: [1., .2, .2, .1, .1, .1] # NOT USED IF "use_natural_robot_inertia" is TRUE...
+      damping_ratio: [0.9, 0.9, 0.9, 0.9, 0.9, 0.9]
+      stiffness:
+        - 200.0
+        - 200.0
+        - 200.0
+        - 2.0
+        - 2.0
+        - 2.0

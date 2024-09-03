@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="ft_sensor_r2c_hardware" params="prefix ethercat_config_file use_fake_hardware:=^|true use_gazebo_ign:=^|false">
+
+  <xacro:if value="${use_fake_hardware}">
+    <xacro:property name="hw_type" value="sensor" />
+  </xacro:if>
+
+  <xacro:unless value="${use_fake_hardware}">
+      <xacro:property name="hw_type" value="system" />
+  </xacro:unless>
+
+  <xacro:unless value="${use_gazebo_ign}">
+    <ros2_control name="ft" type="${hw_type}">
+    <hardware>
+      <xacro:if value="${use_fake_hardware}">
+          <plugin>ft_fake_hw/FtFakeHw</plugin>
+          <param name="sensor_name">${prefix}ft_sensor</param>
+          <param name="topic">/dummy_ft_sensor_data</param>
+          <param name="force.x.state_interface">force.x</param>
+          <param name="force.y.state_interface">force.y</param>
+          <param name="force.z.state_interface">force.z</param>
+          <param name="torque.x.state_interface">torque.x</param>
+          <param name="torque.y.state_interface">torque.y</param>
+          <param name="torque.z.state_interface">torque.z</param>
+      </xacro:if>
+      <xacro:unless value="${use_fake_hardware}">
+            <plugin>ethercat_driver/EthercatDriver</plugin>
+            <param name="master_id">0</param>
+            <param name="control_frequency">125</param>
+      </xacro:unless>
+      </hardware>
+
+        <sensor name="${prefix}ft_sensor">
+
+          <state_interface name="force.x">
+            <param name="initial_value">0.0</param>
+          </state_interface>
+
+          <state_interface name="force.y">
+            <param name="initial_value">0.0</param>
+          </state_interface>
+
+          <state_interface name="force.z">
+            <param name="initial_value">0.0</param>
+          </state_interface>
+
+          <state_interface name="torque.x">
+            <param name="initial_value">0.0</param>
+          </state_interface>
+
+          <state_interface name="torque.y">
+            <param name="initial_value">0.0</param>
+          </state_interface>
+
+          <state_interface name="torque.z">
+            <param name="initial_value">0.0</param>
+          </state_interface>
+
+          <xacro:unless value="${use_fake_hardware}">
+            <ec_module name="Mini40">
+              <plugin>ethercat_generic_plugins/GenericEcSlave</plugin>
+              <param name="alias">0</param>
+              <param name="position">0</param>
+              <param name="slave_config">${ethercat_config_file}</param>
+            </ec_module>
+          </xacro:unless>
+        </sensor>
+      </ros2_control>
+    </xacro:unless>
+  </xacro:macro>
+</robot>

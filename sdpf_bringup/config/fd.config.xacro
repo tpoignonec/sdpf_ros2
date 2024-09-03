@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="fd">
+    <!-- Parameters -->
+    <xacro:arg name="robot_id" default="fd"/> <!-- Name of the haptic interface -->
+    <xacro:arg name="use_fake_hardware" default="false"/>
+
+    <!-- Import interface urdf file -->
+    <xacro:include filename="$(find fd_description)/urdf/fd.urdf.xacro"/>
+
+    <!-- Import ft sensor r2c description file -->
+    <xacro:include filename="$(find sdpf_nodes)/ros2_control/ft_sensor.ros2_control.xacro" />
+
+    <xacro:haptic_interface
+    	robot_id="$(arg robot_id)"
+    	use_orientation="true"
+    	use_clutch="false"
+    />
+
+    <!-- Add world frame -->
+    <link name="world"/>
+
+    <!-- Import and setup interface ros2_control description -->
+    <xacro:include filename="$(find fd_description)/ros2_control/fd.r2c_hardware.xacro" />
+    <xacro:fd_ros2_control
+        robot_id= "$(arg robot_id)"
+        interface_id="-1"
+        use_fake_hardware="false"
+        use_orientation="true"
+        ignore_orientation_readings="true"
+    	  orientation_is_actuated="true"
+        use_clutch="false"
+        emulate_button="false"
+        effector_mass="0.223"
+    />
+    <joint name="joint_world-fd_base" type="fixed">
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <parent link="world"/>
+      <child link="fd_base"/>
+      <axis xyz="0 0 0"/>
+    </joint>
+
+    <!-- Add interaction frame 3.1415 -->
+    <link name="fd_interaction_point"/>
+    <joint name="joint_fd_ee-fd_interaction_point" type="fixed">
+      <origin rpy="0 -1.57079 3.1415" xyz="0 0 0"/>
+      <parent link="fd_ee"/>
+      <child link="fd_interaction_point"/>
+      <axis xyz="0 0 0"/>
+    </joint>
+
+
+    <!-- Import and setup ft sensor ros2_control description -->
+    <xacro:ft_sensor_r2c_hardware
+        prefix="$(arg robot_id)_"
+        use_fake_hardware="$(arg use_fake_hardware)"
+        ethercat_config_file="$(find sdpf_nodes)/config/ft_sensor_ethercat_config.yaml"
+    />
+</robot>
