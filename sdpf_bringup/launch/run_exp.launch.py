@@ -16,7 +16,7 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             'pf_method',
-            description='Used passivation method among "SIPF", "SIPF+", "SDPF-QP", "SDPF-PPF", "SDPF-PPF-adaptive".',
+            description='Used passivation method among "SIPF", "SIPF+", "SDPF", "SDPF-integral", "SDPF-adaptive".',
         )
     )
     declared_arguments.append(
@@ -41,6 +41,7 @@ def generate_launch_description():
     # Simulation global parameters
     # ========================================
     global_setting = {
+        'verbose': False,
         'beta_max': 100.0,
     }
 
@@ -108,37 +109,41 @@ def generate_launch_description():
     # ---------------------------------------
     nodes += Node(
         package='sdpf_nodes',
-        executable='qp_pf_node',
+        executable='sdpf_node',
         name='SDPF_QP_node',
         remappings=[],
         parameters=[
             global_setting,
+            {
+                'passivation_method': 'w_lower_bound'
+            },
         ],
-        condition=IfCondition(EqualsSubstitution(LaunchConfiguration('pf_method'), 'SDPF-QP'))
+        condition=IfCondition(EqualsSubstitution(LaunchConfiguration('pf_method'), 'SDPF'))
     ),
 
     # Launch PPF SDDF, z_min = 0
     # ---------------------------------------
     nodes += Node(
         package='sdpf_nodes',
-        executable='ppf_node',
-        name='SDPF_PPF_node',
+        executable='sdpf_node',
+        name='SDPF_integral_node',
         remappings=[],
         parameters=[
             global_setting,
             {
-                'passivation_method': 'z_lower_bound'
+                'passivation_method': 'z_lower_bound',
+                'z_max': 1.0,
             },
         ],
-        condition=IfCondition(EqualsSubstitution(LaunchConfiguration('pf_method'), 'SDPF-PPF'))
+        condition=IfCondition(EqualsSubstitution(LaunchConfiguration('pf_method'), 'SDPF-integral'))
     ),
 
     # Launch PPF SDDF, z_min adaptive
     # ---------------------------------------
     nodes += Node(
         package='sdpf_nodes',
-        executable='ppf_node',
-        name='SDPF_PPF_adaptive_node',
+        executable='sdpf_node',
+        name='SDPF_integral_adaptive_node',
         remappings=[],
         parameters=[
             global_setting,
@@ -147,7 +152,7 @@ def generate_launch_description():
                 'tau_delay_adaptive_z_min': 3.0,
             },
         ],
-        condition=IfCondition(EqualsSubstitution(LaunchConfiguration('pf_method'), 'SDPF-PPF-adaptive'))
+        condition=IfCondition(EqualsSubstitution(LaunchConfiguration('pf_method'), 'SDPF-adaptive'))
     ),
 
     # ========================================

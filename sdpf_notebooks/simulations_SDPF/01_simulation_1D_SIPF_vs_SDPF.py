@@ -117,7 +117,7 @@ controller_SDPF_sim_data = simulate_controller_and_package_data(controller_SDPF,
 
 # %% [markdown]
 # # Plot benchmark results
-# 
+#
 # ## Define utils
 
 # %%
@@ -140,7 +140,7 @@ if plot_SIPF_W4:
         controller_SIPF_W2_sim_data,
         controller_SIPF_W4_sim_data
     ] + SDPF_controllers_sim_datasets
-else: 
+else:
     controller_sim_datasets = [
         controller_SIPF_W2_sim_data,
         placeholder_dataset

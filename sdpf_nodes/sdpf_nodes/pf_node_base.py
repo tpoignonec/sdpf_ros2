@@ -86,16 +86,19 @@ class PassivityFilterNodeBase(Node):
             self._max_inertia_lambda = np.max(fixed_M)
 
         # Impedance traj. setting
-        self._K_min_diag = np.array([50.0, 500.0, 500.0])
-        self._K_max_diag = np.array([500.0, 500.0, 500.0])
-        self._damping_ratios = np.array([0.3, 0.3, 0.3])
-        self._D_min_diag = 2*self._damping_ratios*np.sqrt(
+        self._K_min_diag = np.array([10.0, 200.0, 200.0])
+        self._K_max_diag = np.array([200.0, 200.0, 200.0])
+        self._damping_ratios = np.array([0.1, 0.1, 0.1])
+        self._D_min_diag = 2 * self._damping_ratios*np.sqrt(
             self._K_min_diag * self._max_inertia_lambda
         )
-        self._D_max_diag = 2*self._damping_ratios*np.sqrt(
-            self._max_inertia_lambda * self._K_max_diag
-        )
-
+        fixed_D = True
+        if fixed_D:
+            self._D_max_diag = self._D_min_diag
+        else:
+            self._D_max_diag = 2 * self._damping_ratios*np.sqrt(
+                self._max_inertia_lambda * self._K_max_diag
+            )
         # Attention !!!
         # alpha = min(eig(D))/max(eig(M)) --> see "get_dummy_reference()"
         self._max_M = self._max_inertia_lambda
@@ -194,14 +197,6 @@ class PassivityFilterNodeBase(Node):
         if (not self._is_ready):
             self.ref_compliant_frame_traj = self.get_dummy_reference(0.0)
             self.compute_control()
-            # Override impedance profile
-            self._filtered_M_d = np.diag(np.array([0.7, 0.7, 0.7]))
-            self._filtered_K_d = np.diag(self._K_min_diag)
-            self._filtered_D_d = np.diag(2 * 0.8 * np.sqrt(
-                self._filtered_M_d.diagonal() * self._filtered_K_d.diagonal()
-            ))
-            # print(self._filtered_K_d)
-            # print(self._filtered_D_d)
             # Static target for initialization
             self.ref_compliant_frame_traj.p_dot_desired.fill(0)
             self.ref_compliant_frame_traj.p_ddot_desired.fill(0)
@@ -284,13 +279,13 @@ class PassivityFilterNodeBase(Node):
         w = 2*np.pi/2
 
         def get_K_and_D(time):
-            gamma = 0.5*(1 - np.cos(w*time))
+            gamma = 0.5 * (1 - np.cos(w*time))
             K_d = K_min + (K_max - K_min)*gamma
             D_d = D_min + (D_max - D_min)*gamma
             return K_d, D_d
 
         def get_K_dot_and_D_dot(time):
-            gamma_dot = w*0.5*np.sin(w*time)
+            gamma_dot = w * 0.5 * np.sin(w*time)
             K_d_dot = (K_max - K_min)*gamma_dot
             D_d_dot = (D_max - D_min)*gamma_dot
             return K_d_dot, D_d_dot

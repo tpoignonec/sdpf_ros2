@@ -28,7 +28,6 @@ setup(
     entry_points={
         'console_scripts': [
             'stiffness_estimation_node = sdpf_nodes.stiffness_estimation_node:main',
-            'ppf_node = sdpf_nodes.ppf_node:main',
             'sdpf_node = sdpf_nodes.sdpf_node:main',
             'bednarczyk_node = sdpf_nodes.bednarczyk_node:main'
         ],
