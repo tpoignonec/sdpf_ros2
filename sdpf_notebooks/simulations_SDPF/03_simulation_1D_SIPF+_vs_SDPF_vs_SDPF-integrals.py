@@ -39,11 +39,14 @@ def simulate_controller_and_package_data(controller_handle, sim_data, label_str)
     }
 
 
-export_figs_dir = "export_figures/simulations_SIPF_vs_SDPF"
+export_figs_dir = "export_figures/simulations_SIPF+_vs_SDPF_vs_integral"
 
 # Base simulation scenario
 import simulation_scenarios
 simulation_data = simulation_scenarios.make_simulation_data('scenario_1')  # 'scenario_1_K_only')
+
+tau_delay_adaptive_z_min = 3.0
+z_max = 1.0
 
 # ---------------------
 # Vanilla controller
@@ -69,15 +72,15 @@ for idx in range(simulation_data['N']):
     del temp_C_dot_value
 del temp_alpha
 
-# ---------------------
-# Maciej's controllers
-# ---------------------
+# -------------------------------
+# Maciej's SIPF+ (W4) controller
+# -------------------------------
 from vic_controllers.controllers import Bednarczyk2020
 # Setup and build PPF controller
-controller_SIPF_W2 = Bednarczyk2020({
+controller_SIPF_W4 = Bednarczyk2020({
     'dim' : 1,
     'beta' : 100.0,
-    'passivation_function' : 'bednarczyk_W2',
+    'passivation_function' : 'bednarczyk_W4',
     'verbose' : False,
     'N_logging' : simulation_data['N'],
     'M' : np.array([[np.min(simulation_data['M_d'])]]),
@@ -87,12 +90,6 @@ controller_SIPF_W2 = Bednarczyk2020({
     'D_max' : np.array([[np.max(simulation_data['D_d'])]])
 })
 
-controller_SIPF_W2_sim_data = simulate_controller_and_package_data(controller_SIPF_W2, simulation_data, 'SIPF')
-
-
-controller_SIPF_W4_settings = deepcopy(controller_SIPF_W2.settings.data)
-controller_SIPF_W4_settings['passivation_function'] = 'bednarczyk_W4'
-controller_SIPF_W4 = Bednarczyk2020(controller_SIPF_W4_settings)
 controller_SIPF_W4_sim_data = simulate_controller_and_package_data(controller_SIPF_W4, simulation_data, 'SIPF+')
 
 # ----------------------
@@ -115,6 +112,43 @@ controller_SDPF = SdpfController({
 controller_SDPF_sim_data = simulate_controller_and_package_data(controller_SDPF, simulation_data, 'SDPF')
 
 
+# ---------------------------------------------
+# Our controller SDPF, with integral condition
+# ---------------------------------------------
+
+controller_SDPF_integral = SdpfController({
+    'dim' : 1,
+    'alpha' : np.min(simulation_data['D_d'])/np.max(simulation_data['M_d']),
+    'independent_beta_values' : False,
+    'passivation_method' : 'z_lower_bound',
+    'z_max': z_max,
+    'beta_max' : 100.0,
+    'filter_implementation' : 'LP',
+    'verbose' : False,
+    'N_logging' : simulation_data['N'],
+})
+
+controller_SDPF_integral_sim_data = simulate_controller_and_package_data(controller_SDPF_integral, simulation_data, 'SDPF integral')
+
+# ------------------------------------------------------
+# Our controller SDPF, with ADAPTIVE integral condition
+# ------------------------------------------------------
+
+controller_SDPF_adaptive = SdpfController({
+    'dim' : 1,
+    'alpha' : np.min(simulation_data['D_d'])/np.max(simulation_data['M_d']),
+    'independent_beta_values' : False,
+    'passivation_method' : 'z_adaptative_lower_bound',
+    'tau_delay_adaptive_z_min': tau_delay_adaptive_z_min,
+    'beta_max' : 100.0,
+    'filter_implementation' : 'LP',
+    'verbose' : False,
+    'N_logging' : simulation_data['N'],
+})
+
+controller_SDPF_adaptive_sim_data = simulate_controller_and_package_data(controller_SDPF_adaptive, simulation_data, 'SDPF adaptive')
+
+
 # %% [markdown]
 # # Plot benchmark results
 #
@@ -123,35 +157,23 @@ controller_SDPF_sim_data = simulate_controller_and_package_data(controller_SDPF,
 # %%
 # Prepare plots
 SAVE_FIGS = True
-plot_SIPF_W4 = False
+plot_SIPF_W4 = True
 
 label_nominal = 'No passivation'  # label_nominal
 
 SDPF_controllers_sim_datasets = [
-    controller_SDPF_sim_data
+    controller_SDPF_sim_data,
+    controller_SDPF_integral_sim_data,
+    controller_SDPF_adaptive_sim_data
 ]
 
 placeholder_dataset = {
     'is_placeholder' : True,
 }
 
-if plot_SIPF_W4:
-    controller_sim_datasets = [
-        controller_SIPF_W2_sim_data,
-        controller_SIPF_W4_sim_data
-    ] + SDPF_controllers_sim_datasets
-else:
-    controller_sim_datasets = [
-        controller_SIPF_W2_sim_data,
-        placeholder_dataset
-    ] + SDPF_controllers_sim_datasets
-
-# %%
-
-import numpy as np
-np.cumsum(
-        controller_SIPF_W2_sim_data['controller'].controller_log['z_dot'].reshape((-1,))
-    ) * simulation_data['Ts']
+controller_sim_datasets = [
+    controller_SIPF_W4_sim_data
+] + SDPF_controllers_sim_datasets
 
 # %%
 
@@ -199,8 +221,8 @@ import scipy
 vanilla_z_dot_integral = np.cumsum(
         z_dot_vanilla.reshape((-1,))
     ) * simulation_data['Ts']
-for controller_sim_data in [controller_SIPF_W2_sim_data] + SDPF_controllers_sim_datasets:
-    if (controller_sim_data['is_placeholder']):
+for controller_sim_data in SDPF_controllers_sim_datasets:
+    if (controller_sim_data['is_placeholder'] == True):
         continue
     print('Computing z for controller "' + controller_sim_data['label'])
     # controller_sim_data['z_dot_integral'] = np.empty_like(simulation_data['time'])
@@ -251,7 +273,7 @@ ax2.plot(
 
 # Controllers sim data
 for controller_sim_data in controller_sim_datasets:
-    if (controller_sim_data['is_placeholder']):
+    if (controller_sim_data['is_placeholder'] == True):
         ax1.plot([], [], label = '_hh')
         ax2.plot([], [], label = '_hh')
         continue
@@ -280,7 +302,7 @@ ax1.set_ylabel(r'$K$' + '\n' + r'\small{(N.m$^{-1}$)}')
 ax2.set_ylabel(r'$D$' + '\n' + r'\small{(N.m$^{-1}$.s)}')
 ax2.set_xlabel(r'time (s)')
 ax1.legend(
-    ncol=4,
+    ncol=3,
     bbox_to_anchor=(0.5, 1.45),
     loc='upper center'
 )
@@ -361,7 +383,7 @@ if plot_ref:
 
 # Controllers sim data
 for controller_sim_data in controller_sim_datasets:
-    if (controller_sim_data['is_placeholder']):
+    if (controller_sim_data['is_placeholder'] == True):
         ax1.plot([], [], label = '_hh')
         ax2.plot([], [], label = '_hh')
         ax3.plot([], [], label = '_hh')
@@ -400,7 +422,7 @@ for ax in [ax1, ax2, ax3]:
     ax.grid(which='minor', linewidth=0.1)
 
 ax1.legend(
-    ncol=4,
+    ncol=3,
     bbox_to_anchor=(0.5, 1.6),
     loc='upper center'
 )
@@ -484,7 +506,7 @@ ax2.plot(
 # ax3.plot([], [], label = '_h')
 
 # Controllers sim data
-for controller_sim_data in [placeholder_dataset] * 2 + SDPF_controllers_sim_datasets:
+for controller_sim_data in [placeholder_dataset] * 1 + SDPF_controllers_sim_datasets:
     if (controller_sim_data['is_placeholder']):
         ax1.plot([], [], label = '_hh')
         ax2.plot([], [], label = '_hh')
@@ -533,7 +555,7 @@ for ax in [ax1, ax2, ax3]:
     ax.grid(which='minor', linewidth=0.1)
 
 ax1.legend(
-    ncol=3,
+    ncol=4,
     bbox_to_anchor=(0.5, 1.6),
     loc='upper center',
 )  # , framealpha=0.5)
@@ -628,7 +650,6 @@ def compute_vic_errors(controller_sim_data):
 
 # Controllers sim data
 for controller_sim_data in [
-    controller_SIPF_W2_sim_data,
     controller_SIPF_W4_sim_data
 ] + SDPF_controllers_sim_datasets:
     vic_errors = compute_vic_errors(controller_sim_data)
@@ -662,7 +683,7 @@ ax2.set_ylabel(r'$ \| \tilde{M} \ddot{e} \|^2$' + '\n' + r'\small{(N)}')
 ax3.set_ylabel(r'$ \| \tilde{D} \dot{e} \|^2$' + '\n' + r'\small{(N)}')
 ax4.set_ylabel(r'$ \| \tilde{K} e \|^2$' + '\n' + r'\small{(N)}')
 ax1.legend(
-    ncol=3,
+    ncol=4,
     bbox_to_anchor=(0.5, 1.45),
     loc='upper center'
 )
