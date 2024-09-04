@@ -2,6 +2,20 @@
 # # Generate simulation data
 
 # %%
+# ##################################
+# Simulation settings
+# ##################################
+
+epsilon_stability = 1e-3
+
+# list of parameter values to test
+tau_delay_adaptive_z_min_list = [1., 5., 10.]
+z_max_list = [0.05, 0.1, 0.2, 0.3]
+
+SAVE_FIGS = True
+export_figs_dir = "export_figures/effect_of_z_max_and_tau_z"
+# ##################################
+
 import matplotlib
 import matplotlib.pyplot as plt
 from vic_controllers.plotting import multi_format_savefig, init_plt
@@ -31,15 +45,11 @@ highlight_regions = plot_utils_1D.highlight_regions
 annotate_regions = plot_utils_1D.annotate_regions
 simulate_controller_and_package_data = nb_commons_1D.simulate_controller_and_package_data
 
-
-
-SAVE_FIGS = True
-export_figs_dir = "export_figures/effect_of_z_max_and_tau_z"
 simulation_data = simulation_scenarios.make_simulation_data('scenario_1')  # 'scenario_1_K_only')
 
-alpha_value = np.min(simulation_data['D_d'])/np.max(simulation_data['M_d'])
-tau_delay_adaptive_z_min_list = [1., 5., 10.]
-z_max_list = [0.05, 0.1, 0.2, 0.3]
+
+alpha_value = (np.min(simulation_data['D_d']) - epsilon_stability) / np.min(simulation_data['M_d'])
+print(f"alpha = {alpha_value}")
 
 plot_utils_1D.ensure_dir_exists(export_figs_dir)
 

@@ -3,6 +3,17 @@
 
 # %%
 
+# ##################################
+# Simulation settings
+# ##################################
+
+epsilon_stability = 1e-3
+
+SAVE_FIGS = True
+export_figs_dir = "export_figures/simulations_SIPF_vs_SDPF"
+plot_SIPF_W4 = True
+# ##################################
+
 import matplotlib
 import matplotlib.pyplot as plt
 from vic_controllers.plotting import multi_format_savefig, init_plt
@@ -24,8 +35,6 @@ if commons_module_path not in sys.path:
     sys.path.append(commons_module_path)
 
 import plot_utils_1D
-
-export_figs_dir = "export_figures/simulations_SIPF_vs_SDPF"
 plot_utils_1D.ensure_dir_exists(export_figs_dir)
 
 # Base simulation scenario
@@ -36,8 +45,9 @@ simulation_data = simulation_scenarios.make_simulation_data('scenario_1')  # 'sc
 
 simulate_controller_and_package_data = nb_commons_1D.simulate_controller_and_package_data
 
-alpha_value = np.min(simulation_data['D_d'])/np.max(simulation_data['M_d'])
-
+alpha_value = (np.min(simulation_data['D_d']) - epsilon_stability) / np.min(simulation_data['M_d'])
+print(f"alpha = {alpha_value}")
+#%%
 # ---------------------
 # Vanilla controller
 # ---------------------
@@ -82,6 +92,7 @@ from vic_controllers.controllers import SdpfController
 controller_SDPF = SdpfController({
     'dim' : 1,
     'alpha' : alpha_value,
+    'epsilon_stability' : epsilon_stability,
     'independent_beta_values' : False,
     'beta_max' : 100.0,
     'filter_implementation' : 'LP',
@@ -96,9 +107,6 @@ controller_SDPF_sim_data = simulate_controller_and_package_data(controller_SDPF,
 # # Plot benchmark results
 
 # %% Define utils
-
-SAVE_FIGS = True
-plot_SIPF_W4 = True
 
 SDPF_controllers_sim_datasets = [
     controller_SDPF_sim_data

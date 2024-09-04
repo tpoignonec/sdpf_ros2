@@ -25,15 +25,31 @@ def build_LPP(LPP_in):
     alpha = float(LPP_in['alpha'])
     beta_max = float(LPP_in['beta_max'])
 
+    epsilon_0 = 0.0
+    if ('epsilon_stability' in LPP_in.keys()):
+        epsilon_0 = float(LPP_in['epsilon_stability'])
+
+    z_dot_min = 0.0
+    if ('z_dot_min' in LPP_in.keys()):
+        z_dot_min = float(LPP_in['z_dot_min'])
+
     # linear constraints:
-    # cst_rhs + cst_b_M * beta_M + cst_b_D * beta_D + cst_b_K * beta_K  >= 0
+    # w = ... >= z_dot_min
+    # ==> cst_rhs + cst_b_M * beta_M + cst_b_D * beta_D + cst_b_K * beta_K  >= 0
     # ==> -1 * cst_b_M * beta_M - cst_b_D * beta_D - cst_b_K * beta_K  <= cst_rhs
-    cst_rhs = err_dot.reshape((1, -1))  @ (D - alpha * M) @ err_dot.reshape((-1, 1)) \
-        + alpha * err.reshape((1, -1))  @ K @ err.reshape((-1, 1))
-    cst_beta_M = - 0.5 *err_dot.reshape((1, -1))  @ (M_d - M) @ err_dot.reshape((-1, 1)) \
-        - alpha *  err.reshape((1, -1)) @ (M_d - M) @ err_dot.reshape((-1, 1))
-    cst_beta_D = - 0.5 * err.reshape((1, -1))  @ (D_d - D) @ err.reshape((-1, 1))
-    cst_beta_K = - 0.5 * err.reshape((1, -1))  @ (K_d - K) @ err.reshape((-1, 1))
+    # LP constraints are therefore of the form A @ u <= b
+    #  where A[0, :] = [- cst_b_M; - cst_b_D; - cst_b_K]
+    #        u = [beta_M; beta_D; beta_K]
+    #        b[0] = cst_rhs
+    I = np.eye(err.size)
+    cst_rhs = err_dot.reshape((1, -1))  @ (D - alpha * M - epsilon_0 * I) @ err_dot.reshape((-1, 1)) \
+        + err.reshape((1, -1))  @ (alpha * K - alpha**2 * epsilon_0 * I) @ err.reshape((-1, 1)) \
+        + err.reshape((1, -1))  @ (-1 * alpha * epsilon_0 * I) @ err_dot.reshape((-1, 1)) \
+        - z_dot_min
+    cst_beta_M = - 0.5 * err_dot.reshape((1, -1))  @ (M_d - M) @ err_dot.reshape((-1, 1)) \
+        - alpha * err.reshape((1, -1)) @ (M_d - M) @ err_dot.reshape((-1, 1))
+    cst_beta_D = - 0.5 * err.reshape((1, -1)) @ (D_d - D) @ err.reshape((-1, 1))
+    cst_beta_K = - 0.5 * err.reshape((1, -1)) @ (K_d - K) @ err.reshape((-1, 1))
 
     # linprog LPP
     LPP_out = {}
@@ -270,6 +286,27 @@ def get_2D_beta_meshgrid(LPP_in):
     return range_beta, mesh_D, mesh_K
 
 def plot_LPP_for_D_and_K(LPP_out, ax=None, with_LP_cost=True):
+    """
+    Plot the Linear Programming problem (LPP) given by LPP_out.
+
+    The plot shows the feasible region of the LPP, the cost function of the
+    LPP, and the optimal solution of the LPP.
+
+    Parameters
+    ----------
+    LPP_out : dict
+        The dictionary containing the output of the LPP.
+    ax : matplotlib.axes.Axes, optional
+        The axes to plot on. If None, a new figure and axes will be created.
+    with_LP_cost : bool, optional
+        If True, the cost function of the LPP will be plotted.
+
+    Returns
+    -------
+    ax : matplotlib.axes.Axes
+        The axes with the plot.
+
+    """
     if ax is None:
         plt.figure()
         ax = plt.gca()
@@ -343,6 +380,27 @@ def plot_LPP_for_D_and_K(LPP_out, ax=None, with_LP_cost=True):
     return ax
 
 def plot_LPP_for_D_and_M(LPP_out, ax=None):
+    """
+    Plot the feasible region of the Linear Programming problem, in the beta_D/beta_M plane.
+
+    Parameters
+    ----------
+    LPP_out : dict
+        Output of the SDPF LP problem.
+    ax : matplotlib axis, optional
+        Axis to plot on. If None, a new figure is created.
+
+    Returns
+    -------
+    ax : matplotlib axis
+        Axis with the plot.
+
+    Notes
+    -----
+    The passivity constraint is plotted as a dashed red line.
+    The bounds of the beta variables are plotted as a black line.
+    The optimal LP solution is plotted as a blue dot.
+    """
     if ax is None:
         plt.figure()
         ax = plt.gca()
