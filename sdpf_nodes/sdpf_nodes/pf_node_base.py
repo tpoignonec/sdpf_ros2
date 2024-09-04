@@ -50,7 +50,7 @@ class PassivityFilterNodeBase(Node):
         self,
         name='PassivityFilterNode',
         dim=3,
-        control_rate=200,
+        control_rate=500,
         fixed_M=np.eye(3)*0.2
     ):
         super().__init__(name)
