@@ -76,5 +76,3 @@ multi_format_savefig(
     dir_name = export_figs_dir,
     fig_name = "illustration_z_min_adaptative"
 )
-
-

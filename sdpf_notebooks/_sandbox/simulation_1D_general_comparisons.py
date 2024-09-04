@@ -1087,7 +1087,3 @@ legend = ax2.legend(
     loc='upper center', bbox_to_anchor=(0.5, -0.15),
     ncol=2
 )
-
-
-
-

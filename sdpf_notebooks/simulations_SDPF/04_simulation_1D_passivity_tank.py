@@ -180,5 +180,3 @@ if SAVE_FIGS :
         dir_name = export_figs_dir,
         fig_name = "passivity_tank_on_3_phases_simulation"
     )
-
-

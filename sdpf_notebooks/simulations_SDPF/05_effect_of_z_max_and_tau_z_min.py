@@ -363,5 +363,3 @@ if SAVE_FIGS :
         dir_name = export_figs_dir,
         fig_name = "effect_of_z_max"
     )
-
-
