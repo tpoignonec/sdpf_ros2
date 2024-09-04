@@ -193,16 +193,16 @@ annotate_regions = plot_utils_1D.annotate_regions
 
 
 # %% Plot all results
-fig_profile = plot_utils_1D.plot_K_and_D(
+fig_profile, axs_profile = plot_utils_1D.plot_K_and_D(
     simulation_data, controller_sim_datasets, num_columns=3)
 
-fig_state_meas = plot_utils_1D.plot_cartesian_state(
+fig_state_meas, axs_state_meas = plot_utils_1D.plot_cartesian_state(
     simulation_data, controller_sim_datasets, num_columns=3)
 
-fig_z_z_dot_beta = plot_utils_1D.plot_z_dot_z_and_beta(
+fig_z_z_dot_beta, axs_z_z_dot_beta = plot_utils_1D.plot_z_dot_z_and_beta(
     simulation_data, controller_sim_datasets, num_columns=4)
 
-fig_vic_errors = plot_utils_1D.plot_vic_tracking_errors(
+fig_vic_errors, axs_vic_errors = plot_utils_1D.plot_vic_tracking_errors(
     simulation_data, controller_sim_datasets, num_columns=4)
 
 # %% Export figures

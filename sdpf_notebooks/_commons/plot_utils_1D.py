@@ -145,7 +145,7 @@ def plot_K_and_D(simulation_data, controller_sim_datasets, num_columns=3):
     annotation_rel_hight = 0.86
     annotate_regions(simulation_data, ax1, annotation_rel_hight)
 
-    return fig_profile
+    return fig_profile, (ax1, ax2)
 
 def plot_cartesian_state(simulation_data, controller_sim_datasets, num_columns=3):
 
@@ -268,13 +268,12 @@ def plot_cartesian_state(simulation_data, controller_sim_datasets, num_columns=3
     fig_state_meas.align_ylabels([ax1, ax2, ax3])
     ax1.set_xlim((0., np.max(simulation_data['time'])))
 
-    return fig_state_meas
+    return fig_state_meas, (ax1, ax2, ax3)
 
 
 
 # plot passivity related data
 def plot_z_dot_z_and_beta(simulation_data, controller_sim_datasets, num_columns=3):
-
     vanilla_VIC_controller_sim_data = None
     for controller_sim_data in controller_sim_datasets:
         if (controller_sim_data['is_vanilla'] == True):
@@ -402,7 +401,192 @@ def plot_z_dot_z_and_beta(simulation_data, controller_sim_datasets, num_columns=
     fig_z_z_dot_beta.align_ylabels([ax1, ax2, ax3])
     ax1.set_xlim((0., np.max(simulation_data['time'])))
 
-    return fig_z_z_dot_beta
+    return fig_z_z_dot_beta, (ax1, ax2, ax3)
+
+def plot_K_z_dot_z_and_beta(
+    simulation_data: dict,
+    controller_sim_datasets: list,
+    num_columns: int = 3,
+    plot_z_min: bool = False,
+    plot_z_max: bool = False
+):
+    vanilla_VIC_controller_sim_data = None
+    for controller_sim_data in controller_sim_datasets:
+        if (controller_sim_data['is_vanilla'] == True):
+            vanilla_VIC_controller_sim_data = controller_sim_data
+            break
+    if (vanilla_VIC_controller_sim_data is not None):
+        label_nominal = vanilla_VIC_controller_sim_data['label']
+        z_dot_vanilla = vanilla_VIC_controller_sim_data['z_dot']
+        vanilla_z_dot_integral = vanilla_VIC_controller_sim_data['z_dot_integral']
+
+    # create figure
+    gs_kw = dict(width_ratios=[1], height_ratios=[2, 5, 5, 5, 5])
+    fig_z_z_dot_beta, axd = plt.subplot_mosaic([
+        ['legend'],
+        ['top'],
+        ['center1'],
+        ['center2'],
+        ['bottom']],
+        gridspec_kw=gs_kw,
+        sharex=True
+        # layout='constrained'
+    )
+    axd['legend'].axis('off')
+    ax0 = axd['top']
+    ax1 = axd['center1']
+    ax2 = axd['center2']
+    ax3 = axd['bottom']
+
+    highlight_regions(simulation_data, ax0)
+    highlight_regions(simulation_data, ax1)
+    highlight_regions(simulation_data, ax2)
+    highlight_regions(simulation_data, ax3)
+
+    color_list = get_color_list()
+
+    i = 0
+
+    # Nominal
+    # -------------------------
+    # K
+    ax0.plot(
+        simulation_data['time'],
+        simulation_data['K_d'],
+        'k--',
+        label = '__NO_LABEL'
+    )
+    if (vanilla_VIC_controller_sim_data is not None):
+        # z_dot
+        ax1.plot(
+            simulation_data['time'],
+            z_dot_vanilla,
+            'k--',
+            label= '_' + label_nominal
+        )
+        # Integral of z_dot
+        ax2.plot(
+            simulation_data['time'],
+            vanilla_z_dot_integral,
+            'k--',
+            label= '_' + label_nominal
+        )
+
+    # Controllers sim data
+    for controller_sim_data in controller_sim_datasets:
+        skip_this = (
+            controller_sim_data['is_placeholder'] or
+            (controller_sim_data['is_vanilla'] == True)
+        )
+        available_keys = None
+        if (not skip_this):
+            available_keys = \
+                controller_sim_data['controller'].controller_log.keys()
+            skip_this = skip_this or ('beta' not in available_keys)
+            skip_this = skip_this or ('z_dot' not in available_keys)
+            if skip_this:
+                print(
+                    'Controller "'
+                    + controller_sim_data['label']
+                    + '" does not have the beta and/or z_dot field! Skipping'
+                )
+        if (skip_this):
+            ax1.plot([], [], label = '_hh')
+            ax2.plot([], [], label = '_hh')
+            ax3.plot([], [], label = '_hh')
+            continue
+
+        # -------------------------
+        # Stiffness
+        # -------------------------
+        ax0.plot(
+            simulation_data['time'],
+            controller_sim_data['controller'].controller_log['K'].reshape((-1,)),
+            color=color_list[i],
+            label = controller_sim_data['label']
+        )
+        # -------------------------
+        # z_dot
+        # -------------------------
+        ax1.plot(
+            simulation_data['time'],
+            controller_sim_data['controller'].controller_log['z_dot'].reshape((-1,)),
+            color=color_list[i],
+            label = controller_sim_data['label']
+        )
+        # -------------------------
+        # Integral of z_dot
+        # -------------------------
+        # Integral of z_dot
+        z_key = 'z'
+        if (not z_key in available_keys):
+            z_key = 'z_dot_integral'
+            print(
+                'Controller "'
+                + controller_sim_data['label']
+                + '" does not have the z field! Using computed integral'
+            )
+        ax2.plot(
+            simulation_data['time'],
+            controller_sim_data['controller'].controller_log[z_key].reshape((-1,)),
+            color=color_list[i],
+            label = controller_sim_data['label']
+        )
+        if plot_z_min:
+            ax2.plot(
+                simulation_data['time'],
+                controller_sim_data['controller'].controller_log['z_min'].reshape((-1,)),
+                ':',
+                color=color_list[i]
+            )
+
+        if (plot_z_max and ('z_max' in controller_sim_data.keys())):
+            ax2.plot(
+                simulation_data['time'],
+                np.ones(simulation_data['time'].shape) * controller_sim_data['z_max'],
+                ':',
+                color=color_list[i]
+            )
+        # -------------------------
+        # Beta
+        # -------------------------
+        ax3.plot(
+            simulation_data['time'],
+            controller_sim_data['controller'].controller_log['beta'].reshape((-1,)),
+            color=color_list[i],
+            label = controller_sim_data['label']
+        )
+        i += 1
+
+    # Labels & legend
+    ax0.set_ylabel(r'$K(t)$')  # + ' ' + r'\small{(J.s${}^{-1}$)}')
+    ax1.set_ylabel(r'$w(\beta, t)$')  # + ' ' + r'\small{(J.s${}^{-1}$)}')
+    ax2.set_ylabel(
+        r'$z(t)$'  # = \int_0^t w(\cdot) d\tau$'
+        # r'{\setlength{\fboxrule}{0pt} \fbox{ \phantom{${\displaystyle \int_0^t}$} ${\int_0^t w\left(\beta(\tau), \tau\right) d\tau}$}}'
+        # + '\n'
+        # + ' '
+        # + r'\small{(J)}'
+    )
+    ax3.set_ylabel(r'$\beta$')  # + ' ' + r'\small{(unitless)}')
+    ax3.set_xlabel(r'time (s)')
+
+    ax0.legend(
+        ncol=num_columns,
+        bbox_to_anchor=(0.5, 2.0),
+        loc='upper center',
+    )  # , framealpha=0.5)
+
+    # extra setup
+    for ax in [ax0, ax1, ax2, ax3]:
+        ax.grid(which='major')
+        ax.grid(which='minor', linewidth=0.1)
+
+
+    fig_z_z_dot_beta.align_ylabels([ax0, ax1, ax2, ax3])
+    ax1.set_xlim((0., np.max(simulation_data['time'])))
+
+    return fig_z_z_dot_beta, (ax0, ax1, ax2, ax3)
 
 
 def plot_vic_tracking_errors(simulation_data, controller_sim_datasets, num_columns=3):
@@ -535,4 +719,4 @@ def plot_vic_tracking_errors(simulation_data, controller_sim_datasets, num_colum
     annotation_rel_hight = 0.86
     annotate_regions(simulation_data, ax1, annotation_rel_hight)
 
-    return fig_vic_errors
+    return fig_vic_errors, (ax1, ax2, ax3, ax4)

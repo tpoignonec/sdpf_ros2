@@ -137,16 +137,16 @@ for controller_sim_data in [controller_SIPF_W2_sim_data] + SDPF_controllers_sim_
 # ##  Main results: SIPF vs. SDPF
 
 # %% Plot all results
-fig_profile = plot_utils_1D.plot_K_and_D(
+fig_profile, axs_profile = plot_utils_1D.plot_K_and_D(
     simulation_data, controller_sim_datasets, num_columns=3)
 
-fig_state_meas = plot_utils_1D.plot_cartesian_state(
+fig_state_meas, axs_state_meas = plot_utils_1D.plot_cartesian_state(
     simulation_data, controller_sim_datasets, num_columns=3)
 
-fig_z_z_dot_beta = plot_utils_1D.plot_z_dot_z_and_beta(
+fig_z_z_dot_beta, axs_z_z_dot_beta = plot_utils_1D.plot_z_dot_z_and_beta(
     simulation_data, controller_sim_datasets, num_columns=3)
 
-fig_vic_errors = plot_utils_1D.plot_vic_tracking_errors(
+fig_vic_errors, axs_vic_errors = plot_utils_1D.plot_vic_tracking_errors(
     simulation_data, controller_sim_datasets, num_columns=3)
 
 # %% Export figures
