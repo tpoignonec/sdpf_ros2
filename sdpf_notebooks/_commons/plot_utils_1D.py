@@ -120,7 +120,7 @@ def plot_K_and_D(simulation_data, controller_sim_datasets, num_columns=3):
     ax2.set_ylabel(r'$D$' + '\n' + r'\small{(N.m$^{-1}$.s)}')
     ax2.set_xlabel(r'time (s)')
     ax1.legend(
-        ncol=4,
+        ncol=num_columns,
         bbox_to_anchor=(0.5, 1.45),
         loc='upper center'
     )
@@ -341,7 +341,7 @@ def plot_z_dot_z_and_beta(simulation_data, controller_sim_datasets, num_columns=
             print(
                 'Controller "'
                 + controller_sim_data['label']
-                + '" doesnt have the beta and/or z_dot field! Skipping'
+                + '" does not have the beta and/or z_dot field! Skipping'
             )
         if (skip_this):
             ax1.plot([], [], label = '_hh')
@@ -359,7 +359,11 @@ def plot_z_dot_z_and_beta(simulation_data, controller_sim_datasets, num_columns=
         z_key = 'z'
         if (not z_key in available_keys):
             z_key = 'z_dot_integral'
-            print('Controller "' + controller_sim_data['label'] + '" doesnt have the z field! Using computed integral')
+            print(
+                'Controller "'
+                + controller_sim_data['label']
+                + '" does not have the z field! Using computed integral'
+            )
         ax2.plot(
             simulation_data['time'],
             controller_sim_data['controller'].controller_log[z_key],

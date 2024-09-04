@@ -133,16 +133,6 @@ for controller_sim_data in [controller_SIPF_W2_sim_data] + SDPF_controllers_sim_
         controller_sim_data['controller'].controller_log['z_dot'].reshape((-1,))
     ) * simulation_data['Ts']
 
-vanilla_VIC_controller_sim_data['z_dot_integral'] = np.cumsum(
-        vanilla_VIC_controller_sim_data['z_dot'].reshape((-1,))
-    ) * simulation_data['Ts']
-
-color_list = plot_utils_1D.get_color_list()
-
-flip = plot_utils_1D.flip
-highlight_regions = plot_utils_1D.highlight_regions
-annotate_regions = plot_utils_1D.annotate_regions
-
 # %% [markdown]
 # ##  Main results: SIPF vs. SDPF
 
