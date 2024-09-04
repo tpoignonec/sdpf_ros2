@@ -91,6 +91,43 @@ def simulate_controller(controller, simulation_data, N_horizon_controller=0, cal
             callback()
     return simU, simX, sim_f_ext
 
+def simulate_controller_and_package_data(controller_handle, sim_data, label_str):
+    _simU, _simX, _simFext = simulate_controller(controller_handle, sim_data)
+    return {
+        'is_vanilla' : False,
+        'is_placeholder' : False,
+        'U' : _simU,
+        'X' : _simX,
+        'Fext' : _simFext,
+        'label' : label_str,
+        'controller' : controller_handle
+    }
+
+def get_vanilla_VIC_controller_sim_data(simulation_data, alpha_est_z_dot):
+    from vic_controllers.commons import VanillaVicController
+    vanilla_VIC_controller = VanillaVicController({'dim' : 1})
+    vanilla_VIC_controller_sim_data = simulate_controller_and_package_data(vanilla_VIC_controller, simulation_data, 'No passivation')
+    vanilla_VIC_controller_sim_data['is_vanilla'] = True
+
+    z_dot_vanilla = np.zeros((simulation_data['N'],))
+
+    temp_alpha = alpha_est_z_dot
+    for idx in range(simulation_data['N']):
+        temp_err_pos = simulation_data['X_d'][idx, 0] - vanilla_VIC_controller_sim_data['X'][idx, 0]
+        temp_err_vel = simulation_data['X_d'][idx, 1] - vanilla_VIC_controller_sim_data['X'][idx, 1]
+        temp_C_dot_value = simulation_data['K_d_dot'][idx] + temp_alpha * simulation_data['D_d_dot'][idx]
+        z_dot_vanilla[idx] = \
+            temp_err_vel.T * (
+                simulation_data['D_d'][idx] - temp_alpha * simulation_data['M_d'][idx]
+                ) * temp_err_vel \
+            + temp_err_pos.T * (
+                temp_alpha * simulation_data['K_d'][idx] - 0.5 * temp_C_dot_value
+                ) * temp_err_pos
+        del temp_C_dot_value
+    del temp_alpha
+    vanilla_VIC_controller_sim_data['z_dot'] = z_dot_vanilla
+
+    return vanilla_VIC_controller_sim_data
 
 def plot_results_bednarczyk(simulation_data, controller_handle):
     plt.figure()
