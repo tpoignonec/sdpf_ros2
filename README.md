@@ -33,6 +33,7 @@ cd ..
 # Source ros2 distro
 source /opt/ros/jazzy/setup.bash
 
+sudo apt install ptython3-pip -y
 # Install dependencies
 export PIP_BREAK_SYSTEM_PACKAGES=1  # for casadi pip install
 # !WARNING! Do not abuse PIP installs in this mode (unsafe...)!!!
