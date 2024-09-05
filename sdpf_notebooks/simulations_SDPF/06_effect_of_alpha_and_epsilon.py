@@ -254,6 +254,7 @@ plt.ylabel(r'$\beta$')
 
 # Show figure in GUI if is main() script
 if __name__ == '__main__':
+    import sys
     try:
         # Put matplotlib.pyplot in interactive mode so that the plots are shown in a background thread.
         plt.ion()
