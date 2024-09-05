@@ -45,6 +45,9 @@ pip install future-fstrings  # Python retro-compatibility for acados
 # revert to "safe" pip policy
 export PIP_BREAK_SYSTEM_PACKAGES=0
 
+# Manually install packages that don't have a rosdistro key
+sudo apt install ptython3-scienceplots -y
+
 # Build
 colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
 ```
