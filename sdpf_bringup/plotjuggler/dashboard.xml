@@ -1,0 +1,218 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<root>
+ <tabbed_widget name="Main Window" parent="main_window">
+  <Tab tab_name="VIC state (trajectory)" containers="1">
+   <Container>
+    <DockSplitter count="3" orientation="-" sizes="0.333333;0.333333;0.333333">
+     <DockSplitter count="3" orientation="|" sizes="0.333542;0.332915;0.333542">
+      <DockArea name="position">
+       <plot flip_y="false" mode="TimeSeries" style="Lines" flip_x="false">
+        <range left="126.332073" right="136.331117" top="-0.010380" bottom="-0.020235"/>
+        <limitY/>
+        <curve name="/cartesian_vic_controller/status/pose/position/x" color="#1f77b4"/>
+        <curve name="/cartesian_vic_controller/status/desired_pose/position/x" color="#d62728"/>
+       </plot>
+      </DockArea>
+      <DockArea name="velocity">
+       <plot flip_y="false" mode="TimeSeries" style="Lines" flip_x="false">
+        <range left="126.332073" right="136.331117" top="0.000644" bottom="-0.000645"/>
+        <limitY/>
+        <curve name="/cartesian_vic_controller/status/velocity/linear/x" color="#ff7f0e"/>
+        <curve name="/cartesian_vic_controller/status/desired_velocity/linear/x" color="#f14cc1"/>
+       </plot>
+      </DockArea>
+      <DockArea name="acceleration">
+       <plot flip_y="false" mode="TimeSeries" style="Lines" flip_x="false">
+        <range left="126.332073" right="136.331117" top="0.080724" bottom="-0.083548"/>
+        <limitY/>
+        <curve name="/cartesian_vic_controller/status/acceleration/linear/x" color="#17becf"/>
+        <curve name="/cartesian_vic_controller/status/desired_acceleration/linear/x" color="#bcbd22"/>
+       </plot>
+      </DockArea>
+     </DockSplitter>
+     <DockSplitter count="3" orientation="|" sizes="0.333542;0.332915;0.333542">
+      <DockArea name="...">
+       <plot flip_y="false" mode="TimeSeries" style="Lines" flip_x="false">
+        <range left="126.332073" right="136.331117" top="0.000010" bottom="-0.000415"/>
+        <limitY/>
+        <curve name="/cartesian_vic_controller/status/pose/position/y" color="#d62728"/>
+        <curve name="/cartesian_vic_controller/status/desired_pose/position/y" color="#1ac938"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot flip_y="false" mode="TimeSeries" style="Lines" flip_x="false">
+        <range left="126.332073" right="136.331117" top="0.000539" bottom="-0.000538"/>
+        <limitY/>
+        <curve name="/cartesian_vic_controller/status/velocity/linear/y" color="#f14cc1"/>
+        <curve name="/cartesian_vic_controller/status/desired_velocity/linear/y" color="#9467bd"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot flip_y="false" mode="TimeSeries" style="Lines" flip_x="false">
+        <range left="126.332073" right="136.331117" top="0.083824" bottom="-0.084271"/>
+        <limitY/>
+        <curve name="/cartesian_vic_controller/status/acceleration/linear/y" color="#bcbd22"/>
+        <curve name="/cartesian_vic_controller/status/desired_acceleration/linear/y" color="#1f77b4"/>
+       </plot>
+      </DockArea>
+     </DockSplitter>
+     <DockSplitter count="3" orientation="|" sizes="0.333542;0.332915;0.333542">
+      <DockArea name="...">
+       <plot flip_y="false" mode="TimeSeries" style="Lines" flip_x="false">
+        <range left="126.332073" right="136.331117" top="0.000001" bottom="-0.000039"/>
+        <limitY/>
+        <curve name="/cartesian_vic_controller/status/pose/position/z" color="#1ac938"/>
+        <curve name="/cartesian_vic_controller/status/desired_pose/position/z" color="#ff7f0e"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot flip_y="false" mode="TimeSeries" style="Lines" flip_x="false">
+        <range left="126.332073" right="136.331117" top="0.001331" bottom="-0.001245"/>
+        <limitY/>
+        <curve name="/cartesian_vic_controller/status/velocity/linear/z" color="#9467bd"/>
+        <curve name="/cartesian_vic_controller/status/desired_velocity/linear/z" color="#17becf"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot flip_y="false" mode="TimeSeries" style="Lines" flip_x="false">
+        <range left="126.332073" right="136.331117" top="0.131949" bottom="-0.123825"/>
+        <limitY/>
+        <curve name="/cartesian_vic_controller/status/acceleration/linear/z" color="#1f77b4"/>
+        <curve name="/cartesian_vic_controller/status/desired_acceleration/linear/z" color="#d62728"/>
+       </plot>
+      </DockArea>
+     </DockSplitter>
+    </DockSplitter>
+   </Container>
+  </Tab>
+  <Tab tab_name="VIC state (impedance)" containers="1">
+   <Container>
+    <DockSplitter count="3" orientation="-" sizes="0.333333;0.333333;0.333333">
+     <DockSplitter count="3" orientation="|" sizes="0.333542;0.332915;0.333542">
+      <DockArea name="Inertia">
+       <plot flip_y="false" mode="TimeSeries" style="Lines" flip_x="false">
+        <range left="0.000000" right="136.331117" top="0.300000" bottom="0.100000"/>
+        <limitY/>
+        <curve name="/cartesian_vic_controller/status/rendered_inertia/data[0]" color="#1ac938"/>
+        <curve name="/desired_compliance/inertia/data[0]" color="#17becf"/>
+       </plot>
+      </DockArea>
+      <DockArea name="Damping">
+       <plot flip_y="false" mode="TimeSeries" style="Lines" flip_x="false">
+        <range left="0.000000" right="136.331117" top="6.102565" bottom="1.794801"/>
+        <limitY/>
+        <curve name="/cartesian_vic_controller/status/rendered_damping/data[0]" color="#bcbd22"/>
+        <curve name="/desired_compliance/damping/data[0]" color="#1ac938"/>
+       </plot>
+      </DockArea>
+      <DockArea name="Stiffness">
+       <plot flip_y="false" mode="TimeSeries" style="Lines" flip_x="false">
+        <range left="0.000000" right="136.331117" top="511.249941" bottom="38.750053"/>
+        <limitY/>
+        <curve name="/cartesian_vic_controller/status/rendered_stiffness/data[0]" color="#1ac938"/>
+        <curve name="/desired_compliance/stiffness/data[0]" color="#17becf"/>
+       </plot>
+      </DockArea>
+     </DockSplitter>
+     <DockSplitter count="3" orientation="|" sizes="0.333542;0.332915;0.333542">
+      <DockArea name="...">
+       <plot flip_y="false" mode="TimeSeries" style="Lines" flip_x="false">
+        <range left="0.000000" right="136.331117" top="0.300000" bottom="0.100000"/>
+        <limitY/>
+        <curve name="/cartesian_vic_controller/status/rendered_inertia/data[7]" color="#9467bd"/>
+        <curve name="/desired_compliance/inertia/data[4]" color="#1f77b4"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot flip_y="false" mode="TimeSeries" style="Lines" flip_x="false">
+        <range left="0.000000" right="136.331117" top="6.100000" bottom="5.900000"/>
+        <limitY/>
+        <curve name="/cartesian_vic_controller/status/rendered_damping/data[7]" color="#1f77b4"/>
+        <curve name="/desired_compliance/damping/data[4]" color="#f14cc1"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot flip_y="false" mode="TimeSeries" style="Lines" flip_x="false">
+        <range left="0.000000" right="136.331117" top="500.100000" bottom="499.900000"/>
+        <limitY/>
+        <curve name="/cartesian_vic_controller/status/rendered_stiffness/data[7]" color="#ff7f0e"/>
+        <curve name="/desired_compliance/stiffness/data[4]" color="#bcbd22"/>
+       </plot>
+      </DockArea>
+     </DockSplitter>
+     <DockSplitter count="3" orientation="|" sizes="0.333542;0.332915;0.333542">
+      <DockArea name="...">
+       <plot flip_y="false" mode="TimeSeries" style="Lines" flip_x="false">
+        <range left="0.000000" right="136.331117" top="0.300000" bottom="0.100000"/>
+        <limitY/>
+        <curve name="/cartesian_vic_controller/status/rendered_inertia/data[14]" color="#17becf"/>
+        <curve name="/desired_compliance/inertia/data[8]" color="#d62728"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot flip_y="false" mode="TimeSeries" style="Lines" flip_x="false">
+        <range left="0.000000" right="136.331117" top="6.100000" bottom="5.900000"/>
+        <limitY/>
+        <curve name="/cartesian_vic_controller/status/rendered_damping/data[14]" color="#d62728"/>
+        <curve name="/desired_compliance/damping/data[8]" color="#9467bd"/>
+       </plot>
+      </DockArea>
+      <DockArea name="...">
+       <plot flip_y="false" mode="TimeSeries" style="Lines" flip_x="false">
+        <range left="0.000000" right="136.331117" top="500.100000" bottom="499.900000"/>
+        <limitY/>
+        <curve name="/cartesian_vic_controller/status/rendered_stiffness/data[14]" color="#f14cc1"/>
+        <curve name="/desired_compliance/stiffness/data[8]" color="#1f77b4"/>
+       </plot>
+      </DockArea>
+     </DockSplitter>
+    </DockSplitter>
+   </Container>
+  </Tab>
+  <currentTabIndex index="1"/>
+ </tabbed_widget>
+ <use_relative_time_offset enabled="1"/>
+ <!-- - - - - - - - - - - - - - - -->
+ <!-- - - - - - - - - - - - - - - -->
+ <Plugins>
+  <plugin ID="DataLoad CSV">
+   <parameters time_axis="" delimiter="0"/>
+  </plugin>
+  <plugin ID="DataLoad MCAP"/>
+  <plugin ID="DataLoad ROS2 bags">
+   <use_header_stamp value="false"/>
+   <discard_large_arrays value="true"/>
+   <max_array_size value="100"/>
+   <boolean_strings_to_number value="true"/>
+   <remove_suffix_from_strings value="true"/>
+   <selected_topics value=""/>
+  </plugin>
+  <plugin ID="DataLoad ULog"/>
+  <plugin ID="ROS2 Topic Subscriber">
+   <use_header_stamp value="false"/>
+   <discard_large_arrays value="true"/>
+   <max_array_size value="100"/>
+   <boolean_strings_to_number value="true"/>
+   <remove_suffix_from_strings value="true"/>
+   <selected_topics value="/cartesian_vic_controller/reference_compliant_frame_trajectory;/cartesian_vic_controller/status;/passivity_filter_diagnostic_data;/simulation_time;/desired_compliance"/>
+  </plugin>
+  <plugin ID="UDP Server"/>
+  <plugin ID="WebSocket Server"/>
+  <plugin ID="ZMQ Subscriber"/>
+  <plugin ID="Fast Fourier Transform"/>
+  <plugin ID="Quaternion to RPY"/>
+  <plugin ID="Reactive Script Editor">
+   <library code="--[[ Helper function to create a series from arrays&#xa;&#xa; new_series: a series previously created with ScatterXY.new(name)&#xa; prefix:     prefix of the timeseries, before the index of the array&#xa; suffix_X:   suffix to complete the name of the series containing the X value. If [nil], use the index of the array.&#xa; suffix_Y:   suffix to complete the name of the series containing the Y value&#xa; timestamp:   usually the tracker_time variable&#xa;              &#xa; Example:&#xa; &#xa; Assuming we have multiple series in the form:&#xa; &#xa;   /trajectory/node.{X}/position/x&#xa;   /trajectory/node.{X}/position/y&#xa;   &#xa; where {N} is the index of the array (integer). We can create a reactive series from the array with:&#xa; &#xa;   new_series = ScatterXY.new(&quot;my_trajectory&quot;) &#xa;   CreateSeriesFromArray( new_series, &quot;/trajectory/node&quot;, &quot;position/x&quot;, &quot;position/y&quot;, tracker_time );&#xa;--]]&#xa;&#xa;function CreateSeriesFromArray( new_series, prefix, suffix_X, suffix_Y, timestamp )&#xa;  &#xa;  --- clear previous values&#xa;  new_series:clear()&#xa;  &#xa;  --- Append points to new_series&#xa;  index = 0&#xa;  while(true) do&#xa;&#xa;    x = index;&#xa;    -- if not nil, get the X coordinate from a series&#xa;    if suffix_X ~= nil then &#xa;      series_x = TimeseriesView.find( string.format( &quot;%s.%d/%s&quot;, prefix, index, suffix_X) )&#xa;      if series_x == nil then break end&#xa;      x = series_x:atTime(timestamp)&#x9; &#xa;    end&#xa;    &#xa;    series_y = TimeseriesView.find( string.format( &quot;%s.%d/%s&quot;, prefix, index, suffix_Y) )&#xa;    if series_y == nil then break end &#xa;    y = series_y:atTime(timestamp)&#xa;    &#xa;    new_series:push_back(x,y)&#xa;    index = index+1&#xa;  end&#xa;end&#xa;&#xa;--[[ Similar to the built-in function GetSeriesNames(), but select only the names with a give prefix. --]]&#xa;&#xa;function GetSeriesNamesByPrefix(prefix)&#xa;  -- GetSeriesNames(9 is a built-in function&#xa;  all_names = GetSeriesNames()&#xa;  filtered_names = {}&#xa;  for i, name in ipairs(all_names)  do&#xa;    -- check the prefix&#xa;    if name:find(prefix, 1, #prefix) then&#xa;      table.insert(filtered_names, name);&#xa;    end&#xa;  end&#xa;  return filtered_names&#xa;end&#xa;&#xa;--[[ Modify an existing series, applying offsets to all their X and Y values&#xa;&#xa; series: an existing timeseries, obtained with TimeseriesView.find(name)&#xa; delta_x: offset to apply to each x value&#xa; delta_y: offset to apply to each y value &#xa;  &#xa;--]]&#xa;&#xa;function ApplyOffsetInPlace(series, delta_x, delta_y)&#xa;  -- use C++ indices, not Lua indices&#xa;  for index=0, series:size()-1 do&#xa;    x,y = series:at(index)&#xa;    series:set(index, x + delta_x, y + delta_y)&#xa;  end&#xa;end&#xa;"/>
+   <scripts/>
+  </plugin>
+  <plugin ID="CSV Exporter"/>
+  <plugin ID="ROS2 Topic Re-Publisher"/>
+ </Plugins>
+ <!-- - - - - - - - - - - - - - - -->
+ <previouslyLoaded_Datafiles/>
+ <previouslyLoaded_Streamer name="ROS2 Topic Subscriber"/>
+ <!-- - - - - - - - - - - - - - - -->
+ <customMathEquations/>
+ <snippets/>
+ <!-- - - - - - - - - - - - - - - -->
+</root>
