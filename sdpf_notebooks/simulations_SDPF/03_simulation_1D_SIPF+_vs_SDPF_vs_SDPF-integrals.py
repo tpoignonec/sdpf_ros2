@@ -21,7 +21,7 @@ plot_SIPF_W4 = True
 import matplotlib
 import matplotlib.pyplot as plt
 from vic_controllers.plotting import multi_format_savefig, init_plt
-init_plt(full_screen = False, scale = 2, use_latex=True)
+init_plt(full_screen = False, scale = 1, use_latex=True)
 # plt.rcParams['text.usetex'] = True
 
 from tqdm import tqdm
@@ -34,7 +34,8 @@ from vic_controllers.commons import MeasurementData, CompliantFrameTrajectory
 
 import os
 import sys
-commons_module_path = os.path.abspath(os.path.join('../_commons/'))
+parent_folder = os.path.abspath(os.path.join(__file__, os.pardir))
+commons_module_path = os.path.abspath(os.path.join(parent_folder, os.pardir, '_commons/'))
 if commons_module_path not in sys.path:
     sys.path.append(commons_module_path)
 
@@ -176,6 +177,7 @@ else:
         placeholder_dataset
     ] + SDPF_controllers_sim_datasets
 
+
 # precompute the integrals
 import scipy
 for controller_sim_data in [controller_SIPF_W2_sim_data] + SDPF_controllers_sim_datasets:
@@ -183,12 +185,8 @@ for controller_sim_data in [controller_SIPF_W2_sim_data] + SDPF_controllers_sim_
         continue
     print('Computing z for controller "' + controller_sim_data['label'])
     # controller_sim_data['z_dot_integral'] = np.empty_like(simulation_data['time'])
-    controller_sim_data['z_dot_integral'] = np.cumsum(
+    controller_sim_data['controller'].controller_log['z_dot_integral'] = np.cumsum(
         controller_sim_data['controller'].controller_log['z_dot'].reshape((-1,))
-    ) * simulation_data['Ts']
-
-vanilla_VIC_controller_sim_data['z_dot_integral'] = np.cumsum(
-        vanilla_VIC_controller_sim_data['z_dot'].reshape((-1,))
     ) * simulation_data['Ts']
 
 color_list = plot_utils_1D.get_color_list()
@@ -242,3 +240,15 @@ if SAVE_FIGS :
         dir_name = export_figs_dir,
         fig_name = "vic_errors" + prepend_to_figname
     )
+
+# Show figure in GUI if is main() script
+if __name__ == '__main__':
+    try:
+        # Put matplotlib.pyplot in interactive mode so that the plots are shown in a background thread.
+        plt.ion()
+        while(True):
+            plt.show(block=True)
+
+    except KeyboardInterrupt:
+        print ("Caught KeyboardInterrupt, terminating workers")
+        sys.exit(0)

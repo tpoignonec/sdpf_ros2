@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from vic_controllers.plotting import multi_format_savefig, init_plt
 
-init_plt(full_screen = False, scale = 2, use_latex=True)
+init_plt(full_screen = False, scale = 1, use_latex=True)
 
 Ts = 0.001
 t = np.linspace(0, 10, int(10*1/Ts))
@@ -76,3 +76,15 @@ multi_format_savefig(
     dir_name = export_figs_dir,
     fig_name = "illustration_z_min_adaptative"
 )
+
+# Show figure in GUI if is main() script
+if __name__ == '__main__':
+    try:
+        # Put matplotlib.pyplot in interactive mode so that the plots are shown in a background thread.
+        plt.ion()
+        while(True):
+            plt.show(block=True)
+
+    except KeyboardInterrupt:
+        print ("Caught KeyboardInterrupt, terminating workers")
+        sys.exit(0)

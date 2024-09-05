@@ -18,7 +18,7 @@ export_figs_dir = "export_figures/effect_of_alpha_and_epsilon"
 import matplotlib
 import matplotlib.pyplot as plt
 from vic_controllers.plotting import multi_format_savefig, init_plt
-init_plt(full_screen = False, scale = 2, use_latex=True)
+init_plt(full_screen = False, scale = 1, use_latex=True)
 # plt.rcParams['text.usetex'] = True
 
 from tqdm import tqdm
@@ -30,7 +30,8 @@ from vic_controllers.commons import MeasurementData, CompliantFrameTrajectory
 
 import os
 import sys
-commons_module_path = os.path.abspath(os.path.join('../_commons/'))
+parent_folder = os.path.abspath(os.path.join(__file__, os.pardir))
+commons_module_path = os.path.abspath(os.path.join(parent_folder, os.pardir, '_commons/'))
 if commons_module_path not in sys.path:
     sys.path.append(commons_module_path)
 
@@ -250,3 +251,15 @@ plt.figure()
 plt.plot(err_values, beta_solutions, '.-')
 plt.xlabel(r'$e(t)$')
 plt.ylabel(r'$\beta$')
+
+# Show figure in GUI if is main() script
+if __name__ == '__main__':
+    try:
+        # Put matplotlib.pyplot in interactive mode so that the plots are shown in a background thread.
+        plt.ion()
+        while(True):
+            plt.show(block=True)
+
+    except KeyboardInterrupt:
+        print ("Caught KeyboardInterrupt, terminating workers")
+        sys.exit(0)

@@ -6,7 +6,7 @@
 import matplotlib
 import matplotlib.pyplot as plt
 from vic_controllers.plotting import multi_format_savefig, init_plt
-init_plt(full_screen = False, scale = 2, use_latex=True)
+init_plt(full_screen = False, scale = 1, use_latex=True)
 # plt.rcParams['text.usetex'] = True
 
 from tqdm import tqdm

@@ -126,6 +126,10 @@ def get_vanilla_VIC_controller_sim_data(simulation_data, alpha_est_z_dot):
         del temp_C_dot_value
     del temp_alpha
     vanilla_VIC_controller_sim_data['z_dot'] = z_dot_vanilla
+    # Compute z_integral
+    vanilla_VIC_controller_sim_data['z_dot_integral'] = np.cumsum(
+        vanilla_VIC_controller_sim_data['z_dot'].reshape((-1,))
+    ) * simulation_data['Ts']
 
     return vanilla_VIC_controller_sim_data
 

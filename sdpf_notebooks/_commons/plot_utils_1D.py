@@ -279,11 +279,14 @@ def plot_z_dot_z_and_beta(simulation_data, controller_sim_datasets, num_columns=
         if (controller_sim_data['is_vanilla'] == True):
             vanilla_VIC_controller_sim_data = controller_sim_data
             break
-    assert (vanilla_VIC_controller_sim_data is not None)
-    label_nominal = vanilla_VIC_controller_sim_data['label']
-    z_dot_vanilla = vanilla_VIC_controller_sim_data['z_dot']
-    vanilla_z_dot_integral = vanilla_VIC_controller_sim_data['z_dot_integral']
+    if(vanilla_VIC_controller_sim_data is None):
+        print("WARNING!!! No vanilla dataset provided!")
+    else:
+        label_nominal = vanilla_VIC_controller_sim_data['label']
+        z_dot_vanilla = vanilla_VIC_controller_sim_data['z_dot']
+        vanilla_z_dot_integral = vanilla_VIC_controller_sim_data['z_dot_integral']
 
+    # assert (vanilla_VIC_controller_sim_data is not None)
     # ----------------------------------
     gs_kw = dict(width_ratios=[1], height_ratios=[0.5, 5, 5, 5])
     fig_z_z_dot_beta, axd = plt.subplot_mosaic([
@@ -308,23 +311,24 @@ def plot_z_dot_z_and_beta(simulation_data, controller_sim_datasets, num_columns=
 
     # Nominal
     # -------------------------
-    # z_dot
-    ax1.plot(
-        simulation_data['time'],
-        z_dot_vanilla,
-        'k--',
-        label=label_nominal
-    )
-    # Integral of z_dot
-    ax2.plot(
-        simulation_data['time'],
-        vanilla_z_dot_integral,
-        'k--',
-        label=label_nominal
-    )
+    if(vanilla_VIC_controller_sim_data is not None):
+        # z_dot
+        ax1.plot(
+            simulation_data['time'],
+            z_dot_vanilla,
+            'k--',
+            label=label_nominal
+        )
+        # Integral of z_dot
+        ax2.plot(
+            simulation_data['time'],
+            vanilla_z_dot_integral,
+            'k--',
+            label=label_nominal
+        )
 
-    # Skip beta
-    # ax3.plot([], [], label = '_h')
+        # Skip beta
+        # ax3.plot([], [], label = '_h')
 
     # Controllers sim data
     for controller_sim_data in controller_sim_datasets:
