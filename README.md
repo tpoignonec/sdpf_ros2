@@ -90,7 +90,46 @@ ros2 launch sdpf_bringup run_exp.launch.py pf_method:=SIPF # SIPF / SIPF+ / SDPF
 cd ~/dev/ros2_workspaces/ws_sdpf_ros2
 source install/setup.bash
 
+export EXP_SERIES_NAME=<name_of_this_series_of_experiment>
+
 ros2 launch sdpf_bringup run_exp.launch.py \
     record_bags:=true \
-    pf_method:=SIPF # SIPF / SIPF+ / SDPF / etc.
+    bag_path:=rosbags/$EXP_SERIES_NAME/ \
+    pf_method:=SIPF
+
+# CTRL + C at the end of the simulation (+- 15 seconds)
+
+ros2 launch sdpf_bringup run_exp.launch.py \
+    record_bags:=true \
+    bag_path:=rosbags/$EXP_SERIES_NAME/ \
+    pf_method:=SIPF+
+
+# CTRL + C at the end of the simulation (+- 15 seconds)
+
+# 3 more times with the other controllers: "SDPF", "SDPF-integral", and "SDPF-adaptive"
+
+# You should have the following files:
+# ws_sdpf_ros2/rosbags/<name_of_this_series_of_experiment>/SIPF/***
+# ws_sdpf_ros2/rosbags/<name_of_this_series_of_experiment>/SIPF+/***
+# ws_sdpf_ros2/rosbags/<name_of_this_series_of_experiment>/SDPF/***
+# ws_sdpf_ros2/rosbags/<name_of_this_series_of_experiment>/SDPF-integral/***
+# ws_sdpf_ros2/rosbags/<name_of_this_series_of_experiment>/SDPF-adaptive/***
 ```
+
+## 4) Generate the figures
+
+```bash
+cd ~/dev/ros2_workspaces/ws_sdpf_ros2
+source install/setup.bash
+
+# Go to SDPF notebooks package
+cd src/sdpf_ros2/sdpf_notebooks
+
+# Export figures
+python3 plot_exp_data.py --display-figs true --dataset <name_of_this_series_of_experiment>
+
+# Wait a bit, might take a few minutes...
+# Then, you should have the figure files at
+#   ~/dev/ros2_workspaces/ws_sdpf_ros2/src/sdpf_ros2/sdpf_notebooks/export_figures/exp_results-<name_of_this_series_of_experiment>/***
+```
+ 

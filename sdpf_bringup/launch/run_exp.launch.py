@@ -29,13 +29,13 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             'bag_path',
-            default_value=['rosbags/new_recordings/', LaunchConfiguration('pf_method')],
+            default_value=['rosbags/new_recordings/'],
             description='Output path for the ros2bag record process.',
         )
     )
 
     record_bags = LaunchConfiguration('record_bags')
-    record_bag_path = LaunchConfiguration('bag_path')
+    record_bag_path = [LaunchConfiguration('bag_path'), LaunchConfiguration('pf_method')]
 
     # ========================================
     # Simulation global parameters
