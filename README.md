@@ -91,6 +91,7 @@ cd ~/dev/ros2_workspaces/ws_sdpf_ros2
 source install/setup.bash
 
 export EXP_SERIES_NAME=<name_of_this_series_of_experiment>
+# e.g., export EXP_SERIES_NAME=exp_october_12_2024
 
 ros2 launch sdpf_bringup run_exp.launch.py \
     record_bags:=true \
