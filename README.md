@@ -57,6 +57,32 @@ colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
 source install/setup.bash
 ```
 
+# How to run the simulations?
+
+```bash
+cd ~/dev/ros2_workspaces/ws_sdpf_ros2
+source install/setup.bash
+
+# Option 1: run one by one in interactive mode
+code .  # launch vs code here
+# - install Python3 and Jupyter extensions
+# - open the file in vs code (see src/sdpf_ros2/sdpf_notebooks/**)
+# - select Python env (ros2 python3 bin or local .venv if relevant)
+# - run cell-by-cell
+
+# Option 2: run all simulations + export figures
+
+cd src/sdpf_ros2/sdpf_notebooks
+
+python3 01-A_simulation_1D_SIPF_vs_SDPF.py
+python3 01-B_simulation_1D_variable_inertia.py
+python3 02_illustration_z_min_adaptative.py
+python3 03_simulation_1D_SIPF+_vs_SDPF_vs_SDPF-integrals.py
+python3 04_simulation_1D_passivity_tank.py
+python3 05_effect_of_z_max_and_tau_z_min.py
+python3 06_effect_of_alpha_and_epsilon.py
+```
+
 # How to launch the experiment?
 
 ## 1) Launch the VIC controller
