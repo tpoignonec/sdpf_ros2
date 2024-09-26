@@ -147,6 +147,111 @@ def plot_K_and_D(simulation_data, controller_sim_datasets, num_columns=3):
 
     return fig_profile, (ax1, ax2)
 
+def plot_M_and_D(simulation_data, controller_sim_datasets, num_columns=3):
+
+    vanilla_VIC_controller_sim_data = None
+    for controller_sim_data in controller_sim_datasets:
+        if (controller_sim_data['is_vanilla'] == True):
+            vanilla_VIC_controller_sim_data = controller_sim_data
+            break
+    assert (vanilla_VIC_controller_sim_data is not None)
+    label_nominal = vanilla_VIC_controller_sim_data['label']
+
+    # -------------------------
+    # Impedance profile
+    # -------------------------
+    gs_kw = dict(width_ratios=[1], height_ratios=[0.5, 5, 5])
+    fig_profile, axd = plt.subplot_mosaic([
+        ['legend'],
+        ['top'],
+        ['bottom']],
+        gridspec_kw=gs_kw,
+        sharex=True
+        # layout='constrained'
+    )
+    axd['legend'].axis('off')
+
+    ax1 = axd['top']
+    ax2 = axd['bottom']
+
+    highlight_regions(simulation_data, ax1)
+    highlight_regions(simulation_data, ax2)
+
+    # Stiffness nominal
+    ax1.plot(
+        simulation_data['time'],
+        simulation_data['M_d'],
+        'k--',
+        label = label_nominal
+    )
+    # Damping nominal
+    ax2.plot(
+        simulation_data['time'],
+        simulation_data['D_d'],
+        'k--',
+        label = label_nominal
+    )
+
+    # Controllers sim data
+    for controller_sim_data in controller_sim_datasets:
+        if (controller_sim_data['is_placeholder'] or
+        controller_sim_data['is_vanilla'] == True):
+            ax1.plot([], [], label = '_hh')
+            ax2.plot([], [], label = '_hh')
+            continue
+        key_K = 'K'
+        key_D = 'D'
+        key_M = 'M'
+        if controller_sim_data['controller'].controller_log.get('M', None) is None:
+            key_K = 'K_diag'
+            key_D = 'D_diag'
+            key_M = 'M_diag'
+        # Stiffness
+        ax1.plot(
+            simulation_data['time'],
+            controller_sim_data['controller'].controller_log[key_M].reshape((-1,)),
+            label = controller_sim_data['label']
+        )
+        ax2.plot(
+            simulation_data['time'],
+            controller_sim_data['controller'].controller_log[key_D].reshape((-1,)),
+            label = controller_sim_data['label']
+        )
+
+    # extra setup
+    # ------------
+    ax1.set_ylabel(r'$M$' + '\n' + r'\small{(Kg.m$^2$)}')
+    ax2.set_ylabel(r'$D$' + '\n' + r'\small{(N.m$^{-1}$.s)}')
+    ax2.set_xlabel(r'time (s)')
+    ax1.legend(
+        ncol=num_columns,
+        bbox_to_anchor=(0.5, 1.45),
+        loc='upper center'
+    )
+    '''
+    handles, labels = ax1.get_legend_handles_labels()
+    ax1.legend(
+        flip(handles, 2), flip(labels, 2),
+        ncol=num_columns,
+        bbox_to_anchor=(0.5, 1.45),
+        loc='upper center'
+    )
+    '''
+
+    for ax in [ax1, ax2]:
+        ax.grid(which='major')
+        ax.grid(which='minor', linewidth=0.1)
+
+    fig_profile.align_ylabels([ax1, ax2])
+    ax1.set_xlim((0., np.max(simulation_data['time'])))
+
+    # Annotation phases
+    annotation_rel_hight = 0.86
+    annotate_regions(simulation_data, ax1, annotation_rel_hight)
+
+    return fig_profile, (ax1, ax2)
+
+
 def plot_cartesian_state(simulation_data, controller_sim_datasets, num_columns=3):
 
     vanilla_VIC_controller_sim_data = None
