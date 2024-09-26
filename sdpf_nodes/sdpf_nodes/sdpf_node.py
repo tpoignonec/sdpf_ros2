@@ -41,6 +41,11 @@ class SdpfNode(PassivityFilterNodeBase):
         self.get_logger().info(f'beta_max : {beta_max}')
         self.undeclare_parameter('beta_max')
 
+        epsilon_stability = self.get_parameter('epsilon_stability').value
+        assert (epsilon_stability >= 0.0)
+        self.get_logger().info(f'epsilon_stability : {epsilon_stability}')
+        self.undeclare_parameter('epsilon_stability')
+
         solver_type = self.get_parameter('solver').get_parameter_value().string_value
         assert (solver_type in ['QP', 'LP'])
         self.get_logger().info(f'solver_type : {solver_type}')
@@ -60,6 +65,7 @@ class SdpfNode(PassivityFilterNodeBase):
         sdpf_args = {
             'dim': self._dim,
             'alpha': self._min_d/self._max_M,
+            'epsilon_stability' : epsilon_stability,
             'beta_max': beta_max,
             'independent_beta_values' : False,
             'passivation_method' : passivation_method,

@@ -43,6 +43,7 @@ def generate_launch_description():
     global_setting = {
         'verbose': False,
         'beta_max': 100.0,
+        'epsilon_stability': 1e-3,
     }
 
     # ========================================
