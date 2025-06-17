@@ -17,8 +17,9 @@ Ros2 nodes based on the [vic_controllers](https://github.com/tpoignonec/vic_pyth
 
 ```bash
 # Go to/create ros2 workspace dir <ws>
-mkdir -p ~/dev/ros2_workspaces/ws_sdpf_ros2/src
-cd ~/dev/ros2_workspaces/ws_sdpf_ros2/src
+export SDPF_WS=~/dev/ros2-jazzy/dev_sdpf_ros2
+mkdir -p $SDPF_WS/src
+cd $SDPF_WS/src
 
 # Clone this repos
 git clone https://github.com/tpoignonec/sdpf_ros2.git
@@ -33,17 +34,12 @@ cd ..
 # Source ros2 distro
 source /opt/ros/jazzy/setup.bash
 
-sudo apt install python3-pip -y
 # Install dependencies
-export PIP_BREAK_SYSTEM_PACKAGES=1  # for casadi pip install
-# !WARNING! Do not abuse PIP installs in this mode (unsafe...)!!!
+PIP_BREAK_SYSTEM_PACKAGES=1 rosdep install --ignore-src --from-paths . -y -r
 
-rosdep install --ignore-src --from-paths . -y -r
-
-pip install future-fstrings  # Python retro-compatibility for acados
-
-# revert to "safe" pip policy
-export PIP_BREAK_SYSTEM_PACKAGES=0
+# Python retro-compatibility for acados
+sudo apt install python3-pip -y
+PIP_BREAK_SYSTEM_PACKAGES=1 pip install future-fstrings
 
 # Manually install packages that don't have a rosdistro key
 sudo apt install python3-scienceplots -y
@@ -60,7 +56,7 @@ source install/setup.bash
 # How to run the simulations?
 
 ```bash
-cd ~/dev/ros2_workspaces/ws_sdpf_ros2
+cd $SDPF_WS
 source install/setup.bash
 
 # Option 1: run one by one in interactive mode
@@ -72,7 +68,7 @@ code .  # launch vs code here
 
 # Option 2: run all simulations + export figures
 
-cd src/sdpf_ros2/sdpf_notebooks
+cd src/sdpf_ros2/sdpf_notebooks/simulations_SDPF
 
 python3 01-A_simulation_1D_SIPF_vs_SDPF.py
 python3 01-B_simulation_1D_variable_inertia.py
