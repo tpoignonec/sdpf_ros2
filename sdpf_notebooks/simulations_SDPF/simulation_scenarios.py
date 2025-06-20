@@ -54,12 +54,31 @@ def make_simulation_data_scenario_1():
     D_w = K_w
     D_phi = K_phi
 
-    func_K_d = lambda time: K_min + (K_max-K_min)*(1 + np.sin(K_w*time + K_phi))/2  # noqa: E731
-    func_K_d_dot = lambda time: (K_max-K_min)*K_w*np.cos(K_w*time + K_phi)/2  # noqa: E731
+    def fct_sinus(time_point, period, derivative=0):
+        omega = 2*np.pi / period  # Convert to angular frequency
+        if derivative == 0:
+            return (1 + np.sin(omega*time_point + K_phi))/2
+        elif derivative == 1:
+            return omega*np.cos(omega*time_point + K_phi)/2
+        else:
+            raise ValueError("Invalid derivative order")
 
-    func_D_d = lambda time: D_min + (D_max-D_min)*(1 + np.sin(D_w*time + D_phi))/2  # noqa: E731
+    def fct_step(time_point, period, derivative=0):
+        if derivative == 0:
+            return np.where(np.mod(time_point, period) >= period / 2, 1.0, 0.0)
+        else:
+            return np.nan * np.zeros_like(time_point)
+
+    # WARNING!!! The step function is not differentiable and causes problem with some controllers.
+    # For testing purposes only :)
+    function_to_use = fct_sinus  # Choose between fct_sinus or fct_step
+
+    func_K_d = lambda time: K_min + (K_max-K_min)*function_to_use(time, period=(2 * np.pi) / K_w)  # noqa: E731
+    func_K_d_dot = lambda time: (K_max-K_min)*K_w*function_to_use(time, period=(2 * np.pi) / K_w, derivative=1)  # noqa: E731
+
+    func_D_d = lambda time: D_min + (D_max-D_min)*function_to_use(time, period=(2 * np.pi) / D_w)  # noqa: E731
     # 2*np.sqrt(D_damp_ratio*real_mass*func_K_d(time))
-    func_D_d_dot = lambda time: (D_max-D_min)*D_w*np.cos(D_w*time + D_phi)/2  # noqa: E731
+    func_D_d_dot = lambda time: (D_max-D_min)*D_w*function_to_use(time, period=(2 * np.pi) / D_w, derivative=1)  # noqa: E731
     # (D_damp_ratio*real_mass*func_K_d_dot(time))/np.sqrt(D_damp_ratio*real_mass*func_K_d(time))
 
     sim_data['K_d'] = func_K_d(sim_data['time'])
