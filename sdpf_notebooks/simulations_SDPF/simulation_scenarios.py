@@ -46,39 +46,45 @@ def make_simulation_data_scenario_1():
     K_min = 10
     K_max = 200
     K_w = (2 * np.pi) / (t_max / 6)  # 5*np.pi/10
-    K_phi = -np.pi/2
+    K_phi = 0.0
 
     D_damp_ratio = 0.2
     D_min = 2*D_damp_ratio*np.sqrt(real_mass*K_min)
     D_max = 2*D_damp_ratio*np.sqrt(real_mass*K_max)
     D_w = K_w
-    D_phi = K_phi
 
-    def fct_sinus(time_point, period, derivative=0):
-        omega = 2*np.pi / period  # Convert to angular frequency
-        if derivative == 0:
-            return (1 + np.sin(omega*time_point + K_phi))/2
-        elif derivative == 1:
-            return omega*np.cos(omega*time_point + K_phi)/2
-        else:
-            raise ValueError("Invalid derivative order")
+    from interpolation_functions import (  # noqa: F401
+        fct_sinus,
+        fct_tanh_alternating,
+        fct_step
+    )
 
-    def fct_step(time_point, period, derivative=0):
-        if derivative == 0:
-            return np.where(np.mod(time_point, period) >= period / 2, 1.0, 0.0)
-        else:
-            return np.nan * np.zeros_like(time_point)
+    function_to_use = fct_tanh_alternating
 
-    # WARNING!!! The step function is not differentiable and causes problem with some controllers.
-    # For testing purposes only :)
-    function_to_use = fct_sinus  # Choose between fct_sinus or fct_step
+    if (function_to_use == fct_sinus):
+        K_phi = 0.0 - np.pi/2
 
-    func_K_d = lambda time: K_min + (K_max-K_min)*function_to_use(time, period=(2 * np.pi) / K_w)  # noqa: E731
-    func_K_d_dot = lambda time: (K_max-K_min)*K_w*function_to_use(time, period=(2 * np.pi) / K_w, derivative=1)  # noqa: E731
+    # WARNING!!! The step function is not differentiable and causes problem
+    # with some controllers. For testing purposes only :)
 
-    func_D_d = lambda time: D_min + (D_max-D_min)*function_to_use(time, period=(2 * np.pi) / D_w)  # noqa: E731
+    def interpolation_fct(time, period, derivative=0):
+        return function_to_use(time, period, delay=K_phi, derivative=derivative)
+
+    func_K_d = \
+        lambda time: K_min + (K_max-K_min)*interpolation_fct(  # noqa: E731
+            time, period=(2 * np.pi) / K_w)
+    func_K_d_dot = \
+        lambda time: (K_max-K_min)*K_w*interpolation_fct(  # noqa: E731
+            time, period=(2 * np.pi) / K_w, derivative=1)
+
+    func_D_d = \
+        lambda time: D_min + (D_max-D_min)*interpolation_fct(  # noqa: E731
+            time, period=(2 * np.pi) / D_w)
     # 2*np.sqrt(D_damp_ratio*real_mass*func_K_d(time))
-    func_D_d_dot = lambda time: (D_max-D_min)*D_w*function_to_use(time, period=(2 * np.pi) / D_w, derivative=1)  # noqa: E731
+
+    func_D_d_dot = \
+        lambda time: (D_max-D_min)*D_w*interpolation_fct(  # noqa: E731
+            time, period=(2 * np.pi) / D_w, derivative=1)
     # (D_damp_ratio*real_mass*func_K_d_dot(time))/np.sqrt(D_damp_ratio*real_mass*func_K_d(time))
 
     sim_data['K_d'] = func_K_d(sim_data['time'])
@@ -140,7 +146,7 @@ def make_scenario_variable_inertia():
     M_phi = -np.pi/2
 
     D_damp_ratio = 0.2
-    
+
     func_K_d = lambda time: K_d * np.ones(time.shape)  # noqa: E731
     func_K_d_dot = lambda time: K_d * np.ones(time.shape)  # noqa: E731
 
