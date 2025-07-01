@@ -56,26 +56,30 @@ def fct_tanh_alternating(
         Function value or its derivative at the given time point
     """
     # Steepness controls how sharp the transition is (higher = closer to a step function)
-    steepness = 200.0
+    steepness = 100.0
 
     # Calculate normalized position within period (0 to 1)
     normalized_time = ((time_point + delay) % period) / period
 
     # Create a square wave with smooth transitions
-    # Use tanh centered at 0.25 and 0.75 of the period
+    # Use tanh centered at 0.1 and 0.6 of the period
     if derivative == 0:
-        # Transition from 0→1 at 0.25 of period, and from 1→0 at 0.75
-        up_transition = 0.5 * (1 + np.tanh(steepness * (normalized_time - 0.25)))
-        down_transition = 0.5 * (1 - np.tanh(steepness * (normalized_time - 0.75)))
+        # Transition from 0→1 at 0.1 of period, and from 1→0 at 0.6
+        up_transition = \
+            0.5 * (1 + np.tanh(steepness * (normalized_time - 0.1)))
+        down_transition = \
+            0.5 * (1 - np.tanh(steepness * (normalized_time - 0.6)))
 
         # Combine the transitions to get the alternating step pattern
         return np.minimum(up_transition, down_transition)
     elif derivative == 1:
         # Derivative of up transition (0→1)
-        dup_dt = 0.5 * steepness * (1 / period) * (1 / np.cosh(steepness * (normalized_time - 0.25))**2)
+        dup_dt = 0.5 * steepness * (1 / period) \
+            * (1 / np.cosh(steepness * (normalized_time - 0.1))**2)
 
         # Derivative of down transition (1→0)
-        ddown_dt = -0.5 * steepness * (1 / period) * (1 / np.cosh(steepness * (normalized_time - 0.75))**2)
+        ddown_dt = -0.5 * steepness * (1 / period) \
+            * (1 / np.cosh(steepness * (normalized_time - 0.6))**2)
 
         # Only one transition is active at any time
         return np.where(normalized_time < 0.5, dup_dt, ddown_dt)
