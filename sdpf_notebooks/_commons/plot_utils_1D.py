@@ -4,27 +4,32 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-def ensure_dir_exists(dir_name):
+from scipy.signal import find_peaks
+
+
+def ensure_dir_exists(dir_name):  # noqa:D103
     if not os.path.exists(dir_name):
         # Create a new directory because it does not exist
         os.makedirs(dir_name)
         print(f"The directory {dir_name} was created!")
 
-def get_color_list():
+
+def get_color_list():  # noqa:D103
     return plt.rcParams['axes.prop_cycle'].by_key()['color']
 
-def flip(items, ncol):
+
+def flip(items, ncol):  # noqa:D103
     # https://stackoverflow.com/questions/10101141/matplotlib-legend-add-items-across-columns-instead-of-down
     return itertools.chain(*[items[i::ncol] for i in range(ncol)])
 
 
-def highlight_regions(simulation_data, ax):
+def highlight_regions(simulation_data, ax):  # noqa:D103
     alpha = 0.1
     # ax.axvspan(0.0, simulation_data['t2'], color='red', alpha=alpha, lw=0)
     ax.axvspan(simulation_data['t1'], simulation_data['t2'], color='green', alpha=alpha, lw=0)
     # ax.axvspan(simulation_data['t2'], np.max(simulation_data['time']), color='red', alpha=alpha, lw=0)
 
-def annotate(ax, text, coord, bgc='white', extra_text_kwargs={}):
+def annotate(ax, text, coord, bgc='white', extra_text_kwargs={}):  # noqa:D103
     t = ax.text(
         *coord,
         text,
@@ -34,13 +39,108 @@ def annotate(ax, text, coord, bgc='white', extra_text_kwargs={}):
     t.set_bbox(dict(facecolor=bgc, alpha=0.5, edgecolor='none'))
     return t
 
-def annotate_regions(simulation_data, ax, relative_height):
-    """
-    Annotate a plot with (a), (b), (c) at relative_height in ax's axes fraction coordinates.
+
+def annotate_regions(simulation_data, ax, relative_height):  # noqa:D103
+    """Annotate a plot with (a), (b), (c) at relative_height.
+
+    Note: relative_heights in ax's axes fraction coordinates.
     """
     annotate(ax, r'(a)', (1/3/2.25, relative_height))
     annotate(ax, r'(b)', (1/3 + 1/3/2.25, relative_height), bgc='none')
     annotate(ax, r'(c)', (2/3 + 1/3/2.25, relative_height))
+
+
+def annotate_single_peak(
+        ax, x, y, y_limit,
+        offset_text, alignment, is_min, color
+):
+    """
+    Annotate a single peak or valley on the plot.
+
+    Parameters:
+    - ax: The axis to annotate.
+    - x: The x-coordinate of the peak/valley.
+    - y: The y-coordinate of the peak/valley.
+    - y_limit: The limit for annotation placement (e.g., y_min or y_max).
+    - offset_text: Offset for text annotation.
+    - alignment: Text alignment ('left' or 'right').
+    - is_min: Whether the annotation is for a minimum ('Min') or maximum ('Max').
+    - color: Color of the annotation text.
+    """
+    args_font = {
+        'fontsize': 3,
+        'color': color,
+        'ha': alignment,
+        'textcoords': "offset points",
+        # 'bbox': dict(boxstyle="round,pad=0.3", edgecolor="none", facecolor="white")
+    }
+    is_left = (alignment == 'left')
+    format_text = \
+        f"{'*' if is_left else ''}{y:.2f}{'*' if not is_left else ''}"
+    ax.annotate(
+        format_text,
+        (x, y_limit),
+        xytext=(-0.1 if is_left else -0.2, -offset_text if is_min else offset_text - 2),
+        **args_font
+    )
+
+
+def annotate_peaks(
+        ax, x_data, y_data,
+        color='black',
+        annotate_min=True,
+        annotate_max=True,
+        proximity_threshold=1.):
+    """
+    Annotate peaks (min/max values) on a plot, dynamically adjusting alignment
+    to avoid overlap if peaks are close.
+
+    Parameters:
+    - ax: The axis to annotate.
+    - x_data: The x-axis data.
+    - y_data: The y-axis data.
+    - annotate_min: Whether to annotate minimum values.
+    - annotate_max: Whether to annotate maximum values.
+    - proximity_threshold: Minimum distance between peaks to avoid overlap.
+    """
+    y_min, y_max = ax.get_ylim()  # Get current axis limits
+    offset_text = 3.0  # Offset for text annotation
+
+    def find_peaks_in_range(data, threshold):
+        """Find peaks in data that are above a certain threshold."""
+        peaks, _ = find_peaks(data)
+        return [peak for peak in peaks if data[peak] > threshold]
+
+    if annotate_max:
+        # Detect peaks (local maxima)
+        peaks = find_peaks_in_range(y_data, y_max)
+        for i, peak in enumerate(peaks):
+            y_peak = y_data[peak]
+            alignment = 'left'  # Default alignment
+            if i < len(peaks) - 1 and abs(x_data[peak] - x_data[peaks[i + 1]]) < proximity_threshold:  # noqa:E501
+                print("Proximity alert for max peack annotation!")
+                alignment = 'right' if alignment == 'left' else 'left'
+            if i == len(peaks):
+                alignment = 'left'
+            annotate_single_peak(
+                ax, x_data[peak], y_peak,
+                y_max, offset_text, alignment, False, color)
+
+    if annotate_min:
+        # Detect valleys (local minima)
+        valleys = find_peaks_in_range(-y_data, -y_min)
+        for i, valley in enumerate(valleys):
+            y_valley = y_data[valley]
+            alignment = 'left'  # Default alignment
+            if i < len(valleys) - 1 and abs(x_data[valley] - x_data[valleys[i + 1]]) < proximity_threshold:  # noqa:E501
+                print("Proximity alert for min valley annotation!")
+                alignment = 'right' if alignment == 'left' else 'left'
+            if i == len(valleys):
+                alignment = 'left'
+            annotate_single_peak(
+                ax, x_data[valley], y_valley,
+                y_min, offset_text, alignment, True, color)
+
 
 # plot state and impedance profiles
 def plot_K_and_D(simulation_data, controller_sim_datasets, num_columns=3):
@@ -378,7 +478,11 @@ def plot_cartesian_state(simulation_data, controller_sim_datasets, num_columns=3
 
 
 # plot passivity related data
-def plot_z_dot_z_and_beta(simulation_data, controller_sim_datasets, num_columns=3):
+def plot_z_dot_z_and_beta(
+        simulation_data,
+        controller_sim_datasets,
+        num_columns=3,
+        restrict_z_dot_y_range=False):
     vanilla_VIC_controller_sim_data = None
     for controller_sim_data in controller_sim_datasets:
         if (controller_sim_data['is_vanilla'] == True):
@@ -435,27 +539,33 @@ def plot_z_dot_z_and_beta(simulation_data, controller_sim_datasets, num_columns=
         # Skip beta
         # ax3.plot([], [], label = '_h')
 
-    # Controllers sim data
-    for controller_sim_data in controller_sim_datasets:
+    def should_skip(controller_data):
         skip_this = (
-            controller_sim_data['is_placeholder'] or
-            (controller_sim_data['is_vanilla'] == True)
+            controller_data['is_placeholder'] or
+            (controller_data['is_vanilla'] == True)
         )
         if (not skip_this):
             available_keys = \
-                controller_sim_data['controller'].controller_log.keys()
+                controller_data['controller'].controller_log.keys()
             skip_this = skip_this or ('beta' not in available_keys)
             skip_this = skip_this or ('z_dot' not in available_keys)
             print(
                 'Controller "'
-                + controller_sim_data['label']
+                + controller_data['label']
                 + '" does not have the beta and/or z_dot field! Skipping'
             )
-        if (skip_this):
+        return skip_this
+
+    # Controllers sim data
+    for controller_sim_data in controller_sim_datasets:
+        if (should_skip(controller_sim_data)):
             ax1.plot([], [], label = '_hh')
             ax2.plot([], [], label = '_hh')
             ax3.plot([], [], label = '_hh')
             continue
+
+        available_keys = \
+            controller_sim_data['controller'].controller_log.keys()
 
         # z_dot
         ax1.plot(
@@ -485,7 +595,7 @@ def plot_z_dot_z_and_beta(simulation_data, controller_sim_datasets, num_columns=
     ax1.set_ylabel(r'$w(\beta, t)$' + '\n' + r'\small{(J.s${}^{-1}$)}')
 
     ax2.set_ylabel(
-        r'{\setlength{\fboxrule}{0pt} \fbox{ \phantom{${\displaystyle \int_0^t}$} ${\int_0^t w\left(\beta(\tau), \tau\right) d\tau}$}}'
+        r'{\setlength{\fboxrule}{0pt} \fbox{ \phantom{${\displaystyle \int_0^t}$} ${\int_0^t w\left(.\right) d\tau}$}}'
         + '\n'
         + r'\small{(J)}'
     )
@@ -509,6 +619,35 @@ def plot_z_dot_z_and_beta(simulation_data, controller_sim_datasets, num_columns=
 
     fig_z_z_dot_beta.align_ylabels([ax1, ax2, ax3])
     ax1.set_xlim((0., np.max(simulation_data['time'])))
+
+    if restrict_z_dot_y_range:
+        # restrict y range of z_dot
+        max_z_dot = np.nan
+        min_z_dot = np.nan
+        for controller_sim_data in controller_sim_datasets:
+            if (should_skip(controller_sim_data)):
+                continue
+            if 'z_dot' in controller_sim_data['controller'].controller_log.keys():
+                max_z_dot = np.nanmax([
+                    max_z_dot, np.max(controller_sim_data['controller'].controller_log['z_dot'])])
+                min_z_dot = np.nanmin([
+                    min_z_dot, np.min(controller_sim_data['controller'].controller_log['z_dot'])])
+        # apply 10% margin
+        print("z_dot range: ", min_z_dot, max_z_dot)
+        min_z_dot = min_z_dot - 0.1 * np.abs(min_z_dot)
+        if (np.abs(min_z_dot) < 1e-2):
+            min_z_dot = - 0.5
+        max_z_dot = max_z_dot + 0.4 * np.abs(max_z_dot)
+        ax1.set_ylim((min_z_dot, max_z_dot))
+
+        annotate_peaks(
+            ax1,
+            simulation_data['time'],
+            z_dot_vanilla,
+            color='black',
+            annotate_min=True,
+            annotate_max=True
+        )
 
     return fig_z_z_dot_beta, (ax1, ax2, ax3)
 
@@ -690,7 +829,6 @@ def plot_K_z_dot_z_and_beta(
     for ax in [ax0, ax1, ax2, ax3]:
         ax.grid(which='major')
         ax.grid(which='minor', linewidth=0.1)
-
 
     fig_z_z_dot_beta.align_ylabels([ax0, ax1, ax2, ax3])
     ax1.set_xlim((0., np.max(simulation_data['time'])))
