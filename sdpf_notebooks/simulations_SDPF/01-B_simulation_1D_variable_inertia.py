@@ -7,7 +7,7 @@
 # Simulation settings
 # ##################################
 
-epsilon_stability = 1e-3
+epsilon_stability = 0.0
 
 SAVE_FIGS = True
 export_figs_dir = "export_figures/simulations_variable_inertia"

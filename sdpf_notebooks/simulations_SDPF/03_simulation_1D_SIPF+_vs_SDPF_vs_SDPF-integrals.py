@@ -7,7 +7,7 @@
 # Simulation settings
 # ##################################
 
-epsilon_stability = 1e-3
+epsilon_stability = 0.0
 
 tau_delay_adaptive_z_min = 3.0
 z_max = 1.0

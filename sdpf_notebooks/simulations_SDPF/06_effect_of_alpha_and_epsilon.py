@@ -6,7 +6,7 @@
 # Simulation settings
 # ##################################
 
-epsilon_stability = 1e-3
+epsilon_stability = 0.0
 
 # list of parameter values to test
 epsilon_value_list = [0.0, 0.2, 0.5, 1]

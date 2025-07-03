@@ -6,7 +6,7 @@
 # Simulation settings
 # ##################################
 
-epsilon_stability = 1e-3
+epsilon_stability = 0.0
 
 # list of parameter values to test
 tau_delay_adaptive_z_min_list = [1., 5., 10.]
