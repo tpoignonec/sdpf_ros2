@@ -139,6 +139,7 @@ def get_vanilla_VIC_controller_sim_data(  # noqa: D103
     z_dot_vanilla = np.zeros((simulation_data['N'],))
 
     temp_alpha = alpha_est_z_dot
+    matrix_dim = 1  # 1D case
     for idx in range(simulation_data['N']):
         temp_err_pos = simulation_data['X_d'][idx, 0] \
             - vanilla_VIC_controller_sim_data['X'][idx, 0]
@@ -150,14 +151,17 @@ def get_vanilla_VIC_controller_sim_data(  # noqa: D103
                 simulation_data['D_d'][idx] \
                 - temp_alpha * simulation_data['M_d'][idx]
                 - 0.5 * simulation_data['M_d_dot'][idx]
+                - epsilon_stability * np.eye(matrix_dim)
             ) * temp_err_vel \
             + temp_err_pos.T * (
                 - temp_alpha * simulation_data['M_d_dot'][idx]
+                - temp_alpha * epsilon_stability * np.eye(matrix_dim)
             ) * temp_err_vel \
             + temp_err_pos.T * (
                 temp_alpha * simulation_data['K_d'][idx]
                 - 0.5 * simulation_data['K_d_dot'][idx]
                 - 0.5 * temp_alpha * simulation_data['D_d_dot'][idx]
+                - temp_alpha * (epsilon_stability**2) * np.eye(matrix_dim)
             ) * temp_err_pos
     del temp_alpha
     vanilla_VIC_controller_sim_data['z_dot'] = z_dot_vanilla
