@@ -48,7 +48,7 @@ simulation_data = simulation_scenarios.make_simulation_data('scenario_1')  # 'sc
 
 simulate_controller_and_package_data = nb_commons_1D.simulate_controller_and_package_data
 
-alpha_value = (np.min(simulation_data['D_d']) - epsilon_stability) / np.min(simulation_data['M_d'])
+alpha_value = (np.min(simulation_data['D_d']) - epsilon_stability) / np.max(simulation_data['M_d'])
 print(f"alpha = {alpha_value}")
 #%%
 # ---------------------

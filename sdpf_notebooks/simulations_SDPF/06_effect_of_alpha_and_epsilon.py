@@ -48,7 +48,7 @@ simulate_controller_and_package_data = nb_commons_1D.simulate_controller_and_pac
 plot_utils_1D.ensure_dir_exists(export_figs_dir)
 simulation_data = simulation_scenarios.make_simulation_data('scenario_1')  # 'scenario_1_K_only')
 
-ideal_alpha_value = (np.min(simulation_data['D_d']) - epsilon_stability) / np.min(simulation_data['M_d'])
+alpha_value = (np.min(simulation_data['D_d']) - epsilon_stability) / np.max(simulation_data['M_d'])
 print(f"ideal_alpha_value = {ideal_alpha_value}")
 
 alpha_value_list = [0.0, ideal_alpha_value/2.0, ideal_alpha_value]
