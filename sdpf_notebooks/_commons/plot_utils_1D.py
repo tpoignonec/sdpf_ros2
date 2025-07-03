@@ -90,7 +90,7 @@ def annotate_peaks(
         color='black',
         annotate_min=True,
         annotate_max=True,
-        proximity_threshold=1.):
+        proximity_threshold=1.2):
     """
     Annotate peaks (min/max values) on a plot, dynamically adjusting alignment
     to avoid overlap if peaks are close.
