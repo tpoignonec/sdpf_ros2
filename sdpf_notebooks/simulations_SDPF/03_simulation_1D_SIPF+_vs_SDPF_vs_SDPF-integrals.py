@@ -209,6 +209,14 @@ fig_state_meas, axs_state_meas = plot_utils_1D.plot_cartesian_state(
 fig_z_z_dot_beta, axs_z_z_dot_beta = plot_utils_1D.plot_z_dot_z_and_beta(
     simulation_data, controller_sim_datasets, num_columns=4)
 
+fig_z_z_dot_beta_annotated, axs_z_z_dot_beta_annotated = \
+    plot_utils_1D.plot_z_dot_z_and_beta(
+        simulation_data,
+        controller_sim_datasets,
+        num_columns=3,
+        restrict_z_dot_y_range=True
+    )
+
 fig_vic_errors, axs_vic_errors = plot_utils_1D.plot_vic_tracking_errors(
     simulation_data, controller_sim_datasets, num_columns=4)
 
@@ -234,6 +242,11 @@ if SAVE_FIGS :
         figure = fig_z_z_dot_beta,
         dir_name = export_figs_dir,
         fig_name = "z_dot_z_and_beta"
+    )
+    multi_format_savefig(
+        figure = fig_z_z_dot_beta_annotated,
+        dir_name = export_figs_dir,
+        fig_name = "z_dot_z_and_beta(annotated)"
     )
     multi_format_savefig(
         figure = fig_vic_errors,
