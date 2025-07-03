@@ -206,11 +206,12 @@ if SAVE_FIGS :
 if __name__ == '__main__':
     import sys
     try:
-        # Put matplotlib.pyplot in interactive mode so that the plots are shown in a background thread.
+        # Put matplotlib.pyplot in interactive mode so that the plots
+        # are shown in a background thread.
         plt.ion()
-        while(True):
+        while (True):
             plt.show(block=True)
 
     except KeyboardInterrupt:
-        print ("Caught KeyboardInterrupt, terminating workers")
+        print("Caught KeyboardInterrupt, terminating workers")
         sys.exit(0)

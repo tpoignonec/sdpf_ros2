@@ -155,4 +155,3 @@ python3 plot_exp_data.py --display-figs true --dataset <name_of_this_series_of_e
 # Then, you should have the figure files at
 #   ~/dev/ros2_workspaces/ws_sdpf_ros2/src/sdpf_ros2/sdpf_notebooks/export_figures/exp_results-<name_of_this_series_of_experiment>/***
 ```
- 
