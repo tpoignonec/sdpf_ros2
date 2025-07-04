@@ -115,6 +115,9 @@ for controller_sim_data in SDPF_controllers_sim_datasets:
 fig_profile, axs_profile = plot_utils_1D.plot_M_and_D(
     simulation_data, controller_sim_datasets, num_columns=2)
 
+fig_M_only, axs_M_only = plot_utils_1D.plot_M(
+    simulation_data, controller_sim_datasets, num_columns=2)
+
 fig_state_meas, axs_state_meas = plot_utils_1D.plot_cartesian_state(
     simulation_data, controller_sim_datasets, num_columns=2)
 
@@ -140,9 +143,9 @@ fig_vic_errors, axs_vic_errors = plot_utils_1D.plot_vic_tracking_errors(
 if SAVE_FIGS :
     prepend_to_figname = ""
     multi_format_savefig(
-        figure = fig_profile,
-        dir_name = export_figs_dir,
-        fig_name = "impedance_profiles" + prepend_to_figname
+        figure=fig_M_only,
+        dir_name=export_figs_dir,
+        fig_name='impedance_profiles_M_only' + prepend_to_figname
     )
     multi_format_savefig(
         figure = fig_state_meas,
