@@ -140,33 +140,38 @@ fig_vic_errors, axs_vic_errors = plot_utils_1D.plot_vic_tracking_errors(
 # -------------------------------
 # EXPORT TO FILES
 # -------------------------------
-if SAVE_FIGS :
-    prepend_to_figname = ""
+if SAVE_FIGS:
+    prepend_to_figname = ''
+    multi_format_savefig(
+        figure=fig_profile,
+        dir_name=export_figs_dir,
+        fig_name='impedance_profiles' + prepend_to_figname
+    )
     multi_format_savefig(
         figure=fig_M_only,
         dir_name=export_figs_dir,
         fig_name='impedance_profiles_M_only' + prepend_to_figname
     )
     multi_format_savefig(
-        figure = fig_state_meas,
-        dir_name = export_figs_dir,
-        fig_name = "pos_vel_and_force" + prepend_to_figname
+        figure=fig_state_meas,
+        dir_name=export_figs_dir,
+        fig_name='pos_vel_and_force' + prepend_to_figname
     )
     # No need for prepend, SIPF_W4 is already ignored by default
     multi_format_savefig(
-        figure = fig_z_z_dot_beta,
-        dir_name = export_figs_dir,
-        fig_name = "z_dot_z_and_beta"
+        figure=fig_z_z_dot_beta,
+        dir_name=export_figs_dir,
+        fig_name='z_dot_z_and_beta'
     )
     multi_format_savefig(
-        figure = fig_z_z_dot_beta_annotated,
-        dir_name = export_figs_dir,
-        fig_name = "z_dot_z_and_beta(annotated)"
+        figure=fig_z_z_dot_beta_annotated,
+        dir_name=export_figs_dir,
+        fig_name='z_dot_z_and_beta(annotated)'
     )
     multi_format_savefig(
-        figure = fig_vic_errors,
-        dir_name = export_figs_dir,
-        fig_name = "vic_errors" + prepend_to_figname
+        figure=fig_vic_errors,
+        dir_name=export_figs_dir,
+        fig_name='vic_errors' + prepend_to_figname
     )
 
 # Show figure in GUI if is main() script
