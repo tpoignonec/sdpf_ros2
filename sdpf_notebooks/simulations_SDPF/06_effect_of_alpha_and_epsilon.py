@@ -6,10 +6,10 @@
 # Simulation settings
 # ##################################
 
-epsilon_stability = 0.0
+epsilon_stability = 0.0  # for variable alpha
 
 # list of parameter values to test
-epsilon_value_list = [0.0, 0.2, 0.5, 1]
+epsilon_value_list = [0.0, 0.1, 0.2, 0.5, 1]
 
 SAVE_FIGS = True
 export_figs_dir = "export_figures/effect_of_alpha_and_epsilon"
@@ -48,7 +48,7 @@ simulate_controller_and_package_data = nb_commons_1D.simulate_controller_and_pac
 plot_utils_1D.ensure_dir_exists(export_figs_dir)
 simulation_data = simulation_scenarios.make_simulation_data('scenario_1')  # 'scenario_1_K_only')
 
-alpha_value = (np.min(simulation_data['D_d']) - epsilon_stability) / np.max(simulation_data['M_d'])
+ideal_alpha_value = (np.min(simulation_data['D_d']) - epsilon_stability) / np.max(simulation_data['M_d'])
 print(f"ideal_alpha_value = {ideal_alpha_value}")
 
 alpha_value_list = [0.0, ideal_alpha_value/2.0, ideal_alpha_value]
@@ -70,7 +70,7 @@ for alpha_value in alpha_value_list:
     _controller_SDPF = SdpfController({
         'dim' : 1,
         'alpha' : alpha_value,
-        'epsilon_stability' : 0.0,
+        'epsilon_stability' : epsilon_stability,
         'independent_beta_values' : False,
         'passivation_method' : 'w_lower_bound',
         'beta_max' : 100.0,
@@ -118,7 +118,7 @@ if SAVE_FIGS :
 # Effect of epsilon on SDPF "classic"
 controller_sim_datasets = []
 i = 0
-for epsilon_value in epsilon_value_list:
+for new_epsilon_value in epsilon_value_list:
     i += 1
     # --------------------------------
     # SDPF with ADAPTIVE z constraint
@@ -126,12 +126,12 @@ for epsilon_value in epsilon_value_list:
     from vic_controllers.controllers import SdpfController
 
     alpha_value = \
-        np.min(simulation_data['D_d'] - epsilon_value)/np.max(simulation_data['M_d'])
+        np.min(simulation_data['D_d'] - new_epsilon_value)/np.max(simulation_data['M_d'])
 
     _controller_SDPF = SdpfController({
         'dim' : 1,
         'alpha' : alpha_value,
-        'epsilon_stability' : epsilon_value,
+        'epsilon_stability' : new_epsilon_value,
         'independent_beta_values' : False,
         'passivation_method' : 'w_lower_bound',
         'beta_max' : 100.0,
@@ -140,9 +140,9 @@ for epsilon_value in epsilon_value_list:
         'N_logging' : simulation_data['N'],
     })
     _controller_SDPF_sim_data = simulate_controller_and_package_data(
-        _controller_SDPF, simulation_data, str(epsilon_value))
+        _controller_SDPF, simulation_data, str(new_epsilon_value))
 
-    _controller_SDPF_sim_data['epsilon_stability'] = epsilon_value
+    _controller_SDPF_sim_data['epsilon_stability'] = new_epsilon_value
 
     controller_sim_datasets += [_controller_SDPF_sim_data]
 
