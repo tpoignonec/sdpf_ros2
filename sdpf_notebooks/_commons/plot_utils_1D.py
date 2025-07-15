@@ -320,7 +320,7 @@ def plot_M_and_D(simulation_data, controller_sim_datasets, num_columns=3):
 
     # extra setup
     # ------------
-    ax1.set_ylabel(r'$M$' + '\n' + r'\small{(Kg.m$^2$)}')
+    ax1.set_ylabel(r'$M$' + '\n' + r'\small{(Kg)}')
     ax2.set_ylabel(r'$D$' + '\n' + r'\small{(N.m$^{-1}$.s)}')
     ax2.set_xlabel(r'time (s)')
     ax1.legend(
@@ -406,7 +406,7 @@ def plot_M(simulation_data, controller_sim_datasets, num_columns=3):
 
     # extra setup
     # ------------
-    ax1.set_ylabel(r'$M$' + '\n' + r'\small{(Kg.m$^2$)}')
+    ax1.set_ylabel(r'$M$' + '\n' + r'\small{(Kg)}')
     ax1.set_xlabel(r'time (s)')
     ax1.legend(
         ncol=num_columns,
@@ -542,12 +542,157 @@ def plot_cartesian_state(simulation_data, controller_sim_datasets, num_columns=3
     )
     '''
 
+    # Annotation phases
+    annotation_rel_height = 0.8
+    annotate_regions(simulation_data, ax1, annotation_rel_height)
+
     fig_state_meas.align_ylabels([ax1, ax2, ax3])
     ax1.set_xlim((0., np.max(simulation_data['time'])))
 
     return fig_state_meas, (ax1, ax2, ax3)
 
 
+# plot passivity related data
+def plot_z_dot_and_beta(
+        simulation_data,
+        controller_sim_datasets,
+        num_columns=3,
+        restrict_z_dot_y_range=False):
+    vanilla_VIC_controller_sim_data = None
+    for controller_sim_data in controller_sim_datasets:
+        if (controller_sim_data['is_vanilla'] == True):
+            vanilla_VIC_controller_sim_data = controller_sim_data
+            break
+    if(vanilla_VIC_controller_sim_data is None):
+        print("WARNING!!! No vanilla dataset provided!")
+    else:
+        label_nominal = vanilla_VIC_controller_sim_data['label']
+        z_dot_vanilla = vanilla_VIC_controller_sim_data['z_dot']
+
+    # assert (vanilla_VIC_controller_sim_data is not None)
+    # ----------------------------------
+    gs_kw = dict(width_ratios=[1], height_ratios=[0.0, 5, 5])
+    fig_z_dot_beta, axd = plt.subplot_mosaic([
+        ['legend'],
+        ['top'],
+        ['bottom']],
+        gridspec_kw=gs_kw,
+        sharex=True,
+        figsize=(plt.rcParams["figure.figsize"][0], plt.rcParams["figure.figsize"][1]*0.7)
+        # layout='constrained'
+    )
+    axd['legend'].axis('off')
+    ax1 = axd['top']
+    ax2 = axd['bottom']
+    highlight_regions(simulation_data, ax1)
+    highlight_regions(simulation_data, ax2)
+
+    annotation_rel_hight = 0.82
+    annotate_regions(simulation_data, ax1, annotation_rel_hight)
+
+    # Nominal
+    # -------------------------
+    if(vanilla_VIC_controller_sim_data is not None):
+        # z_dot
+        ax1.plot(
+            simulation_data['time'],
+            z_dot_vanilla,
+            'k--',
+            label=label_nominal
+        )
+        # Skip beta
+        # ax3.plot([], [], label = '_h')
+
+    def should_skip(controller_data):
+        skip_this = (
+            controller_data['is_placeholder'] or
+            (controller_data['is_vanilla'] == True)
+        )
+        if (not skip_this):
+            available_keys = \
+                controller_data['controller'].controller_log.keys()
+            skip_this = skip_this or ('beta' not in available_keys)
+            skip_this = skip_this or ('z_dot' not in available_keys)
+            print(
+                'Controller "'
+                + controller_data['label']
+                + '" does not have the beta and/or z_dot field! Skipping'
+            )
+        return skip_this
+
+    # Controllers sim data
+    for controller_sim_data in controller_sim_datasets:
+        if (should_skip(controller_sim_data)):
+            ax1.plot([], [], label = '_hh')
+            ax2.plot([], [], label = '_hh')
+            continue
+
+        available_keys = \
+            controller_sim_data['controller'].controller_log.keys()
+
+        # z_dot
+        ax1.plot(
+            simulation_data['time'],
+            controller_sim_data['controller'].controller_log['z_dot'],
+            label = controller_sim_data['label']
+        )
+        ax2.plot(
+            simulation_data['time'],
+            controller_sim_data['controller'].controller_log['beta'].reshape((-1,)),
+            label = controller_sim_data['label']
+        )
+    ax1.set_ylabel(r'$w(\beta, t)$' + '\n' + r'\small{(J.s${}^{-1}$)}')
+
+    ax2.set_ylabel(r'$\beta$' + '\n' + r'\small{(unitless)}')
+
+    # ax2.set_ylabel(r'${\displaystyle \int_0^t w\left(\beta(\tau), \tau\right) d\tau}$')  # r'\small{(J)}')
+    # ax2.set_ylabel(r'$\int_0^t w$' + '\n' + r'\small{(J)}')
+    ax2.set_xlabel(r'Time(s)')
+
+    # extra setup
+    for ax in [ax1, ax2]:
+        ax.grid(which='major')
+        ax.grid(which='minor', linewidth=0.1)
+
+    # ax1.legend(
+    #     ncol=num_columns,
+    #     bbox_to_anchor=(0.5, 1.6),
+    #     loc='upper center',
+    # )  # , framealpha=0.5)
+
+    fig_z_dot_beta.align_ylabels([ax1, ax2])
+    ax1.set_xlim((0., np.max(simulation_data['time'])))
+
+    if restrict_z_dot_y_range:
+        # restrict y range of z_dot
+        max_z_dot = np.nan
+        min_z_dot = np.nan
+        for controller_sim_data in controller_sim_datasets:
+            if (should_skip(controller_sim_data)):
+                continue
+            if 'z_dot' in controller_sim_data['controller'].controller_log.keys():
+                max_z_dot = np.nanmax([
+                    max_z_dot, np.max(controller_sim_data['controller'].controller_log['z_dot'])])
+                min_z_dot = np.nanmin([
+                    min_z_dot, np.min(controller_sim_data['controller'].controller_log['z_dot'])])
+        # apply 10% margin
+        print("z_dot range: ", min_z_dot, max_z_dot)
+        min_z_dot = min_z_dot - 0.1 * np.abs(min_z_dot)
+        if (np.abs(min_z_dot) < 1e-2):
+            min_z_dot = - 0.5
+        max_z_dot = max_z_dot + 0.4 * np.abs(max_z_dot)
+        ax1.set_ylim((min_z_dot, max_z_dot))
+
+        annotate_peaks(
+            ax1,
+            simulation_data['time'],
+            z_dot_vanilla,
+            color='black',
+            annotate_min=True,
+            annotate_max=True
+        )
+
+    return fig_z_dot_beta, (ax1, ax2)
 
 # plot passivity related data
 def plot_z_dot_z_and_beta(

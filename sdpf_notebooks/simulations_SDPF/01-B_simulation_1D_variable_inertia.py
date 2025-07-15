@@ -1,4 +1,4 @@
-# %% [markdown]
+# %% [markdown]  # noqa:D100
 # # Generate simulation data
 
 # %%
@@ -10,20 +10,17 @@
 epsilon_stability = 0.0
 
 SAVE_FIGS = True
-export_figs_dir = "export_figures/simulations_variable_inertia"
+export_figs_dir = 'export_figures/simulations_variable_inertia'
 
 # ##################################
 
-import matplotlib
 import matplotlib.pyplot as plt
 from vic_controllers.plotting import multi_format_savefig, init_plt
-init_plt(full_screen = False, scale = 1, use_latex=True)
+init_plt(full_screen=False, scale=1, use_latex=True)
 # plt.rcParams['text.usetex'] = True
 
 from tqdm import tqdm
 import numpy as np
-import scipy.linalg
-from copy import deepcopy
 
 from vic_controllers.simulation import export_linear_mass_model, plot_linear_mass
 from vic_controllers.commons import MeasurementData, CompliantFrameTrajectory
@@ -44,38 +41,44 @@ plot_utils_1D.ensure_dir_exists(export_figs_dir)
 import simulation_scenarios
 import nb_commons_1D
 
-simulation_data = simulation_scenarios.make_simulation_data('scenario_variable_inertia')
+simulation_data = \
+    simulation_scenarios.make_simulation_data('scenario_variable_inertia')
 
-simulate_controller_and_package_data = nb_commons_1D.simulate_controller_and_package_data
+simulate_controller_and_package_data = \
+    nb_commons_1D.simulate_controller_and_package_data
 
-alpha_value = (np.min(simulation_data['D_d']) - epsilon_stability) / np.max(simulation_data['M_d'])
-print(f"alpha = {alpha_value}")
-#%%
+alpha_value = (np.min(simulation_data['D_d']) - epsilon_stability
+               ) / np.max(simulation_data['M_d'])
+print(f'alpha = {alpha_value}')
+# %%
 # ---------------------
 # Vanilla controller
 # ---------------------
 vanilla_VIC_controller_sim_data = \
-    nb_commons_1D.get_vanilla_VIC_controller_sim_data(simulation_data, alpha_value)
+    nb_commons_1D.get_vanilla_VIC_controller_sim_data(
+        simulation_data, alpha_value
+    )
 
 # ----------------------
 # Our controller SDPF
 #  -> beta_M = beta_D = beta_K
 # ----------------------
-from vic_controllers.controllers import SdpfController
+from vic_controllers.controllers import SdpfController  # noqa: E402
 
 # Setup and build PPF controller
 controller_SDPF = SdpfController({
-    'dim' : 1,
-    'alpha' : alpha_value,
-    'epsilon_stability' : epsilon_stability,
-    'independent_beta_values' : False,
-    'beta_max' : 100.0,
-    'filter_implementation' : 'LP',
-    'verbose' : False,
-    'N_logging' : simulation_data['N'],
+    'dim': 1,
+    'alpha': alpha_value,
+    'epsilon_stability': epsilon_stability,
+    'independent_beta_values': False,
+    'beta_max': 100.0,
+    'filter_implementation': 'LP',
+    'verbose': False,
+    'N_logging': simulation_data['N'],
 })
 
-controller_SDPF_sim_data = simulate_controller_and_package_data(controller_SDPF, simulation_data, 'SDPF')
+controller_SDPF_sim_data = simulate_controller_and_package_data(
+    controller_SDPF, simulation_data, 'SDPF')
 
 
 # %% [markdown]
@@ -88,8 +91,8 @@ SDPF_controllers_sim_datasets = [
 ]
 
 placeholder_dataset = {
-    'is_vanilla' : False,
-    'is_placeholder' : True,
+    'is_vanilla': False,
+    'is_placeholder': True,
 }
 
 controller_sim_datasets = [
@@ -98,15 +101,16 @@ controller_sim_datasets = [
 ] + SDPF_controllers_sim_datasets
 
 # precompute the integrals
-import scipy
 for controller_sim_data in SDPF_controllers_sim_datasets:
     if (controller_sim_data['is_placeholder']):
         continue
     print('Computing z for controller "' + controller_sim_data['label'])
-    # controller_sim_data['z_dot_integral'] = np.empty_like(simulation_data['time'])
-    controller_sim_data['controller'].controller_log['z_dot_integral'] = np.cumsum(
-        controller_sim_data['controller'].controller_log['z_dot'].reshape((-1,))
-    ) * simulation_data['Ts']
+    # controller_sim_data['z_dot_integral'] = \
+    #   np.empty_like(simulation_data['time'])
+    controller_sim_data['controller'].controller_log['z_dot_integral'] = \
+        np.cumsum(controller_sim_data[
+            'controller'].controller_log['z_dot'].reshape((-1,))
+        ) * simulation_data['Ts']
 
 # %% [markdown]
 # ##  Main results: SIPF vs. SDPF
@@ -128,9 +132,19 @@ fig_z_z_dot_beta_annotated, axs_z_z_dot_beta_annotated = \
     plot_utils_1D.plot_z_dot_z_and_beta(
         simulation_data,
         controller_sim_datasets,
-        num_columns=3,
+        num_columns=2,
         restrict_z_dot_y_range=True
     )
+
+plot_z_dot_and_beta, _ = plot_utils_1D.plot_z_dot_and_beta(
+    simulation_data, controller_sim_datasets, num_columns=2)
+
+plot_z_dot_and_beta_annotated, _ = plot_utils_1D.plot_z_dot_and_beta(
+    simulation_data,
+    controller_sim_datasets,
+    num_columns=2,
+    restrict_z_dot_y_range=True
+)
 
 fig_vic_errors, axs_vic_errors = plot_utils_1D.plot_vic_tracking_errors(
     simulation_data, controller_sim_datasets, num_columns=2)
@@ -167,6 +181,16 @@ if SAVE_FIGS:
         figure=fig_z_z_dot_beta_annotated,
         dir_name=export_figs_dir,
         fig_name='z_dot_z_and_beta(annotated)'
+    )
+    multi_format_savefig(
+        figure=plot_z_dot_and_beta,
+        dir_name=export_figs_dir,
+        fig_name='z_dot_and_beta'
+    )
+    multi_format_savefig(
+        figure=plot_z_dot_and_beta_annotated,
+        dir_name=export_figs_dir,
+        fig_name='z_dot_and_beta(annotated)'
     )
     multi_format_savefig(
         figure=fig_vic_errors,
