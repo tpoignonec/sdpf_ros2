@@ -12,6 +12,7 @@
   <exec_depend>fd_hardware</exec_depend>
   <exec_depend>fd_inertia_broadcaster</exec_depend>
   <exec_depend>fd_clutch_broadcaster</exec_depend>
+  <exec_depend>ft_tools_ros2</exec_depend>
 
   <exec_depend>rosbag2_storage_mcap</exec_depend> <!-- Only for IRON and below... -->
 

@@ -33,9 +33,14 @@ def generate_launch_description():
     use_fake_hardware = LaunchConfiguration('use_fake_hardware', default='false')
     launch_rviz = LaunchConfiguration('launch_rviz', default='true')
 
-    controllers_file = PathJoinSubstitution(
-        [FindPackageShare(this_package_name), 'config', 'impedance_controllers_config.yaml']
+    config_dir = PathJoinSubstitution(
+        [FindPackageShare(this_package_name), 'config', 'fd']
     )
+
+    controllers_file = PathJoinSubstitution([
+        config_dir,
+        'controllers.yaml'
+    ])
 
     # Generate URDF
     robot_description_content = Command(
@@ -44,8 +49,7 @@ def generate_launch_description():
             ' ',
             PathJoinSubstitution(
                 [
-                    FindPackageShare(this_package_name),
-                    'config',
+                    config_dir,
                     'fd.config.xacro',
                 ]
             ),
@@ -57,16 +61,16 @@ def generate_launch_description():
 
     # rviz
     rviz_config_file = PathJoinSubstitution(
-       [FindPackageShare(this_package_name), "rviz", "display_robot.rviz"]
+        [config_dir, 'display_robot.rviz']
     )
 
     rviz_node = Node(
-        package="rviz2",
+        package='rviz2',
         condition=IfCondition(launch_rviz),
-        executable="rviz2",
-        name="rviz2",
-        output="log",
-        arguments=["-d", rviz_config_file],  # + ['--ros-args', '--log-level', 'DEBUG'],
+        executable='rviz2',
+        name='rviz2',
+        output='log',
+        arguments=['-d', rviz_config_file],  # + ['--ros-args', '--log-level', 'DEBUG'],
         parameters=[
             robot_description,
         ],
@@ -141,7 +145,8 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'use_fake_hardware',
             default_value='false',
-            description='Indicate whether robot is running with mock hardware mirroring command to its states.',
+            description='Indicate whether robot is running with '
+            'mock hardware mirroring command to its states.',
         )
     )
 

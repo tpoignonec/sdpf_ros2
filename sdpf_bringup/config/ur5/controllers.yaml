@@ -1,0 +1,111 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 125  # Hz
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    force_torque_sensor_broadcaster:
+      type: force_torque_sensor_broadcaster/ForceTorqueSensorBroadcaster
+
+    cartesian_vic_controller:
+      type: cartesian_vic_controller/CartesianVicController
+
+force_torque_sensor_broadcaster:
+  ros__parameters:
+    sensor_name: ftsensor
+    frame_id: ft_sensor
+
+cartesian_vic_controller:
+  ros__parameters:
+    command_interfaces:
+      # - position
+      - velocity
+    state_interfaces:
+      - position
+      - velocity
+    joints:
+      - shoulder_pan_joint
+      - shoulder_lift_joint
+      - elbow_joint
+      - wrist_1_joint
+      - wrist_2_joint
+      - wrist_3_joint
+
+    filters:
+      state_position_filter_cuttoff_freq: 90.0
+      state_velocity_filter_cuttoff_freq: 60.0
+      state_acceleration_filter_cuttoff_freq: 60.0
+      command_filter_cuttoff_freq: 120.0
+      ft_sensor_filter_cuttoff_freq: -1.0  # Disable filter
+
+    dynamics:
+      plugin_name: dynamics_interface_kdl/DynamicsInterfaceKDL
+      plugin_package: dynamics_interface
+      base: base_link # Assumed to be stationary
+      tip: interaction_point
+      alpha: 0.0005
+      gravity: [0.0, 0.0, -9.81]
+
+    ft_sensor:
+      is_enabled: true
+      name: ftsensor
+      frame:
+        id: ft_sensor  # Wrench measurements are in this frame
+        external: false # force torque frame exists within URDF kinematic chain
+
+    external_torque_sensor:
+      is_enabled: false
+
+    control:
+      frame:
+        id: interaction_point # Admittance calcs (displacement etc) are done in this frame. Usually the tool or end-effector
+        external: false # control frame exists within URDF kinematic chain
+
+    end_effector_frame:
+      frame:
+        id: interaction_point
+        external: false # control frame exists within URDF kinematic chain
+
+    fixed_world_frame:   # Gravity points down (neg. Z) in this frame (Usually: world or base_link)
+      frame:
+        id: base_link # Admittance calcs (displacement etc) are done in this frame. Usually the tool or end-effector
+        external: false # control frame exists within URDF kinematic chain
+
+    gravity_compensation:
+      frame:
+        id: ft_sensor
+        external: false
+
+      CoG:
+        pos: [0.0, 0.0, 0.0]
+        force: 0.0 # mass * 9.81
+        # pos:
+        #   - 0.00073592013601258232
+        #   - 0.00046804434867505447
+        #   - 0.036425596498529035
+        # force: 0.978 # mass (100g) * 9.81
+
+    vic:
+      frame:
+        id: interaction_point # Admittance calcs (displacement etc) are done in this frame. Usually the tool or end-effector
+        external: false # control frame exists within URDF kinematic chain
+      # Admittance rule
+      plugin_package: cartesian_vic_controller
+      plugin_name: cartesian_vic_controller/VanillaCartesianAdmittanceRule
+
+      # Misc. control parameters
+      activate_nullspace_control: false
+      activate_gravity_compensation: false
+      use_natural_robot_inertia: false
+
+      # Presets
+      selected_axes: [true, true, true, true, true, true]
+      inertia: [5.0, 5.0, 5.0, 1., 1.0, 1.0]
+      damping_ratio: [0.9, 0.9, 0.9, 0.9, 0.9, 0.9]
+      stiffness: [200.0, 200.0, 200.0, 5.0, 5.0, 5.0]
+
+    nullspace_control:
+      joint_inertia: [5.0]
+      joint_stiffness: [20.0]
+      joint_damping: [18.0]  # e.g., 2 * 0.9 * sqrt (m * k

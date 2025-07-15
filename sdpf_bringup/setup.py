@@ -17,7 +17,8 @@ setup(
         # Include all launch files.
         (os.path.join('share', package_name, 'launch'), glob(os.path.join('launch', '*.py'))),
         # Include all config files.
-        (os.path.join('share', package_name, 'config'), glob(os.path.join('config', '*'))),
+        (os.path.join('share', package_name, 'config/fd'), glob(os.path.join('config/fd', '*'))),
+        (os.path.join('share', package_name, 'config/ur5'), glob(os.path.join('config/ur5', '*'))),
         (os.path.join('share', package_name, 'rviz'), glob(os.path.join('rviz', '*'))),
         # (os.path.join('share', package_name, 'urdf'), glob(os.path.join('urdf', '*'))),
         (os.path.join('share', package_name, 'ros2_control'), glob(os.path.join('ros2_control', '*'))),
