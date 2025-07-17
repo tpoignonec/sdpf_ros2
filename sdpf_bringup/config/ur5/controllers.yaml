@@ -19,8 +19,8 @@ force_torque_sensor_broadcaster:
 cartesian_vic_controller:
   ros__parameters:
     command_interfaces:
-      # - position
-      - velocity
+      - position
+      # - velocity
     state_interfaces:
       - position
       - velocity
