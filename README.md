@@ -81,32 +81,51 @@ python3 06_effect_of_alpha_and_epsilon.py
 
 # How to launch the experiment?
 
-## 1) Launch the VIC controller
+## Variable impedance control with Omega3 haptic interface
+
+### 1) Launch the VIC controller
+
+Connect the USB cable of the haptic device and setup rules.
+
+> [!TIP]
+> If using WSL2, bind the USB port first using `sudo usbip attach -r <host_ip> -b <bus_id>`.
+> See [this Gist](https://gist.github.com/tpoignonec/762a108b25a460eb98e0d05412f4da18) for details about the binding procedure.
+
+Setup the Ethercat Master:
+- install the kernel module if needed (see the [documentation page]());
+- start the master: `sudo /etc/init.d/ethercat start `;
+- test that the bus is working: `ethercat slaves`.
+
+Finally, launch the controller itself:
 
 ```bash
 cd ~/dev/ros2_workspaces/ws_sdpf_ros2
 source install/setup.bash
 
-ros2 launch sdpf_bringup launch_impedance_control.launch.py
+ros2 launch sdpf_bringup launch_fd_impedance_control.launch.py
 ```
 
-```bash
-# If using WSL2, bind the USB port first
-sudo usbip attach -r <host_ip> -b <bus_id>
-```
-__Note:__ see [this Gist](https://gist.github.com/tpoignonec/762a108b25a460eb98e0d05412f4da18) for details about the binding procedure.
-
-## 2) Test the passive VIC node
+### 2) Test the passive VIC filtering node
 
 
 ```bash
 cd ~/dev/ros2_workspaces/ws_sdpf_ros2
 source install/setup.bash
 
-ros2 launch sdpf_bringup run_exp.launch.py pf_method:=SIPF # SIPF / SIPF+ / SDPF / etc.
+ros2 launch sdpf_bringup run_exp.launch.py \
+    scenario:=impedance_ft_elastic trajectory_type:=static \
+    pf_method:=SIPF # SIPF / SIPF+ / SDPF / etc.
 ```
 
-## 3) Launch experiment and record data
+or with a circular trajectory
+
+```bash
+ros2 launch sdpf_bringup run_exp.launch.py \
+    scenario:=impedance_ft_elastic trajectory_type:=circular \
+    pf_method:=SIPF # SIPF / SIPF+ / SDPF / etc.
+```
+
+### 3) Launch experiment and record data
 
 ```bash
 cd ~/dev/ros2_workspaces/ws_sdpf_ros2
@@ -116,6 +135,7 @@ export EXP_SERIES_NAME=<name_of_this_series_of_experiment>
 # e.g., export EXP_SERIES_NAME=exp_october_12_2024
 
 ros2 launch sdpf_bringup run_exp.launch.py \
+    scenario:=impedance_ft_elastic trajectory_type:=static \
     record_bags:=true \
     bag_path:=rosbags/$EXP_SERIES_NAME/ \
     pf_method:=SIPF
@@ -123,6 +143,7 @@ ros2 launch sdpf_bringup run_exp.launch.py \
 # CTRL + C at the end of the simulation (+- 15 seconds)
 
 ros2 launch sdpf_bringup run_exp.launch.py \
+    scenario:=impedance_ft_elastic trajectory_type:=static \
     record_bags:=true \
     bag_path:=rosbags/$EXP_SERIES_NAME/ \
     pf_method:=SIPF+
@@ -139,7 +160,81 @@ ros2 launch sdpf_bringup run_exp.launch.py \
 # ws_sdpf_ros2/rosbags/<name_of_this_series_of_experiment>/SDPF-adaptive/***
 ```
 
-## 4) Generate the figures
+
+
+## Variable admittance control with UR5 robot
+
+### 1) Launch the VIC controller
+
+Connect the robot and test the connection: `ping <robot_ip>`.
+
+Connect the F/T sensor and setup the Ethercat Master:
+- install the kernel module if needed (see the [documentation page]());
+- start the master: `sudo /etc/init.d/ethercat start `;
+- test that the bus is working: `ethercat slaves`.
+
+Finally, launch the controller itself:
+
+```bash
+cd ~/dev/ros2_workspaces/ws_sdpf_ros2
+source install/setup.bash
+
+ros2 launch sdpf_bringup launch_ur5_admittance_control.launch.py
+```
+
+### 2) Test the passive VIC filtering node
+
+> [!CAUTION]
+> Make sure you have the E-stop near at hand!
+> Also, check that the robot is near the starting desired position,
+> no approach phase is implemented...
+
+```bash
+cd ~/dev/ros2_workspaces/ws_sdpf_ros2
+source install/setup.bash
+
+ros2 launch sdpf_bringup run_exp.launch.py \
+    scenario:=admittance_ur5_phri trajectory_type:=static \
+    pf_method:=SIPF # SIPF / SIPF+ / SDPF / etc.
+```
+
+or with a circular trajectory
+
+```bash
+ros2 launch sdpf_bringup run_exp.launch.py \
+    scenario:=admittance_ur5_phri trajectory_type:=circular \
+    pf_method:=SIPF # SIPF / SIPF+ / SDPF / etc.
+```
+
+### 3) Launch experiment and record data
+
+```bash
+cd ~/dev/ros2_workspaces/ws_sdpf_ros2
+source install/setup.bash
+
+export EXP_SERIES_NAME=<name_of_this_series_of_experiment>
+# e.g., export EXP_SERIES_NAME=exp_october_12_2024
+
+ros2 launch sdpf_bringup run_exp.launch.py \
+    scenario:=admittance_ur5_phri trajectory_type:=static \
+    record_bags:=true \
+    bag_path:=rosbags/$EXP_SERIES_NAME/ \
+    pf_method:=SIPF
+
+# CTRL + C at the end of the simulation (+- 15 seconds)
+
+ros2 launch sdpf_bringup run_exp.launch.py \
+    scenario:=admittance_ur5_phri trajectory_type:=static \
+    record_bags:=true \
+    bag_path:=rosbags/$EXP_SERIES_NAME/ \
+    pf_method:=SIPF+
+
+# CTRL + C at the end of the simulation (+- 15 seconds)
+
+# 3 more times with the other controllers: "SDPF", "SDPF-integral", and "SDPF-adaptive"
+```
+
+## How to generate the figures?
 
 ```bash
 cd ~/dev/ros2_workspaces/ws_sdpf_ros2

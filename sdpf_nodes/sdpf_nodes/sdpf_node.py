@@ -29,6 +29,7 @@ class SdpfNode(PassivityFilterNodeBase):
         super().declare_parameter('beta_max', 100.0)
         super().declare_parameter('solver', 'LP')
         super().declare_parameter('passivation_method', 'w_lower_bound')
+        super().declare_parameter('epsilon_stability', 0.0)
 
     def init_controller(self):
         # Retrieve and check node parameters

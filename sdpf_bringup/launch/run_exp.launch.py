@@ -14,6 +14,22 @@ def generate_launch_description():  # noqa: D103
     declared_arguments = []
     declared_arguments.append(
         DeclareLaunchArgument(
+            'scenario',
+            default_value='admittance_ur5_phri',
+            description='Scenario to run, e.g., "admittance_ur5_phri".'
+            + ' or "impedance_ft_elastic".'
+        )
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            'trajectory_type',
+            default_value='static',
+            description='Type of trajectory to follow, e.g., "circular".'
+            + ' or "static".'
+        )
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
             'pf_method',
             description='Used passivation method among "SIPF", '
             + '"SIPF+", "SDPF", "SDPF-integral", "SDPF-adaptive".',
@@ -46,7 +62,9 @@ def generate_launch_description():  # noqa: D103
     global_setting = {
         'verbose': False,
         'beta_max': 100.0,
-        'epsilon_stability': 1e-3,
+        'epsilon_stability': 0.0,
+        'scenario': LaunchConfiguration('scenario'),
+        'trajectory_type': LaunchConfiguration('trajectory_type'),
     }
 
     # ========================================
