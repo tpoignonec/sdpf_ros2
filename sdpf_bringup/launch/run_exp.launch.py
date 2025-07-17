@@ -17,7 +17,7 @@ def generate_launch_description():  # noqa: D103
             'scenario',
             default_value='admittance_ur5_phri',
             description='Scenario to run, e.g., "admittance_ur5_phri".'
-            + ' or "impedance_ft_elastic".'
+            + ' or "impedance_ft_elastic". Default is "admittance_ur5_phri".'
         )
     )
     declared_arguments.append(
@@ -25,7 +25,16 @@ def generate_launch_description():  # noqa: D103
             'trajectory_type',
             default_value='static',
             description='Type of trajectory to follow, e.g., "circular".'
-            + ' or "static".'
+            + ' or "static". Default is "static".'
+        )
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            'interpolation_function',
+            default_value='tanh_alternating',
+            description='Interpolation function to use, e.g., "sinus",'
+            + ' "cosinus", "step", or "tanh_alternating".'
+            + ' Default is "tanh_alternating".'
         )
     )
     declared_arguments.append(
@@ -39,14 +48,17 @@ def generate_launch_description():  # noqa: D103
         DeclareLaunchArgument(
             'record_bags',
             default_value='false',
-            description='Run the ros2bag record process.',
+            description='Run the ros2bag record process, '
+            + 'set to "true" to record the data.'
+            + ' Default is "false".',
         )
     )
     declared_arguments.append(
         DeclareLaunchArgument(
             'bag_path',
-            default_value=['rosbags/new_recordings/'],
-            description='Output path for the ros2bag record process.',
+            default_value=['new_recordings/'],
+            description='Output path for the ros2bag record process.'
+            + ' Default is "new_recordings/".',
         )
     )
 
@@ -65,6 +77,8 @@ def generate_launch_description():  # noqa: D103
         'epsilon_stability': 0.0,
         'scenario': LaunchConfiguration('scenario'),
         'trajectory_type': LaunchConfiguration('trajectory_type'),
+        'interpolation_function':
+            LaunchConfiguration('interpolation_function'),
     }
 
     # ========================================

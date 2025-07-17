@@ -24,6 +24,13 @@ from cartesian_control_msgs.msg import (
 )
 from std_msgs.msg import Float64 as FloatMsg
 
+from .interpolation_functions import (
+    fct_sinus,
+    fct_cosinus,
+    fct_step,
+    fct_tanh_alternating
+)
+
 def T_mat_func(euler_xyz):
     """Maps the angular velocity to the euler angle rates."""
     return np.array([
@@ -103,10 +110,38 @@ class PassivityFilterNodeBase(Node):
             'circular'
         ], 'Invalid trajectory type!'
 
+        self.declare_parameter('interpolation_function', 'cosinus')
+        assert self.get_parameter('interpolation_function').value in [
+            'sinus',
+            'cosinus',
+            'step',
+            'tanh_alternating'
+        ], 'Invalid interpolation function!'
+
         self._trajectory_type = self.get_parameter('trajectory_type').value
+
+        interpolation_function_name = \
+            self.get_parameter('interpolation_function').value
+        if interpolation_function_name == 'sinus':
+            self._interpolation_function = fct_sinus
+        elif interpolation_function_name == 'cosinus':
+            self._interpolation_function = fct_cosinus
+        elif interpolation_function_name == 'step':
+            self._interpolation_function = fct_step
+        elif interpolation_function_name == 'tanh_alternating':
+            self._interpolation_function = fct_tanh_alternating
+        else:
+            raise ValueError(
+                'Invalid interpolation function name: {}'.format(
+                    interpolation_function_name
+                )
+            )
+
         self.get_logger().info(
             f'Scenario: {self.get_parameter("scenario").value}, '
-            f'Trajectory type: {self._trajectory_type} \n\n'
+            f'Trajectory type: {self._trajectory_type}, '
+            f'Interpolation function: {
+                self.get_parameter("interpolation_function").value}'
         )
 
         vic_controller_name = self.get_parameter('vic_controller_name').value
@@ -420,18 +455,28 @@ class PassivityFilterNodeBase(Node):
         D_min = np.diag(self._D_min_diag)
         D_max = np.diag(self._D_max_diag)
 
-        w = 2*np.pi/2
+        period_var_impedance = 2  # seconds
 
         def get_K_and_D(time):
-            gamma = 0.5 * (1 - np.cos(w*time))
-            K_d = K_min + (K_max - K_min)*gamma
-            D_d = D_min + (D_max - D_min)*gamma
+            gamma = self._interpolation_function(
+                time,
+                period=period_var_impedance,
+                delay=0,
+                derivative=0
+            )
+            K_d = K_min + (K_max - K_min) * gamma
+            D_d = D_min + (D_max - D_min) * gamma
             return K_d, D_d
 
         def get_K_dot_and_D_dot(time):
-            gamma_dot = w * 0.5 * np.sin(w*time)
-            K_d_dot = (K_max - K_min)*gamma_dot
-            D_d_dot = (D_max - D_min)*gamma_dot
+            gamma_dot = self._interpolation_function(
+                time,
+                period=period_var_impedance,
+                delay=0,
+                derivative=1
+            )
+            K_d_dot = (K_max - K_min) * gamma_dot
+            D_d_dot = (D_max - D_min) * gamma_dot
             return K_d_dot, D_d_dot
 
         ref_compliant_frame_traj.p_desired = np.zeros((self._N, self._dim))
