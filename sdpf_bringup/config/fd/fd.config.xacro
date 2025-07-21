@@ -39,11 +39,20 @@
       <axis xyz="0 0 0"/>
     </joint>
 
-    <!-- Add interaction frame 3.1415 -->
-    <link name="fd_interaction_point"/>
-    <joint name="joint_fd_ee-fd_interaction_point" type="fixed">
+    <!-- Add F/T sensor frame -->
+    <link name="fd_ft_sensor"/>
+    <joint name="joint_fd_ee-fd_ft_sensor" type="fixed">
       <origin rpy="0 -1.57079 3.1415" xyz="0 0 0"/>
       <parent link="fd_ee"/>
+      <child link="fd_ft_sensor"/>
+      <axis xyz="0 0 0"/>
+    </joint>
+
+    <!-- Add interaction point -->
+    <link name="fd_interaction_point"/>
+    <joint name="fd_ft_sensor-fd_interaction_point" type="fixed">
+      <origin rpy="0 -1.57079 -3.1415" xyz="0 0 0"/>
+      <parent link="fd_ft_sensor"/>
       <child link="fd_interaction_point"/>
       <axis xyz="0 0 0"/>
     </joint>

@@ -11,7 +11,7 @@ controller_manager:
     cartesian_vic_controller:
       type: cartesian_vic_controller/CartesianVicController
 
-    fd_ee_broadcaster:
+    fd_interaction_point_broadcaster:
       type: ee_pose_broadcaster/EePoseBroadcaster
 
     fd_inertia_broadcaster:
@@ -20,7 +20,7 @@ controller_manager:
 force_torque_sensor_broadcaster:
   ros__parameters:
     sensor_name: fd_ft_sensor
-    frame_id: fd_interaction_point
+    frame_id: fd_ft_sensor
 
 cartesian_vic_controller:
   ros__parameters:
@@ -39,7 +39,7 @@ cartesian_vic_controller:
 
     filters:
       state_position_filter_cuttoff_freq: -1.0
-      state_velocity_filter_cuttoff_freq: -100.0
+      state_velocity_filter_cuttoff_freq: -1.0
       command_filter_cuttoff_freq: -1.0
       ft_sensor_filter_cuttoff_freq: 30.0
 
@@ -55,7 +55,7 @@ cartesian_vic_controller:
       is_enabled: true
       name: "fd_ft_sensor"
       frame:
-        id: fd_interaction_point
+        id: fd_ft_sensor
 
     external_torque_sensor:
       is_enabled: false
