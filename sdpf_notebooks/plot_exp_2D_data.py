@@ -211,6 +211,71 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
         for key, data_ in data['diagnostic_data'].items():
             print(f'  - {key}')
 
+    # %% Prepare utils
+
+    def get_max_K_periods_idx(ax, K_data):
+        K_mid = 0.5 * (np.max(K_data) + np.min(K_data))
+
+        periods_where_K_is_max = []  # pairs of [t1; t2]
+
+        # Find periods where K is above the midpoint (considered "maximum")
+        is_high = K_data > K_mid
+
+        # Find transitions from low to high and high to low
+        transitions = np.diff(is_high.astype(int))
+
+        # Get indices where transitions occur
+        start_indices = np.where(transitions == 1)[0] + 1  # Start of high periods
+        end_indices = np.where(transitions == -1)[0] + 1   # End of high periods
+
+        # Handle edge cases
+        if is_high[0]:  # If we start in a high period
+            start_indices = np.concatenate([[0], start_indices])
+
+        if is_high[-1]:  # If we end in a high period
+            end_indices = np.concatenate([end_indices, [len(is_high) - 1]])
+
+        # Create time pairs for high stiffness periods
+        for start_idx, end_idx in zip(start_indices, end_indices):
+            periods_where_K_is_max.append((start_idx, end_idx))
+
+        return periods_where_K_is_max
+
+    def annotate_K_min_max(ax, dataset, axis_to_check=0):
+        time_data = crop_time_serie(dataset['desired_compliant_frame'], 'time')
+        K_data = crop_time_serie(
+            dataset['desired_compliant_frame'],
+            'stiffness'
+        )[:, axis_to_check, axis_to_check]
+        periods_idx_where_K_is_max = \
+            get_max_K_periods_idx(ax, K_data)
+
+        for (start_idx, end_idx) in periods_idx_where_K_is_max:
+            ax.axvspan(time_data[start_idx], time_data[end_idx], color='green', alpha=0.1, lw=0)
+
+    def annotate_K_min_max_on_trajectory(ax, dataset, axis_to_check=0):
+        K_data = crop_time_serie(
+            dataset['vic_state'],
+            'stiffness'
+        )[:, axis_to_check, axis_to_check]
+        periods_idx_where_K_is_max = \
+            get_max_K_periods_idx(ax, K_data)
+
+        for (start_idx, end_idx) in periods_idx_where_K_is_max:
+            ax.plot(
+                crop_time_serie(
+                    experimental_data['SDPF']['vic_state'],
+                    'desired_position')[start_idx:end_idx, [idx_X]],
+                crop_time_serie(
+                    experimental_data['SDPF']['vic_state'],
+                    'desired_position')[start_idx:end_idx, [idx_Y]],
+                label=r'_K_annotation',
+                color='green',
+                linestyle='-',
+                alpha=0.2,
+                linewidth=8
+            )
+
     # %% Plot XY trajectory
     gs_kw = dict(width_ratios=[1], height_ratios=[0.5, 5])
     fig_xy_trajectory, axd = plt.subplot_mosaic([
@@ -226,6 +291,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
     ax1 = axd['main']
 
     # Plot XY trajectory
+    annotate_K_min_max_on_trajectory(ax1, experimental_data['SDPF'])
     ax1.plot(
         crop_time_serie(
             experimental_data['SDPF']['vic_state'],
@@ -233,10 +299,11 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
         crop_time_serie(
             experimental_data['SDPF']['vic_state'],
             'desired_position')[:, [idx_Y]],
-        label=r'$p^d$',
+        label=r'_$p^d$',
         color='black',
         linestyle='--'
     )
+
     for tag, dataset in experimental_data.items():
         ax1.plot(
             crop_time_serie(dataset['vic_state'], 'position')[:, [idx_X]],
@@ -246,16 +313,42 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
             linestyle=dataset['linestyle']
         )
 
+    # Plot start / stop
+    start_XY = (
+        crop_time_serie(experimental_data['SDPF']['vic_state'], 'position')[0, [idx_X]],
+        crop_time_serie(experimental_data['SDPF']['vic_state'], 'position')[0, [idx_Y]]
+    )
+    ax1.scatter(
+        start_XY[0], start_XY[1],
+        s=5,
+        marker='s',
+        color='black',
+        label='_Start',
+        zorder=100
+    )
+    from plot_utils import annotate
+    annotate(
+        ax1, 'Start/Stop', (start_XY[0] + 0.1, start_XY[1]),
+        bgc='none',
+        extra_text_kwargs={
+            'ha': 'left',
+            'va': 'top',
+            'fontsize': 6,
+            'zorder': 100
+        }
+    )
+
     ax1.set_xlabel(r'$p_x$' + ' ' + r'\small{(m)}')
     ax1.set_ylabel(r'$p_y$' + ' ' + r'\small{(m)}')
 
     # extra setup
+    bbox_to_anchor_y = 1.2 # 1.27
     ax1.legend(
         ncol=min(3, len(experimental_data)),
         columnspacing=0.8,
-        bbox_to_anchor=(0.5, 1.27),
+        bbox_to_anchor=(0.5, bbox_to_anchor_y),
         loc='upper center',
-    )  # , framealpha=0.5)
+    )
 
     ax1.grid(which='major')
     ax1.grid(which='minor', linewidth=0.1)
@@ -283,6 +376,9 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
 
     ax1 = axd['top']
     ax2 = axd['bottom']
+
+    annotate_K_min_max(ax1, experimental_data['SDPF'], axis_to_check=idx_X)
+    annotate_K_min_max(ax2, experimental_data['SDPF'], axis_to_check=idx_X)
 
     # Stiffness along X
     for selected_axis, ax in zip([idx_X, idx_Y], [ax1, ax2]):
@@ -350,6 +446,10 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
     ax2 = axd['center']
     ax3 = axd['bottom']
 
+    annotate_K_min_max(ax1, experimental_data['SDPF'], axis_to_check=idx_X)
+    annotate_K_min_max(ax2, experimental_data['SDPF'], axis_to_check=idx_X)
+    annotate_K_min_max(ax3, experimental_data['SDPF'], axis_to_check=idx_X)
+
     plot_ref = True
 
     # Position error
@@ -366,7 +466,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
             color = dataset['color'],
             linestyle = dataset['linestyle']
         )
-    ax1.set_ylabel(r'$||e||_{XY}$' + '\n' + r'\small{(m)}')
+    ax1.set_ylabel(r'$||e||$' + '\n' + r'\small{(m)}')
 
     # Velocity
     # ----------------
@@ -382,7 +482,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
             color = dataset['color'],
             linestyle = dataset['linestyle']
         )
-    ax2.set_ylabel(r'$||\dot{e}||_{XY}$' + '\n' + r'\small{(m.s${}^{-1}$)}')
+    ax2.set_ylabel(r'$||\dot{e}||$' + '\n' + r'\small{(m.s${}^{-1}$)}')
 
     # Force
     # -----------------------
@@ -398,7 +498,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
             linestyle = dataset['linestyle']
         )
 
-    ax3.set_ylabel(r'$||f_{ext}||_{XY}$' + '\n' + r'\small{(N)}')
+    ax3.set_ylabel(r'$||f_{ext}||$' + '\n' + r'\small{(N)}')
     ax3.set_xlabel(r'time (s)')
 
 
@@ -447,6 +547,10 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
     ax1 = axd['top']
     ax2 = axd['center']
     ax3 = axd['bottom']
+
+    annotate_K_min_max(ax1, experimental_data['SDPF'], axis_to_check=idx_X)
+    annotate_K_min_max(ax2, experimental_data['SDPF'], axis_to_check=idx_X)
+    annotate_K_min_max(ax3, experimental_data['SDPF'], axis_to_check=idx_X)
 
     # -------------------------
     # z_dot
