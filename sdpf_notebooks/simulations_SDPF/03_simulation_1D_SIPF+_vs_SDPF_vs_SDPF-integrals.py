@@ -39,8 +39,9 @@ commons_module_path = os.path.abspath(os.path.join(parent_folder, os.pardir, '_c
 if commons_module_path not in sys.path:
     sys.path.append(commons_module_path)
 
+import plot_utils
 import plot_utils_1D
-plot_utils_1D.ensure_dir_exists(export_figs_dir)
+plot_utils.ensure_dir_exists(export_figs_dir)
 
 # Base simulation scenario
 import simulation_scenarios
@@ -189,9 +190,9 @@ for controller_sim_data in [controller_SIPF_W2_sim_data] + SDPF_controllers_sim_
         controller_sim_data['controller'].controller_log['z_dot'].reshape((-1,))
     ) * simulation_data['Ts']
 
-color_list = plot_utils_1D.get_color_list()
+color_list = plot_utils.get_color_list()
+flip = plot_utils.flip
 
-flip = plot_utils_1D.flip
 highlight_regions = plot_utils_1D.highlight_regions
 annotate_regions = plot_utils_1D.annotate_regions
 

@@ -37,8 +37,9 @@ if commons_module_path not in sys.path:
     print (f'adding {commons_module_path} to PYTHON_PATH...')
     sys.path.append(commons_module_path)
 
+import plot_utils
 import plot_utils_1D
-plot_utils_1D.ensure_dir_exists(export_figs_dir)
+plot_utils.ensure_dir_exists(export_figs_dir)
 
 # Base simulation scenario
 import simulation_scenarios

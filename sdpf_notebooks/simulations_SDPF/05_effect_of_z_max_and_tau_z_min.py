@@ -39,9 +39,10 @@ if commons_module_path not in sys.path:
 import simulation_scenarios
 import nb_commons_1D
 plot_results_bednarczyk = nb_commons_1D.plot_results_bednarczyk
+import plot_utils
 import plot_utils_1D
-color_list = plot_utils_1D.get_color_list()
-flip = plot_utils_1D.flip
+color_list = plot_utils.get_color_list()
+flip = plot_utils.flip
 highlight_regions = plot_utils_1D.highlight_regions
 annotate_regions = plot_utils_1D.annotate_regions
 simulate_controller_and_package_data = nb_commons_1D.simulate_controller_and_package_data
@@ -52,7 +53,7 @@ simulation_data = simulation_scenarios.make_simulation_data('scenario_1')  # 'sc
 alpha_value = (np.min(simulation_data['D_d']) - epsilon_stability) / np.max(simulation_data['M_d'])
 print(f"alpha = {alpha_value}")
 
-plot_utils_1D.ensure_dir_exists(export_figs_dir)
+plot_utils.ensure_dir_exists(export_figs_dir)
 
 # %% [markdown]
 # # Effect of tau filter z(t)
