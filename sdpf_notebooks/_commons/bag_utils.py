@@ -54,12 +54,24 @@ def extract_matrix(msg, dims=None):
 
 def extract_2D_matrix(msg):
     """Specialization of extract_matrix() with dims = (2, 2)."""
-    return unflatten_multiarray(np.array(msg['data']), (2, 2))
+    if len(msg['data']) == 4:  # 2x2 matrix
+        return unflatten_multiarray(np.array(msg['data']), (2, 2))
+    else:
+        raise ValueError(
+            f"Unexpected data shape {len(
+                msg['data'])} for 2D matrix extraction.")
 
 
 def extract_3D_matrix(msg):
     """Specialization of extract_matrix() with dims = (3, 3)."""
-    return unflatten_multiarray(np.array(msg['data']), (3, 3))
+    data = np.array(msg['data'])
+    if data.shape[0] == 9:  # 3x3 matrix
+        return unflatten_multiarray(np.array(msg['data']), (3, 3))
+    elif data.shape[0] == 36:  # 6x6 matrix
+        return extract_3D_matrix_from_6D(msg)
+    else:
+        raise ValueError(
+            f"Unexpected data shape {data.shape} for 3D matrix extraction.")
 
 
 def extract_3D_matrix_from_6D(msg):
@@ -189,7 +201,7 @@ def get_vic_state(rosbag_raw_data, topic_name=None):
         'acceleration': [],
         'wrench': [],
         'natural_inertia': [],
-        'desired_positon': [],
+        'desired_position': [],
         'desired_velocity': [],
         'desired_acceleration': [],
         'desired_wrench': [],
@@ -212,14 +224,14 @@ def get_vic_state(rosbag_raw_data, topic_name=None):
             data_dict['natural_inertia'] += [extract_3D_matrix_from_6D(
                 msg_data['natural_inertia'])]
             # Retrieve the desired Cartesian trajectory
-            data_dict['desired_position'] = extract_pose_from_msg(
-                msg_data['desired_pose'])
-            data_dict['desired_velocity'] = extract_velocity_from_msg(
-                msg_data['desired_velocity'])
-            data_dict['desired_acceleration'] = extract_acc_from_msg(
-                msg_data['desired_acceleration'])
-            data_dict['desired_wrench'] = extract_wrench_from_msg(
-                msg_data['desired_wrench'])
+            data_dict['desired_position'] += [extract_pose_from_msg(
+                msg_data['desired_pose'])]
+            data_dict['desired_velocity'] += [extract_velocity_from_msg(
+                msg_data['desired_velocity'])]
+            data_dict['desired_acceleration'] += [extract_acc_from_msg(
+                msg_data['desired_acceleration'])]
+            data_dict['desired_wrench'] += [extract_wrench_from_msg(
+                msg_data['desired_wrench'])]
             # Retrieve the rendered compliance
             data_dict['stiffness'] += [extract_3D_matrix_from_6D(
                 msg_data['rendered_stiffness'])]
