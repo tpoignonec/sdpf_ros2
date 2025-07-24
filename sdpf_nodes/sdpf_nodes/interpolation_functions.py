@@ -70,7 +70,7 @@ def fct_tanh_alternating(
         Function value or its derivative at the given time point
     """
     # Steepness controls how sharp the transition is (higher = closer to a step function)
-    steepness = 100.0
+    steepness = 200.0
 
     # Calculate normalized position within period (0 to 1)
     normalized_time = ((time_point + delay) % period) / period
