@@ -243,8 +243,11 @@ source install/setup.bash
 # Go to SDPF notebooks package
 cd src/sdpf_ros2/sdpf_notebooks
 
-# Export figures
-python3 plot_exp_data.py --display-figs true --dataset <name_of_this_series_of_experiment>
+# Export figures for fd experiment
+python3 plot_exp_1D_data.py --display-figs true --dataset <name_of_this_series_of_experiment>
+
+# Or for UR5 experiment
+python3 plot_exp_2D_data.py --display-figs true --dataset <name_of_this_series_of_experiment>
 
 # Wait a bit, might take a few minutes...
 # Then, you should have the figure files at
