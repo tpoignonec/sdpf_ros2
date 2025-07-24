@@ -160,8 +160,6 @@ ros2 launch sdpf_bringup run_exp.launch.py \
 # ws_sdpf_ros2/rosbags/<name_of_this_series_of_experiment>/SDPF-adaptive/***
 ```
 
-
-
 ## Variable admittance control with UR5 robot
 
 ### 1) Launch the VIC controller
@@ -180,6 +178,18 @@ cd ~/dev/ros2_workspaces/ws_sdpf_ros2
 source install/setup.bash
 
 ros2 launch sdpf_bringup launch_ur5_admittance_control.launch.py
+```
+
+Alternatively, you can use a simulated robot:
+
+```bash
+ros2 launch sdpf_bringup launch_ur5_admittance_control.launch.py use_fake_hardware:=true
+```
+
+Although forces are not simulated, a dummy measurement can be provided manually as follows:
+
+```bash
+ros2 topic pub --rate 10 /dummy_ft_sensor_data geometry_msgs/Wrench "{force: {x: 0.0, y: 0., z: 0.0}}"
 ```
 
 ### 2) Test the passive VIC filtering node
@@ -216,18 +226,18 @@ export EXP_SERIES_NAME=<name_of_this_series_of_experiment>
 # e.g., export EXP_SERIES_NAME=exp_october_12_2024
 
 ros2 launch sdpf_bringup run_exp.launch.py \
-    scenario:=admittance_ur5_phri trajectory_type:=static \
+    scenario:=admittance_ur5_phri trajectory_type:=circular \
     record_bags:=true \
     bag_path:=rosbags/$EXP_SERIES_NAME/ \
-    pf_method:=SIPF
+    pf_method:=SDPF
 
 # CTRL + C at the end of the simulation (+- 15 seconds)
 
 ros2 launch sdpf_bringup run_exp.launch.py \
-    scenario:=admittance_ur5_phri trajectory_type:=static \
+    scenario:=admittance_ur5_phri trajectory_type:=circular \
     record_bags:=true \
     bag_path:=rosbags/$EXP_SERIES_NAME/ \
-    pf_method:=SIPF+
+    pf_method:=SIPF
 
 # CTRL + C at the end of the simulation (+- 15 seconds)
 
