@@ -76,16 +76,17 @@ def spawn_pf_node(node):
 class PassivityFilterNodeBase(Node):
     def __init__(
         self,
-        name='PassivityFilterNode',
-        dim=3,
-        control_rate=200,
-        fixed_M=np.eye(3)*0.2
+        name='PassivityFilterNode'
     ):
         super().__init__(name)
-        self._dim = dim
-        self._control_rate = control_rate
-        self._Ts = 1/control_rate
-        self._t_max = 9.0
+        self._dim = None
+
+        self.declare_parameter('control_rate', 200.0)
+        assert self.get_parameter('control_rate').value > 0, \
+            'Invalid control rate!'
+        self._control_rate = self.get_parameter('control_rate').value
+        self._Ts = 1/self._control_rate
+        self._t_max = 0.0
 
         self.declare_parameter('base_frame', 'fd_base')
         self.declare_parameter('ee_frame', 'fd_ee')
@@ -155,53 +156,59 @@ class PassivityFilterNodeBase(Node):
         simulation_time_topic_name = 'simulation_time'
 
         # Inertia setting
-        self._max_inertia_lambda = 1.0
-        if fixed_M is None:
-            self._match_natural_inertia = True
-        else:
-            self._match_natural_inertia = False
-            self._desired_inertia = fixed_M
-            self._max_inertia_lambda = np.max(fixed_M)
+        self._match_natural_inertia = False
 
         # For UR5 PHRI scenario
         if (self.get_parameter('scenario').value == 'admittance_ur5_phri'):
             self._dim = 6
+            self._t_max = 15
+            self._period_var_impedance = self._t_max / 3  # seconds
             self._desired_inertia = np.diag(np.array([
                 5.0, 5.0, 5.0,
-                2.0, 2.0, 2.0
+                0.5, 0.5, 0.5
             ]))
             self._K_min_diag = np.array(
-                [100.0, 100.0, 100.0, 20.0, 20.0, 20.0])
+                [50.0, 50.0, 200.0, 20.0, 20.0, 20.0])
             self._K_max_diag = np.array(
-                [100.0, 300.0, 100.0, 20.0, 20.0, 20.0])
-            self._damping_ratios = np.array([0.2] * 6)
+                [200.0, 200.0, 200.0, 20.0, 20.0, 20.0])
+
+            self._damping_ratios = np.array([0.3] * 6)
+            self._max_inertia_lambda = np.max(self._desired_inertia)
+
+            self._D_min_diag = 2 * self._damping_ratios * np.sqrt(
+                self._K_min_diag * self._max_inertia_lambda
+            )
+            self._D_max_diag = self._D_min_diag.copy()
+            # self._D_max_diag = 2 * self._damping_ratios * np.sqrt(
+            #     self._max_inertia_lambda * self._K_max_diag
+            # )
         elif (self.get_parameter('scenario').value == 'impedance_ft_elastic'):
+            self._dim = 3
+            self._t_max = 12
+            self._period_var_impedance = self._t_max / 3  # seconds
             # Impedance traj. setting
             self._desired_inertia = np.diag(np.array(
-                [0.8] * 3
+                [0.5] * 3
             ))
-            self._K_min_diag = np.array([50.0, 500.0, 500.0])
-            self._K_max_diag = np.array([500.0, 500.0, 500.0])
-            self._damping_ratios = np.array([0.3, 0.3, 0.3])
+            self._K_min_diag = np.array([200.0, 200.0, 1000.0])
+            self._K_max_diag = np.array([1000.0, 1000.0, 1000.0])
+            self._max_inertia_lambda = np.max(self._desired_inertia)
+            self._damping_ratios = np.array([0.3] * 3)
+            self._D_min_diag = 2 * self._damping_ratios * np.sqrt(
+                self._K_min_diag * self._max_inertia_lambda
+            )
+            # self._D_max_diag = self._D_min_diag.copy()
+            self._D_max_diag = 2 * self._damping_ratios * np.sqrt(
+                self._K_max_diag * self._max_inertia_lambda
+            )
         else:
             raise ValueError('Invalid scenario name! (got {})'.format(
                 self.get_parameter('scenario').value
             ))
 
-        self._max_inertia_lambda = np.max(self._desired_inertia)
-        self._D_min_diag = 2 * self._damping_ratios * np.sqrt(
-            self._K_min_diag * self._max_inertia_lambda
-        )
-        fixed_D = False
-        if fixed_D:
-            self._D_max_diag = self._D_min_diag
-        else:
-            self._D_max_diag = 2 * self._damping_ratios * np.sqrt(
-                self._max_inertia_lambda * self._K_max_diag
-            )
         # Attention !!!
         # alpha = min(eig(D))/max(eig(M)) --> see "get_dummy_reference()"
-        self._max_M = self._max_inertia_lambda
+        self._max_M = np.max(np.diag(self._desired_inertia))
         self._min_d = np.min(self._D_min_diag)
 
         self.get_logger().info('Setting up comms...')
@@ -227,6 +234,8 @@ class PassivityFilterNodeBase(Node):
             5
         )
         # Init data
+        assert (self._dim is not None) and (self._dim > 0), \
+            'Invalid dimension!'
         self.measurement_data = MeasurementData(dimension=self._dim)
         self.filtered_compliance_traj = CompliantFrameTrajectory(
             dimension=self._dim,
@@ -402,14 +411,19 @@ class PassivityFilterNodeBase(Node):
                 0.52,
                 0.0, 0.0, 0.0
             ])
-            radius = 0.1  # meters
-            period = self._t_max / 2  # seconds
+            radius = 0.15  # meters
+            period = self._t_max  # seconds
         elif (self.get_parameter('scenario').value == 'impedance_ft_elastic'):
-            center = np.array([
-                0.0, 0.0, 0.0
-            ])
+            if self._trajectory_type == 'static':
+                center = np.array([
+                    - 0.04, 0.0, 0.0
+                ])
+            else:
+                center = np.array([
+                    0.015, 0.0, 0.0
+                ])
             radius = 0.015
-            period = self._t_max / 2  # seconds
+            period = self._t_max  # seconds
         else:
             raise ValueError('Invalid scenario name!')
 
@@ -420,7 +434,7 @@ class PassivityFilterNodeBase(Node):
             return p, dp, ddp
         elif (type == 'circular'):
             # Circular trajectory
-            angle = 2 * np.pi * current_t / period  # 2 seconds period
+            angle = np.pi + 2 * np.pi * current_t / period  # 2 seconds period
             p = center + radius * np.array([
                 np.cos(angle),
                 np.sin(angle)
@@ -455,12 +469,10 @@ class PassivityFilterNodeBase(Node):
         D_min = np.diag(self._D_min_diag)
         D_max = np.diag(self._D_max_diag)
 
-        period_var_impedance = 2  # seconds
-
         def get_K_and_D(time):
             gamma = self._interpolation_function(
                 time,
-                period=period_var_impedance,
+                period=self._period_var_impedance,
                 delay=0,
                 derivative=0
             )
@@ -471,7 +483,7 @@ class PassivityFilterNodeBase(Node):
         def get_K_dot_and_D_dot(time):
             gamma_dot = self._interpolation_function(
                 time,
-                period=period_var_impedance,
+                period=self._period_var_impedance,
                 delay=0,
                 derivative=1
             )
