@@ -64,7 +64,7 @@
           <plugin>ethercat_generic_plugins/GenericEcSlave</plugin>
           <param name="alias">0</param>
           <param name="position">0</param>
-          <param name="slave_config">$(find sdpf_bringup)/config/ur5/ft_sensor_slave_config.yaml</param>
+          <param name="slave_config">$(find sdpf_bringup)/config/ur5/ft_sensor_ethercat_config.yaml</param>
         </ec_module>
         </xacro:unless>
       </sensor>

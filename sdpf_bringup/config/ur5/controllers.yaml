@@ -19,8 +19,8 @@ force_torque_sensor_broadcaster:
 cartesian_vic_controller:
   ros__parameters:
     command_interfaces:
-      - position
-      # - velocity
+      # - position
+      - velocity
     state_interfaces:
       - position
       - velocity
@@ -33,11 +33,11 @@ cartesian_vic_controller:
       - wrist_3_joint
 
     filters:
-      state_position_filter_cuttoff_freq: 90.0
+      state_position_filter_cuttoff_freq: 120.0
       state_velocity_filter_cuttoff_freq: 60.0
       state_acceleration_filter_cuttoff_freq: 60.0
       command_filter_cuttoff_freq: 120.0
-      ft_sensor_filter_cuttoff_freq: -1.0  # Disable filter
+      ft_sensor_filter_cuttoff_freq: 3.0
 
     dynamics:
       plugin_name: dynamics_interface_kdl/DynamicsInterfaceKDL
@@ -78,13 +78,13 @@ cartesian_vic_controller:
         external: false
 
       CoG:
-        pos: [0.0, 0.0, 0.0]
-        force: 0.0 # mass * 9.81
-        # pos:
-        #   - 0.00073592013601258232
-        #   - 0.00046804434867505447
-        #   - 0.036425596498529035
-        # force: 0.978 # mass (100g) * 9.81
+        # pos: [0.0, 0.0, 0.0]
+        # force: 0.0 # mass * 9.81
+        pos:
+          - 0.00073592013601258232
+          - 0.00046804434867505447
+          - 0.036425596498529035
+        force: 0.978 # mass (100g) * 9.81
 
     vic:
       frame:
@@ -101,7 +101,7 @@ cartesian_vic_controller:
 
       # Presets
       selected_axes: [true, true, true, true, true, true]
-      inertia: [5.0, 5.0, 5.0, 1., 1.0, 1.0]
+      inertia: [5.0, 5.0, 5.0, 0.2, 0.2, 0.2]
       damping_ratio: [0.9, 0.9, 0.9, 0.9, 0.9, 0.9]
       stiffness: [200.0, 200.0, 200.0, 5.0, 5.0, 5.0]
 
