@@ -52,7 +52,6 @@ class SdpfNode(PassivityFilterNodeBase):
         self.get_logger().info(f'solver_type : {solver_type}')
         self.undeclare_parameter('solver')
 
-
         passivation_method = self.get_parameter('passivation_method').get_parameter_value().string_value
         assert (passivation_method in valid_passivation_methods)
         self.get_logger().info(f'passivation_method : {passivation_method}')
@@ -135,7 +134,7 @@ class SdpfNode(PassivityFilterNodeBase):
         self._diagnostic_data = {
             "z_dot": self._controller_SDPF.controller_log['z_dot'][0],
             "z": self._controller_SDPF.controller_log['z'][0],
-            "z_min": 0.0,
+            "z_min": self._controller_SDPF.controller_log['z_min'][0],
             "beta": self._controller_SDPF.controller_log['beta'][0],
             "storage_V": self._controller_SDPF.controller_log['V'][0],
         }
