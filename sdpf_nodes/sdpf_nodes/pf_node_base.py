@@ -81,12 +81,16 @@ class PassivityFilterNodeBase(Node):
         super().__init__(name)
         self._dim = None
 
-        self.declare_parameter('control_rate', 200.0)
+        self.declare_parameter('control_rate', 200.)
         assert self.get_parameter('control_rate').value > 0, \
             'Invalid control rate!'
         self._control_rate = self.get_parameter('control_rate').value
         self._Ts = 1/self._control_rate
-        self._t_max = 0.0
+
+        self.get_logger().info(
+            f'VIC passivation filter control rate: {self._control_rate} Hz'
+            + f' (Ts = {self._Ts} seconds)'
+        )
 
         self.declare_parameter('base_frame', 'fd_base')
         self.declare_parameter('ee_frame', 'fd_ee')
@@ -159,6 +163,7 @@ class PassivityFilterNodeBase(Node):
         self._match_natural_inertia = False
 
         # For UR5 PHRI scenario
+        self._t_max = 0.0  # seconds, to be set bellow...
         if (self.get_parameter('scenario').value == 'admittance_ur5_phri'):
             self._dim = 6
             self._t_max = 15

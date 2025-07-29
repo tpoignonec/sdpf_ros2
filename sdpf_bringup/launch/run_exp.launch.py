@@ -46,6 +46,14 @@ def generate_launch_description():  # noqa: D103
     )
     declared_arguments.append(
         DeclareLaunchArgument(
+            'control_rate',
+            default_value='200.0',
+            description='VIC passivation filter control rate in Hz.'
+            + ' Default is 200.0 Hz.'
+        )
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
             'record_bags',
             default_value='false',
             description='Run the ros2bag record process, '
@@ -73,6 +81,7 @@ def generate_launch_description():  # noqa: D103
     # ========================================
     global_setting = {
         'verbose': False,
+        'control_rate': LaunchConfiguration('control_rate'),
         'beta_max': 100.0,
         'epsilon_stability': 0.0,
         'scenario': LaunchConfiguration('scenario'),
