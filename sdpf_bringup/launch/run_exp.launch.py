@@ -194,7 +194,7 @@ def generate_launch_description():  # noqa: D103
             global_setting,
             {
                 'passivation_method': 'z_adaptative_lower_bound',
-                'tau_delay_adaptive_z_min': 3.0,
+                'tau_delay_adaptive_z_min': 1.0,
             },
         ],
         condition=IfCondition(

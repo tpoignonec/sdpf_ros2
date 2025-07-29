@@ -20,10 +20,15 @@ from launch_ros.substitutions import FindPackageShare
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, ExecuteProcess
-from launch.actions import RegisterEventHandler
+from launch.actions import LogInfo, RegisterEventHandler, TimerAction
 from launch.conditions import IfCondition, UnlessCondition  # noqa: F401
-from launch.event_handlers import OnProcessExit
-from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
+from launch.event_handlers import OnProcessExit, OnProcessStart
+from launch.substitutions import (
+    Command,
+    FindExecutable,
+    LaunchConfiguration,
+    PathJoinSubstitution
+)
 
 
 def generate_launch_description():
@@ -108,12 +113,6 @@ def generate_launch_description():
         output='screen'
     )
 
-    load_inertia_broadcaster = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'fd_inertia_broadcaster'],
-        output='screen'
-    )
-
     load_force_torque_sensor_broadcaster = ExecuteProcess(
         cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
              'force_torque_sensor_broadcaster'],
@@ -126,13 +125,98 @@ def generate_launch_description():
         output='screen'
     )
 
+    # Load inertia broadcaster
+
+    load_inertia_broadcaster = ExecuteProcess(
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
+             'fd_inertia_broadcaster'],
+        output='screen',
+        condition=UnlessCondition(LaunchConfiguration('use_constant_inertia'))
+    )
+
+    robot_inertia_diag = [0.2, 0.15, 0.15]
+    end_effector_weight = 0.2
+
+    inertia_data_str = (
+        '{'
+        + '"layout": {'
+        + '"dim": ['
+        + '{"size": 6, "stride": 36, "label": "rows"},'
+        + '{"size": 6, "stride": 6, "label": "cols"}'
+        + '],'
+        + '"data_offset": 0'
+        + '},'
+        + '"data": ['
+        + 'INERTIA_DIAG_X, 0.0, 0.0, 0.0, 0.0, 0.0,'
+        + '0.0, INERTIA_DIAG_Y, 0.0, 0.0, 0.0, 0.0,'
+        + '0.0, 0.0, INERTIA_DIAG_Z, 0.0, 0.0, 0.0,'
+        + '0.0, 0.0, 0.0, 0.1, 0.0, 0.0,'
+        + '0.0, 0.0, 0.0, 0.0, 0.1, 0.0,'
+        + '0.0, 0.0, 0.0, 0.0, 0.0, 0.1'
+        + ']'
+        + '}'
+        ).replace(
+            'INERTIA_DIAG_X', str(
+                robot_inertia_diag[0] + end_effector_weight
+            )
+        ).replace(
+            'INERTIA_DIAG_Y', str(
+                robot_inertia_diag[1] + end_effector_weight
+            )
+        ).replace(
+            'INERTIA_DIAG_Z', str(
+                robot_inertia_diag[2] + end_effector_weight
+            )
+        )
+
+    constant_inertia_broadcaster = ExecuteProcess(
+        cmd=[
+            'ros2',
+            'topic',
+            'pub',
+            '--rate', '500',
+            '/fd_inertia',
+            'std_msgs/msg/Float64MultiArray',
+            inertia_data_str
+        ],
+        output='log',
+        condition=IfCondition(LaunchConfiguration('use_constant_inertia'))
+    )
+
     controllers_loaders = [
         load_inertia_broadcaster,
+        constant_inertia_broadcaster,
         RegisterEventHandler(
-            event_handler=OnProcessExit(
+            OnProcessStart(
+                target_action=constant_inertia_broadcaster,
+                on_start=[
+                    TimerAction(
+                        period=1.0,
+                        actions=[
+                            LogInfo(
+                                msg='constant_inertia_broadcaster ready'
+                                + 'Loading impedance ctrl...'
+                            ),
+                            load_impedance_controller
+                        ],
+                        cancel_on_shutdown=True
+                    ),
+                ],
+            ),
+            condition=IfCondition(LaunchConfiguration('use_constant_inertia'))
+        ),
+        RegisterEventHandler(
+            OnProcessExit(
                 target_action=load_inertia_broadcaster,
-                on_exit=[load_impedance_controller],
-            )
+                on_exit=[
+                    LogInfo(
+                        msg='fd_inertia_broadcaster ready'
+                        + 'Loading impedance ctrl...'
+                    ),
+                    load_impedance_controller
+                ],
+            ),
+            condition=UnlessCondition(LaunchConfiguration('use_constant_inertia'))
         ),
         load_joint_state_broadcaster,
         load_force_torque_sensor_broadcaster,
@@ -150,5 +234,15 @@ def generate_launch_description():
         )
     )
 
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            'use_constant_inertia',
+            default_value='true',
+            description='Indicate whether to use a constant inertia matrix.'
+            + ' By default, the inertia matrix is retrieved from the fd SDK.'
+        )
+    )
+
     return LaunchDescription(
-        declared_arguments + nodes + controllers_loaders)
+        declared_arguments + nodes + controllers_loaders
+    )
