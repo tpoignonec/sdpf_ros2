@@ -1,171 +1,192 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <root>
- <tabbed_widget parent="main_window" name="Main Window">
+ <tabbed_widget name="Main Window" parent="main_window">
   <Tab tab_name="VIC state (trajectory)" containers="1">
    <Container>
-    <DockSplitter orientation="-" sizes="0.333333;0.333333;0.333333" count="3">
-     <DockSplitter orientation="|" sizes="0.333592;0.332816;0.333592" count="3">
+    <DockSplitter sizes="0.333333;0.333333;0.333333" count="3" orientation="-">
+     <DockSplitter sizes="0.333577;0.332847;0.333577" count="3" orientation="|">
       <DockArea name="position">
-       <plot flip_y="false" flip_x="false" mode="TimeSeries" style="Lines">
-        <range left="5633.505562" right="5653.504597" top="0.001033" bottom="-0.041001"/>
+       <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+        <range bottom="-0.000750" right="30.173063" top="0.030750" left="0.173094"/>
         <limitY/>
-        <curve color="#1f77b4" name="/cartesian_vic_controller/status/pose/position/x"/>
-        <curve color="#d62728" name="/cartesian_vic_controller/status/desired_pose/position/x"/>
+        <curve name="/cartesian_vic_controller/status/pose/position/x" color="#1f77b4"/>
+        <curve name="/cartesian_vic_controller/status/desired_pose/position/x" color="#d62728"/>
        </plot>
       </DockArea>
       <DockArea name="velocity">
-       <plot flip_y="false" flip_x="false" mode="TimeSeries" style="Lines">
-        <range left="5633.505562" right="5653.504597" top="0.033090" bottom="-0.033410"/>
+       <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+        <range bottom="-0.061005" right="30.173063" top="0.035682" left="0.173094"/>
         <limitY/>
-        <curve color="#ff7f0e" name="/cartesian_vic_controller/status/velocity/linear/x"/>
-        <curve color="#f14cc1" name="/cartesian_vic_controller/status/desired_velocity/linear/x"/>
+        <curve name="/cartesian_vic_controller/status/velocity/linear/x" color="#ff7f0e"/>
+        <curve name="/cartesian_vic_controller/status/desired_velocity/linear/x" color="#f14cc1"/>
        </plot>
       </DockArea>
       <DockArea name="acceleration">
-       <plot flip_y="false" flip_x="false" mode="TimeSeries" style="Lines">
-        <range left="5633.505562" right="5653.504597" top="0.323845" bottom="-0.364604"/>
+       <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+        <range bottom="-1.048809" right="30.173063" top="1.126282" left="0.173094"/>
         <limitY/>
-        <curve color="#17becf" name="/cartesian_vic_controller/status/acceleration/linear/x"/>
-        <curve color="#bcbd22" name="/cartesian_vic_controller/status/desired_acceleration/linear/x"/>
+        <curve name="/cartesian_vic_controller/status/acceleration/linear/x" color="#17becf"/>
+        <curve name="/cartesian_vic_controller/status/desired_acceleration/linear/x" color="#bcbd22"/>
        </plot>
       </DockArea>
      </DockSplitter>
-     <DockSplitter orientation="|" sizes="0.334368;0.331265;0.334368" count="3">
+     <DockSplitter sizes="0.334307;0.331387;0.334307" count="3" orientation="|">
       <DockArea name="...">
-       <plot flip_y="false" flip_x="false" mode="TimeSeries" style="Lines">
-        <range left="5633.505562" right="5653.504597" top="0.021001" bottom="-0.021061"/>
+       <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+        <range bottom="-0.016633" right="30.173063" top="0.015772" left="0.173094"/>
         <limitY/>
-        <curve color="#d62728" name="/cartesian_vic_controller/status/pose/position/y"/>
-        <curve color="#1ac938" name="/cartesian_vic_controller/status/desired_pose/position/y"/>
+        <curve name="/cartesian_vic_controller/status/pose/position/y" color="#d62728"/>
+        <curve name="/cartesian_vic_controller/status/desired_pose/position/y" color="#1ac938"/>
        </plot>
       </DockArea>
       <DockArea name="...">
-       <plot flip_y="false" flip_x="false" mode="TimeSeries" style="Lines">
-        <range left="5633.505562" right="5653.504597" top="0.052143" bottom="-0.034496"/>
+       <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+        <range bottom="-0.016981" right="30.173063" top="0.024083" left="0.173094"/>
         <limitY/>
-        <curve color="#f14cc1" name="/cartesian_vic_controller/status/velocity/linear/y"/>
-        <curve color="#9467bd" name="/cartesian_vic_controller/status/desired_velocity/linear/y"/>
+        <curve name="/cartesian_vic_controller/status/velocity/linear/y" color="#f14cc1"/>
+        <curve name="/cartesian_vic_controller/status/desired_velocity/linear/y" color="#9467bd"/>
        </plot>
       </DockArea>
       <DockArea name="...">
-       <plot flip_y="false" flip_x="false" mode="TimeSeries" style="Lines">
-        <range left="5633.505562" right="5653.504597" top="0.711558" bottom="-0.763650"/>
+       <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+        <range bottom="-0.482532" right="30.173063" top="0.412395" left="0.173094"/>
         <limitY/>
-        <curve color="#bcbd22" name="/cartesian_vic_controller/status/acceleration/linear/y"/>
-        <curve color="#1f77b4" name="/cartesian_vic_controller/status/desired_acceleration/linear/y"/>
+        <curve name="/cartesian_vic_controller/status/acceleration/linear/y" color="#bcbd22"/>
+        <curve name="/cartesian_vic_controller/status/desired_acceleration/linear/y" color="#1f77b4"/>
        </plot>
       </DockArea>
      </DockSplitter>
-     <DockSplitter orientation="|" sizes="0.334368;0.331265;0.334368" count="3">
+     <DockSplitter sizes="0.334307;0.331387;0.334307" count="3" orientation="|">
       <DockArea name="...">
-       <plot flip_y="false" flip_x="false" mode="TimeSeries" style="Lines">
-        <range left="5633.505562" right="5653.504597" top="0.000621" bottom="-0.000653"/>
+       <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+        <range bottom="-0.002597" right="30.173063" top="0.001159" left="0.173094"/>
         <limitY/>
-        <curve color="#1ac938" name="/cartesian_vic_controller/status/pose/position/z"/>
-        <curve color="#ff7f0e" name="/cartesian_vic_controller/status/desired_pose/position/z"/>
+        <curve name="/cartesian_vic_controller/status/pose/position/z" color="#1ac938"/>
+        <curve name="/cartesian_vic_controller/status/desired_pose/position/z" color="#ff7f0e"/>
        </plot>
       </DockArea>
       <DockArea name="...">
-       <plot flip_y="false" flip_x="false" mode="TimeSeries" style="Lines">
-        <range left="5633.505562" right="5653.504597" top="0.006544" bottom="-0.009080"/>
+       <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+        <range bottom="-0.008630" right="30.173063" top="0.015168" left="0.173094"/>
         <limitY/>
-        <curve color="#9467bd" name="/cartesian_vic_controller/status/velocity/linear/z"/>
-        <curve color="#17becf" name="/cartesian_vic_controller/status/desired_velocity/linear/z"/>
+        <curve name="/cartesian_vic_controller/status/velocity/linear/z" color="#9467bd"/>
+        <curve name="/cartesian_vic_controller/status/desired_velocity/linear/z" color="#17becf"/>
        </plot>
       </DockArea>
       <DockArea name="...">
-       <plot flip_y="false" flip_x="false" mode="TimeSeries" style="Lines">
-        <range left="5633.505562" right="5653.504597" top="0.351292" bottom="-0.424584"/>
+       <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+        <range bottom="-0.384355" right="30.173063" top="0.451074" left="0.173094"/>
         <limitY/>
-        <curve color="#1f77b4" name="/cartesian_vic_controller/status/acceleration/linear/z"/>
-        <curve color="#d62728" name="/cartesian_vic_controller/status/desired_acceleration/linear/z"/>
+        <curve name="/cartesian_vic_controller/status/acceleration/linear/z" color="#1f77b4"/>
+        <curve name="/cartesian_vic_controller/status/desired_acceleration/linear/z" color="#d62728"/>
        </plot>
       </DockArea>
      </DockSplitter>
     </DockSplitter>
    </Container>
   </Tab>
+  <Tab tab_name="FT sensor" containers="1">
+   <Container>
+    <DockSplitter sizes="0.50059;0.49941" count="2" orientation="-">
+     <DockArea name="Forces">
+      <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+       <range bottom="-0.133215" right="30.173063" top="0.017646" left="0.173094"/>
+       <limitY/>
+       <curve name="/cartesian_vic_controller/status/wrench/force/x" color="#1ac938"/>
+       <curve name="/cartesian_vic_controller/status/wrench/force/y" color="#ff7f0e"/>
+       <curve name="/cartesian_vic_controller/status/wrench/force/z" color="#f14cc1"/>
+      </plot>
+     </DockArea>
+     <DockArea name="Torques">
+      <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+       <range bottom="-31.375715" right="30.173063" top="41.450314" left="0.173094"/>
+       <limitY/>
+       <curve name="/cartesian_vic_controller/status/wrench/torque/x" color="#9467bd"/>
+       <curve name="/cartesian_vic_controller/status/wrench/torque/y" color="#17becf"/>
+       <curve name="/cartesian_vic_controller/status/wrench/torque/z" color="#bcbd22"/>
+      </plot>
+     </DockArea>
+    </DockSplitter>
+   </Container>
+  </Tab>
   <Tab tab_name="VIC state (impedance)" containers="1">
    <Container>
-    <DockSplitter orientation="-" sizes="0.333333;0.333333;0.333333" count="3">
-     <DockSplitter orientation="|" sizes="0.333592;0.332816;0.333592" count="3">
+    <DockSplitter sizes="0.333333;0.333333;0.333333" count="3" orientation="-">
+     <DockSplitter sizes="0.333577;0.332847;0.333577" count="3" orientation="|">
       <DockArea name="Inertia">
-       <plot flip_y="false" flip_x="false" mode="TimeSeries" style="Lines">
-        <range left="0.000000" right="5653.504597" top="0.300000" bottom="0.100000"/>
+       <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+        <range bottom="0.900000" right="30.173063" top="1.100000" left="0.000000"/>
         <limitY/>
-        <curve color="#1ac938" name="/cartesian_vic_controller/status/rendered_inertia/data[0]"/>
-        <curve color="#17becf" name="/desired_compliance/inertia/data[0]"/>
+        <curve name="/cartesian_vic_controller/status/rendered_inertia/data[0]" color="#1ac938"/>
+        <curve name="/desired_compliance/inertia/data[0]" color="#17becf"/>
        </plot>
       </DockArea>
       <DockArea name="Damping">
-       <plot flip_y="false" flip_x="false" mode="TimeSeries" style="Lines">
-        <range left="0.000000" right="5653.504597" top="2.548346" bottom="1.770330"/>
+       <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+        <range bottom="11.900000" right="30.173063" top="12.100000" left="0.000000"/>
         <limitY/>
-        <curve color="#bcbd22" name="/cartesian_vic_controller/status/rendered_damping/data[0]"/>
-        <curve color="#1ac938" name="/desired_compliance/damping/data[0]"/>
+        <curve name="/cartesian_vic_controller/status/rendered_damping/data[0]" color="#bcbd22"/>
+        <curve name="/desired_compliance/damping/data[0]" color="#1ac938"/>
        </plot>
       </DockArea>
       <DockArea name="Stiffness">
-       <plot flip_y="false" flip_x="false" mode="TimeSeries" style="Lines">
-        <range left="0.000000" right="5653.504597" top="809.999952" bottom="390.000001"/>
+       <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+        <range bottom="390.000000" right="30.173063" top="810.000000" left="0.000000"/>
         <limitY/>
-        <curve color="#1ac938" name="/cartesian_vic_controller/status/rendered_stiffness/data[0]"/>
-        <curve color="#17becf" name="/desired_compliance/stiffness/data[0]"/>
-        <curve color="#17becf" name="/cartesian_vic_controller/reference_compliant_frame_trajectory/compliance_at_points[0]/stiffness/data[0]"/>
+        <curve name="/cartesian_vic_controller/status/rendered_stiffness/data[0]" color="#1ac938"/>
+        <curve name="/desired_compliance/stiffness/data[0]" color="#17becf"/>
+        <curve name="/cartesian_vic_controller/reference_compliant_frame_trajectory/compliance_at_points[0]/stiffness/data[0]" color="#17becf"/>
        </plot>
       </DockArea>
      </DockSplitter>
-     <DockSplitter orientation="|" sizes="0.334368;0.331265;0.334368" count="3">
+     <DockSplitter sizes="0.334307;0.331387;0.334307" count="3" orientation="|">
       <DockArea name="...">
-       <plot flip_y="false" flip_x="false" mode="TimeSeries" style="Lines">
-        <range left="0.000000" right="5653.504597" top="0.205000" bottom="-0.005000"/>
+       <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+        <range bottom="-0.025000" right="30.173063" top="1.025000" left="0.000000"/>
         <limitY/>
-        <curve color="#9467bd" name="/cartesian_vic_controller/status/rendered_inertia/data[7]"/>
-        <curve color="#ff7f0e" name="/desired_compliance/inertia/data[7]"/>
+        <curve name="/cartesian_vic_controller/status/rendered_inertia/data[7]" color="#9467bd"/>
+        <curve name="/desired_compliance/inertia/data[7]" color="#ff7f0e"/>
        </plot>
       </DockArea>
       <DockArea name="...">
-       <plot flip_y="false" flip_x="false" mode="TimeSeries" style="Lines">
-        <range left="0.000000" right="5653.504597" top="1.833576" bottom="-0.044721"/>
+       <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+        <range bottom="-0.300000" right="30.173063" top="12.300000" left="0.000000"/>
         <limitY/>
-        <curve color="#1f77b4" name="/cartesian_vic_controller/status/rendered_damping/data[7]"/>
-        <curve color="#d62728" name="/desired_compliance/damping/data[7]"/>
+        <curve name="/cartesian_vic_controller/status/rendered_damping/data[7]" color="#1f77b4"/>
+        <curve name="/desired_compliance/damping/data[7]" color="#d62728"/>
        </plot>
       </DockArea>
       <DockArea name="...">
-       <plot flip_y="false" flip_x="false" mode="TimeSeries" style="Lines">
-        <range left="0.000000" right="5653.504597" top="410.000000" bottom="-10.000000"/>
+       <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+        <range bottom="-10.000000" right="30.173063" top="410.000000" left="0.000000"/>
         <limitY/>
-        <curve color="#ff7f0e" name="/cartesian_vic_controller/status/rendered_stiffness/data[7]"/>
-        <curve color="#1f77b4" name="/desired_compliance/stiffness/data[7]"/>
-        <curve color="#bcbd22" name="/cartesian_vic_controller/reference_compliant_frame_trajectory/compliance_at_points[0]/stiffness/data[7]"/>
+        <curve name="/cartesian_vic_controller/status/rendered_stiffness/data[7]" color="#ff7f0e"/>
+        <curve name="/desired_compliance/stiffness/data[7]" color="#1f77b4"/>
+        <curve name="/cartesian_vic_controller/reference_compliant_frame_trajectory/compliance_at_points[0]/stiffness/data[7]" color="#bcbd22"/>
        </plot>
       </DockArea>
      </DockSplitter>
-     <DockSplitter orientation="|" sizes="0.334368;0.331265;0.334368" count="3">
+     <DockSplitter sizes="0.334307;0.331387;0.334307" count="3" orientation="|">
       <DockArea name="...">
-       <plot flip_y="false" flip_x="false" mode="TimeSeries" style="Lines">
-        <range left="0.000000" right="5653.504597" top="5.120000" bottom="0.080000"/>
+       <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+        <range bottom="0.900000" right="30.173063" top="1.100000" left="0.000000"/>
         <limitY/>
-        <curve color="#17becf" name="/cartesian_vic_controller/status/rendered_inertia/data[14]"/>
-        <curve color="#f14cc1" name="/desired_compliance/inertia/data[14]"/>
+        <curve name="/cartesian_vic_controller/status/rendered_inertia/data[14]" color="#17becf"/>
        </plot>
       </DockArea>
       <DockArea name="...">
-       <plot flip_y="false" flip_x="false" mode="TimeSeries" style="Lines">
-        <range left="0.000000" right="5653.504597" top="9.123157" bottom="1.609969"/>
+       <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+        <range bottom="11.900000" right="30.173063" top="12.100000" left="0.000000"/>
         <limitY/>
-        <curve color="#d62728" name="/cartesian_vic_controller/status/rendered_damping/data[14]"/>
-        <curve color="#1ac938" name="/desired_compliance/damping/data[14]"/>
+        <curve name="/cartesian_vic_controller/status/rendered_damping/data[14]" color="#d62728"/>
        </plot>
       </DockArea>
       <DockArea name="...">
-       <plot flip_y="false" flip_x="false" mode="TimeSeries" style="Lines">
-        <range left="0.000000" right="5653.504597" top="407.500000" bottom="92.500000"/>
+       <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+        <range bottom="399.900000" right="30.173063" top="400.100000" left="0.000000"/>
         <limitY/>
-        <curve color="#f14cc1" name="/cartesian_vic_controller/status/rendered_stiffness/data[14]"/>
-        <curve color="#9467bd" name="/desired_compliance/stiffness/data[14]"/>
-        <curve color="#d62728" name="/cartesian_vic_controller/reference_compliant_frame_trajectory/compliance_at_points[0]/stiffness/data[14]"/>
+        <curve name="/cartesian_vic_controller/status/rendered_stiffness/data[14]" color="#f14cc1"/>
+        <curve name="/cartesian_vic_controller/reference_compliant_frame_trajectory/compliance_at_points[0]/stiffness/data[14]" color="#d62728"/>
        </plot>
       </DockArea>
      </DockSplitter>
@@ -174,58 +195,58 @@
   </Tab>
   <Tab tab_name="Passivity filter state" containers="1">
    <Container>
-    <DockSplitter orientation="-" sizes="1" count="1">
-     <DockSplitter orientation="|" sizes="0.464341;0.535659" count="2">
-      <DockSplitter orientation="-" sizes="0.333333;0.333333;0.333333" count="3">
+    <DockSplitter sizes="1" count="1" orientation="-">
+     <DockSplitter sizes="0.465354;0.534646" count="2" orientation="|">
+      <DockSplitter sizes="0.333333;0.333333;0.333333" count="3" orientation="-">
        <DockArea name="...">
-        <plot flip_y="false" flip_x="false" mode="TimeSeries" style="Lines">
-         <range left="5633.504901" right="5653.504597" top="0.001995" bottom="-0.001124"/>
+        <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+         <range bottom="-0.007183" right="30.173063" top="0.006228" left="0.015007"/>
          <limitY/>
-         <curve color="#d62728" name="error_x"/>
-         <curve color="#1ac938" name="error_y"/>
-         <curve color="#ff7f0e" name="error_z"/>
+         <curve name="error_x" color="#d62728"/>
+         <curve name="error_y" color="#1ac938"/>
+         <curve name="error_z" color="#ff7f0e"/>
         </plot>
        </DockArea>
        <DockArea name="...">
-        <plot flip_y="false" flip_x="false" mode="TimeSeries" style="Lines">
-         <range left="5633.504901" right="5653.504597" top="0.029245" bottom="-0.026217"/>
+        <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+         <range bottom="-0.024829" right="30.173063" top="0.055672" left="0.015007"/>
          <limitY/>
-         <curve color="#f14cc1" name="error_dot_"/>
-         <curve color="#9467bd" name="error_dot_x"/>
-         <curve color="#17becf" name="error_dot_y"/>
+         <curve name="error_dot_" color="#f14cc1"/>
+         <curve name="error_dot_x" color="#9467bd"/>
+         <curve name="error_dot_y" color="#17becf"/>
         </plot>
        </DockArea>
        <DockArea name="...">
-        <plot flip_y="false" flip_x="false" mode="TimeSeries" style="Lines">
-         <range left="5633.504901" right="5653.504597" top="0.005298" bottom="-0.032295"/>
+        <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+         <range bottom="-0.133215" right="30.173063" top="0.017646" left="0.015007"/>
          <limitY/>
-         <curve color="#ff7f0e" name="/cartesian_vic_controller/status/wrench/force/x"/>
-         <curve color="#f14cc1" name="/cartesian_vic_controller/status/wrench/force/y"/>
-         <curve color="#9467bd" name="/cartesian_vic_controller/status/wrench/force/z"/>
+         <curve name="/cartesian_vic_controller/status/wrench/force/x" color="#ff7f0e"/>
+         <curve name="/cartesian_vic_controller/status/wrench/force/y" color="#f14cc1"/>
+         <curve name="/cartesian_vic_controller/status/wrench/force/z" color="#9467bd"/>
         </plot>
        </DockArea>
       </DockSplitter>
-      <DockSplitter orientation="-" sizes="0.333333;0.333333;0.333333" count="3">
+      <DockSplitter sizes="0.333333;0.333333;0.333333" count="3" orientation="-">
        <DockArea name="z_dot">
-        <plot flip_y="false" flip_x="false" mode="TimeSeries" style="Lines">
-         <range left="5633.504901" right="5653.504597" top="0.014958" bottom="0.000054"/>
+        <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+         <range bottom="-0.003480" right="30.173063" top="0.303730" left="0.015007"/>
          <limitY/>
-         <curve color="#1ac938" name="/passivity_filter_diagnostic_data/values[0]"/>
+         <curve name="/passivity_filter_diagnostic_data/values[0]" color="#1ac938"/>
         </plot>
        </DockArea>
        <DockArea name="z">
-        <plot flip_y="false" flip_x="false" mode="TimeSeries" style="Lines">
-         <range left="5633.504901" right="5653.504597" top="0.028607" bottom="-0.000698"/>
+        <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+         <range bottom="-0.019744" right="30.173063" top="0.809486" left="0.015007"/>
          <limitY/>
-         <curve color="#ff7f0e" name="/passivity_filter_diagnostic_data/values[1]"/>
-         <curve color="#9467bd" name="/passivity_filter_diagnostic_data/values[2]"/>
+         <curve name="/passivity_filter_diagnostic_data/values[1]" color="#ff7f0e"/>
+         <curve name="/passivity_filter_diagnostic_data/values[2]" color="#9467bd"/>
         </plot>
        </DockArea>
        <DockArea name="...">
-        <plot flip_y="false" flip_x="false" mode="TimeSeries" style="Lines">
-         <range left="5633.504901" right="5653.504597" top="100.100000" bottom="0.000000"/>
+        <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+         <range bottom="0.000000" right="30.173063" top="100.100000" left="0.015007"/>
          <limitY min="0"/>
-         <curve color="#f14cc1" name="/passivity_filter_diagnostic_data/values[3]"/>
+         <curve name="/passivity_filter_diagnostic_data/values[3]" color="#f14cc1"/>
         </plot>
        </DockArea>
       </DockSplitter>
@@ -235,42 +256,60 @@
   </Tab>
   <Tab tab_name="XY plot + z " containers="1">
    <Container>
-    <DockSplitter orientation="-" sizes="0.761566;0.238434" count="2">
+    <DockSplitter sizes="0.761511;0.238489" count="2" orientation="-">
      <DockArea name="...">
-      <plot flip_y="false" flip_x="false" mode="XYPlot" style="Lines">
-       <range left="-0.042523" right="0.002555" top="0.021001" bottom="-0.021061"/>
+      <plot style="Lines" flip_x="false" flip_y="false" mode="XYPlot">
+       <range bottom="-0.016633" right="0.053417" top="0.015772" left="-0.023417"/>
        <limitY/>
-       <curve curve_x="/cartesian_vic_controller/status/desired_pose/position/x" color="#bcbd22" name="/cartesian_vic_controller/status/desired_pose/position/[x;y]" curve_y="/cartesian_vic_controller/status/desired_pose/position/y"/>
-       <curve curve_x="/cartesian_vic_controller/status/pose/position/x" color="#1f77b4" name="/cartesian_vic_controller/status/pose/position/[x;y]" curve_y="/cartesian_vic_controller/status/pose/position/y"/>
+       <curve curve_x="/cartesian_vic_controller/status/desired_pose/position/x" name="/cartesian_vic_controller/status/desired_pose/position/[x;y]" curve_y="/cartesian_vic_controller/status/desired_pose/position/y" color="#bcbd22"/>
+       <curve curve_x="/cartesian_vic_controller/status/pose/position/x" name="/cartesian_vic_controller/status/pose/position/[x;y]" curve_y="/cartesian_vic_controller/status/pose/position/y" color="#1f77b4"/>
       </plot>
      </DockArea>
      <DockArea name="...">
-      <plot flip_y="false" flip_x="false" mode="TimeSeries" style="Lines">
-       <range left="-0.042523" right="5653.504597" top="0.000621" bottom="-0.000653"/>
+      <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+       <range bottom="-0.002597" right="30.173063" top="0.001159" left="-0.023417"/>
        <limitY/>
-       <curve color="#d62728" name="/cartesian_vic_controller/status/pose/position/z"/>
-       <curve color="#1ac938" name="/cartesian_vic_controller/status/desired_pose/position/z"/>
+       <curve name="/cartesian_vic_controller/status/pose/position/z" color="#d62728"/>
+       <curve name="/cartesian_vic_controller/status/desired_pose/position/z" color="#1ac938"/>
       </plot>
      </DockArea>
     </DockSplitter>
    </Container>
   </Tab>
-  <Tab tab_name="tab4" containers="1">
+  <Tab tab_name="Inertia (natural)" containers="1">
    <Container>
-    <DockSplitter orientation="-" sizes="1" count="1">
+    <DockSplitter sizes="1" count="1" orientation="-">
      <DockArea name="...">
-      <plot flip_y="false" flip_x="false" mode="TimeSeries" style="Lines">
-       <range left="5633.505570" right="5653.504604" top="0.015331" bottom="-0.042800"/>
+      <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+       <range bottom="-0.013125" right="30.173063" top="0.309420" left="0.173094"/>
        <limitY/>
-       <curve color="#17becf" name="/force_torque_sensor_broadcaster/wrench/wrench/force/x"/>
-       <curve color="#bcbd22" name="/force_torque_sensor_broadcaster/wrench/wrench/force/y"/>
-       <curve color="#1f77b4" name="/force_torque_sensor_broadcaster/wrench/wrench/force/z"/>
+       <curve name="/cartesian_vic_controller/status/natural_inertia/data[0]" color="#f14cc1"/>
+       <curve name="/cartesian_vic_controller/status/natural_inertia/data[12]" color="#9467bd"/>
+       <curve name="/cartesian_vic_controller/status/natural_inertia/data[13]" color="#17becf"/>
+       <curve name="/cartesian_vic_controller/status/natural_inertia/data[14]" color="#bcbd22"/>
+       <curve name="/cartesian_vic_controller/status/natural_inertia/data[1]" color="#1f77b4"/>
+       <curve name="/cartesian_vic_controller/status/natural_inertia/data[2]" color="#d62728"/>
+       <curve name="/cartesian_vic_controller/status/natural_inertia/data[6]" color="#1ac938"/>
+       <curve name="/cartesian_vic_controller/status/natural_inertia/data[7]" color="#ff7f0e"/>
+       <curve name="/cartesian_vic_controller/status/natural_inertia/data[8]" color="#f14cc1"/>
       </plot>
      </DockArea>
     </DockSplitter>
    </Container>
   </Tab>
-  <currentTabIndex index="1"/>
+  <Tab tab_name="commands" containers="1">
+   <Container>
+    <DockSplitter sizes="1" count="1" orientation="-">
+     <DockArea name="...">
+      <plot style="Lines" flip_x="false" flip_y="false" mode="TimeSeries">
+       <range bottom="0.000000" right="1.000000" top="1.000000" left="0.000000"/>
+       <limitY/>
+      </plot>
+     </DockArea>
+    </DockSplitter>
+   </Container>
+  </Tab>
+  <currentTabIndex index="6"/>
  </tabbed_widget>
  <use_relative_time_offset enabled="1"/>
  <!-- - - - - - - - - - - - - - - -->
@@ -295,7 +334,7 @@
    <max_array_size value="100"/>
    <boolean_strings_to_number value="true"/>
    <remove_suffix_from_strings value="true"/>
-   <selected_topics value="/desired_compliance;/cartesian_vic_controller/reference_compliant_frame_trajectory;/cartesian_vic_controller/status;/simulation_time;/passivity_filter_diagnostic_data;/force_torque_sensor_broadcaster/wrench;/diagnostics"/>
+   <selected_topics value="/cartesian_vic_controller/reference_compliant_frame_trajectory;/cartesian_vic_controller/status;/desired_compliance;/force_torque_sensor_broadcaster/wrench;/passivity_filter_diagnostic_data;/simulation_time;/diagnostics"/>
   </plugin>
   <plugin ID="UDP Server"/>
   <plugin ID="WebSocket Server"/>
@@ -314,79 +353,80 @@
  <previouslyLoaded_Streamer name="ROS2 Topic Subscriber"/>
  <!-- - - - - - - - - - - - - - - -->
  <customMathEquations>
-  <snippet name="error_dot_">
+  <snippet name="e_x">
    <global></global>
-   <function>return value - v1 </function>
-   <linked_source>/cartesian_vic_controller/status/desired_velocity/linear/z</linked_source>
-   <additional_sources>
-    <v1>/cartesian_vic_controller/status/velocity/linear/z</v1>
-   </additional_sources>
-  </snippet>
-  <snippet name="error_dot_y">
-   <global></global>
-   <function>return value - v1 </function>
-   <linked_source>/cartesian_vic_controller/status/desired_velocity/linear/y</linked_source>
-   <additional_sources>
-    <v1>/cartesian_vic_controller/status/velocity/linear/y</v1>
-   </additional_sources>
-  </snippet>
-  <snippet name="error_dot_x">
-   <global></global>
-   <function>return value - v1 </function>
-   <linked_source>/cartesian_vic_controller/status/desired_velocity/linear/x</linked_source>
-   <additional_sources>
-    <v1>/cartesian_vic_controller/status/velocity/linear/x</v1>
-   </additional_sources>
-  </snippet>
-  <snippet name="error_z">
-   <global></global>
-   <function>return value - v1 </function>
-   <linked_source>/cartesian_vic_controller/status/desired_pose/position/z</linked_source>
-   <additional_sources>
-    <v1>/cartesian_vic_controller/status/pose/position/z</v1>
-   </additional_sources>
-  </snippet>
-  <snippet name="error_y">
-   <global></global>
-   <function>return value - v1 </function>
-   <linked_source>/cartesian_vic_controller/status/desired_pose/position/y</linked_source>
-   <additional_sources>
-    <v1>/cartesian_vic_controller/status/pose/position/y</v1>
-   </additional_sources>
-  </snippet>
-  <snippet name="error_x">
-   <global></global>
-   <function>return value - v1 </function>
-   <linked_source>/cartesian_vic_controller/status/desired_pose/position/x</linked_source>
+   <function>return value - v1</function>
+   <linked_source>/cartesian_vic_controller/status/pose/position/x</linked_source>
    <additional_sources>
     <v1>/cartesian_vic_controller/status/pose/position/x</v1>
    </additional_sources>
   </snippet>
-  <snippet name="e_z">
-   <global></global>
-   <function>return value - v1 </function>
-   <linked_source>/cartesian_vic_controller/reference_compliant_frame_trajectory/cartesian_trajectory_points[0]/pose/position/z</linked_source>
-   <additional_sources>
-    <v1>/cartesian_vic_controller/status/pose/position/z</v1>
-   </additional_sources>
-  </snippet>
   <snippet name="e_y">
    <global></global>
-   <function>return value - v1 </function>
+   <function>return value - v1</function>
    <linked_source>/cartesian_vic_controller/reference_compliant_frame_trajectory/cartesian_trajectory_points[0]/pose/position/y</linked_source>
    <additional_sources>
     <v1>/cartesian_vic_controller/status/pose/position/y</v1>
    </additional_sources>
   </snippet>
-  <snippet name="e_x">
+  <snippet name="e_z">
    <global></global>
-   <function>return value - v1 </function>
-   <linked_source>/cartesian_vic_controller/status/pose/position/x</linked_source>
+   <function>return value - v1</function>
+   <linked_source>/cartesian_vic_controller/reference_compliant_frame_trajectory/cartesian_trajectory_points[0]/pose/position/z</linked_source>
+   <additional_sources>
+    <v1>/cartesian_vic_controller/status/pose/position/z</v1>
+   </additional_sources>
+  </snippet>
+  <snippet name="error_x">
+   <global></global>
+   <function>return value - v1</function>
+   <linked_source>/cartesian_vic_controller/status/desired_pose/position/x</linked_source>
    <additional_sources>
     <v1>/cartesian_vic_controller/status/pose/position/x</v1>
+   </additional_sources>
+  </snippet>
+  <snippet name="error_y">
+   <global></global>
+   <function>return value - v1</function>
+   <linked_source>/cartesian_vic_controller/status/desired_pose/position/y</linked_source>
+   <additional_sources>
+    <v1>/cartesian_vic_controller/status/pose/position/y</v1>
+   </additional_sources>
+  </snippet>
+  <snippet name="error_z">
+   <global></global>
+   <function>return value - v1</function>
+   <linked_source>/cartesian_vic_controller/status/desired_pose/position/z</linked_source>
+   <additional_sources>
+    <v1>/cartesian_vic_controller/status/pose/position/z</v1>
+   </additional_sources>
+  </snippet>
+  <snippet name="error_dot_x">
+   <global></global>
+   <function>return value - v1</function>
+   <linked_source>/cartesian_vic_controller/status/desired_velocity/linear/x</linked_source>
+   <additional_sources>
+    <v1>/cartesian_vic_controller/status/velocity/linear/x</v1>
+   </additional_sources>
+  </snippet>
+  <snippet name="error_dot_y">
+   <global></global>
+   <function>return value - v1</function>
+   <linked_source>/cartesian_vic_controller/status/desired_velocity/linear/y</linked_source>
+   <additional_sources>
+    <v1>/cartesian_vic_controller/status/velocity/linear/y</v1>
+   </additional_sources>
+  </snippet>
+  <snippet name="error_dot_">
+   <global></global>
+   <function>return value - v1</function>
+   <linked_source>/cartesian_vic_controller/status/desired_velocity/linear/z</linked_source>
+   <additional_sources>
+    <v1>/cartesian_vic_controller/status/velocity/linear/z</v1>
    </additional_sources>
   </snippet>
  </customMathEquations>
  <snippets/>
  <!-- - - - - - - - - - - - - - - -->
 </root>
+
