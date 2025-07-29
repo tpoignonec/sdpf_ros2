@@ -565,7 +565,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
                 # linestyle = dataset['linestyle']
             )
 
-    ax1.set_ylabel(r'$w$' + ' ' + r'\small{(J.s${}^{-1}$)}')
+    ax1.set_ylabel(r'$w$' + '\n' + r'\small{(J.s${}^{-1}$)}')
 
     # -------------------------
     # Integral of z_dot
@@ -596,7 +596,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
         r'$z$'  # = \int_0^t w(\cdot) d\tau$'
         # r'{\setlength{\fboxrule}{0pt} \fbox{ \phantom{${\displaystyle \int_0^t}$} ${\int_0^t w\left(\beta(\tau), \tau\right) d\tau}$}}'
         # + '\n'
-        + ' '
+        + '\n'
         + r'\small{(J)}'
     )
 
@@ -620,7 +620,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
                 # linestyle = dataset['linestyle']
             )
 
-    ax3.set_ylabel(r'$\beta$' + ' ' + r'\small{(unitless)}')
+    ax3.set_ylabel(r'$\beta$' + '\n' + r'\small{(unitless)}')
     ax3.set_xlabel(r'time (s)')
 
     # extra setup
@@ -628,14 +628,22 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
         ax.grid(which='major')
         ax.grid(which='minor', linewidth=0.1)
 
+
+    fig_z_z_dot_beta.align_ylabels([ax1, ax2, ax3])
+    ax1.set_xlim((0., np.max(crop_time_serie(experimental_data['SDPF']['desired_compliant_frame'], 'time'))))
+
+    if SAVE_FIGS :
+        multi_format_savefig(
+            figure = fig_z_z_dot_beta,
+            dir_name = export_figs_dir,
+            fig_name = "z_dot_z_and_beta_no_legend"
+        )
+
     ax1.legend(
         ncol=4,
         bbox_to_anchor=(0.5, 1.4),
         loc='upper center',
     )  # , framealpha=0.5)
-
-    fig_z_z_dot_beta.align_ylabels([ax1, ax2, ax3])
-    ax1.set_xlim((0., np.max(crop_time_serie(experimental_data['SDPF']['desired_compliant_frame'], 'time'))))
 
     # -------------------------------
     # EXPORT TO FILES
