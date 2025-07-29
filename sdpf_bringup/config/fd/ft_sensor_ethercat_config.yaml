@@ -12,10 +12,10 @@ tpdo:  # TxPDO
     channels:
       - {index: 0x6000, sub_index: 0x01, type: int32, state_interface: force.x, factor: 1e-6, offset: 1.7}  # Fx/Gage0
       - {index: 0x6000, sub_index: 0x02, type: int32, state_interface: force.y, factor: 1e-6, offset: 2.545}  # Fy/Gage1
-      - {index: 0x6000, sub_index: 0x03, type: int32, state_interface: force.z, factor: 1e-6, offset: -0.96}  # Fz/Gage2
-      - {index: 0x6000, sub_index: 0x04, type: int32, state_interface: torque.x, factor: 1e-6, offset: 0.0}  # Tx/Gage3
-      - {index: 0x6000, sub_index: 0x05, type: int32, state_interface: torque.y, factor: 1e-6, offset: 0.0}  # Ty/Gage4
-      - {index: 0x6000, sub_index: 0x06, type: int32, state_interface: torque.z, factor: 1e-6, offset: 0.0}  # Tz/Gage5
+      - {index: 0x6000, sub_index: 0x03, type: int32, state_interface: force.z, factor: 1e-6, offset: -0.7}  # Fz/Gage2
+      - {index: 0x6000, sub_index: 0x04, type: int32, state_interface: torque.x, factor: 0.0, offset: 0.0}  # Tx/Gage3
+      - {index: 0x6000, sub_index: 0x05, type: int32, state_interface: torque.y, factor: 0.0, offset: 0.0}  # Ty/Gage4
+      - {index: 0x6000, sub_index: 0x06, type: int32, state_interface: torque.z, factor: 0.0, offset: 0.0}  # Tz/Gage5
       - {index: 0x6010, sub_index: 0x00, type: uint32}  # Status Code
       - {index: 0x6020, sub_index: 0x00, type: uint32}  # Sample Counter
 sm:  # Sync Manager

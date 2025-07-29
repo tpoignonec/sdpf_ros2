@@ -184,16 +184,16 @@ class PassivityFilterNodeBase(Node):
             # )
         elif (self.get_parameter('scenario').value == 'impedance_ft_elastic'):
             self._dim = 3
-            self._t_max = 12
-            self._period_var_impedance = self._t_max / 3  # seconds
+            self._t_max = 10
+            self._period_var_impedance = self._t_max / 2  # seconds
             # Impedance traj. setting
             self._desired_inertia = np.diag(np.array(
-                [0.5] * 3
+                [0.7] * 3
             ))
-            self._K_min_diag = np.array([200.0, 200.0, 1000.0])
-            self._K_max_diag = np.array([1000.0, 1000.0, 1000.0])
+            self._K_min_diag = np.array([50.0, 500.0, 500.0])
+            self._K_max_diag = np.array([500.0, 500.0, 500.0])
             self._max_inertia_lambda = np.max(self._desired_inertia)
-            self._damping_ratios = np.array([0.3] * 3)
+            self._damping_ratios = np.array([0.2] * 3)
             self._D_min_diag = 2 * self._damping_ratios * np.sqrt(
                 self._K_min_diag * self._max_inertia_lambda
             )
