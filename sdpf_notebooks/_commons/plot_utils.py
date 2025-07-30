@@ -16,6 +16,23 @@ def get_color_list():  # noqa:D103
     return plt.rcParams['axes.prop_cycle'].by_key()['color']
 
 
+def set_linestyle_list(linestyle_list=['-', '-', '-', '-', '-.']):
+    """Set the global matplotlib linestyle cycle to a custom list."""
+    colors = get_color_list()
+    linestyles = linestyle_list + ['-'] * (len(colors) - len(linestyle_list))
+    plt.rcParams['axes.prop_cycle'] = plt.cycler(
+        linestyle=linestyles,
+        color=colors
+    )
+    print(f"Set matplotlib linestyle cycle to: {linestyle_list}")
+
+
+def get_linestyle_list():  # noqa:D103
+    """Get the current matplotlib linestyle cycle."""
+    return plt.rcParams['axes.prop_cycle'].by_key()['linestyle']
+
+
+
 def flip(items, ncol):  # noqa:D103
     # https://stackoverflow.com/questions/10101141/matplotlib-legend-add-items-across-columns-instead-of-down
     return itertools.chain(*[items[i::ncol] for i in range(ncol)])

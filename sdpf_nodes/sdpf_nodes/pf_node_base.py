@@ -163,7 +163,7 @@ class PassivityFilterNodeBase(Node):
         self._match_natural_inertia = False
 
         # For UR5 PHRI scenario
-        self._t_max = 0.0  # seconds, to be set bellow...
+        self._t_max = 0.0  # seconds, to be set below...
         if (self.get_parameter('scenario').value == 'admittance_ur5_phri'):
             self._dim = 6
             self._t_max = 15

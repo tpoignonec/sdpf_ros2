@@ -42,6 +42,7 @@ if commons_module_path not in sys.path:
 import plot_utils
 import plot_utils_1D
 plot_utils.ensure_dir_exists(export_figs_dir)
+plot_utils.set_linestyle_list()  # Set default linestyle cycle
 
 # Base simulation scenario
 import simulation_scenarios

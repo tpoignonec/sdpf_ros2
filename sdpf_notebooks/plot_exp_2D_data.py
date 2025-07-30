@@ -15,7 +15,6 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
 
     import os
     import sys
-    import plot_utils
 
     parent_folder = os.path.abspath(os.path.join(__file__, os.pardir))
     commons_module_path = os.path.abspath(os.path.join(parent_folder, '_commons/'))
@@ -40,6 +39,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
     commons_module_path = os.path.abspath(os.path.join('_commons/'))
     if commons_module_path not in sys.path:
         sys.path.append(commons_module_path)
+    import plot_utils
 
     # Define topics
 
@@ -67,35 +67,38 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
 
     color_list = plot_utils.get_color_list()
     print(f'Color list: {color_list}')
+    plot_utils.set_linestyle_list()
+    linestyle_list = plot_utils.get_linestyle_list()
+    print(f'Linestyle list: {linestyle_list}')
     dataset_info_list = [
-        {
-            'tag': 'SIPF',
-            'path_to_bag': datasets_path_root + 'SIPF/SIPF_0.mcap',
-            'label': label_SIPF_W2,
-            'color': color_list[0],
-            'linestyle': '-'
-        },
+        # {
+        #     'tag': 'SIPF',
+        #     'path_to_bag': datasets_path_root + 'SIPF/SIPF_0.mcap',
+        #     'label': label_SIPF_W2,
+        #     'color': color_list[0],
+        #     'linestyle': linestyle_list[0]
+        # },
         {
             'tag': 'SIPF+',
             'path_to_bag': datasets_path_root + 'SIPF+/SIPF+_0.mcap',
             'label': label_SIPF_W4,
             'color': color_list[1],
-            'linestyle': '-'
+            'linestyle': linestyle_list[1]
         },
         {
             'tag': 'SDPF',
             'path_to_bag': datasets_path_root + 'SDPF/SDPF_0.mcap',
             'label': label_SDPF,
             'color': color_list[2],
-            'linestyle': '-'
+            'linestyle': linestyle_list[2]
         },
-        # {
-        #     'tag': 'SDPF_adaptive',
-        #     'path_to_bag': datasets_path_root + 'SDPF-adaptive/SDPF-adaptive_0.mcap',
-        #     'label': label_SDPF_adaptive,
-        #     'color': color_list[4],
-        #     'linestyle': ':'
-        # }
+        {
+            'tag': 'SDPF_adaptive',
+            'path_to_bag': datasets_path_root + 'SDPF-adaptive/SDPF-adaptive_0.mcap',
+            'label': label_SDPF_adaptive,
+            'color': color_list[4],
+            'linestyle': linestyle_list[4]
+        }
     ]
 
     print(f'Dataset info used for extraction:\n{dataset_info_list}')
@@ -344,9 +347,10 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
     ax1.set_ylabel(r'$p_y$' + ' ' + r'\small{(m)}')
 
     # extra setup
-    bbox_to_anchor_y = 1.2 # 1.27
+    ncol_legend_traj_XY = 2
+    bbox_to_anchor_y = 1.23
     ax1.legend(
-        ncol=min(3, len(experimental_data)),
+        ncol=ncol_legend_traj_XY,
         columnspacing=0.8,
         bbox_to_anchor=(0.5, bbox_to_anchor_y),
         loc='upper center',
@@ -408,7 +412,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
     ax1.legend(
         ncol=len(experimental_data),
         columnspacing=0.8,
-        bbox_to_anchor=(0.5, 1.4),
+        bbox_to_anchor=(0.45, 1.4),
         loc='upper center',
     )  # , framealpha=0.5)
 
@@ -511,7 +515,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
 
     ax1.legend(
         ncol=4,
-        bbox_to_anchor=(0.5, 1.4),
+        bbox_to_anchor=(0.45, 1.4),
         loc='upper center',
     )  # , framealpha=0.5)
 
@@ -643,7 +647,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
 
     ax1.legend(
         ncol=4,
-        bbox_to_anchor=(0.5, 1.4),
+        bbox_to_anchor=(0.45, 1.4),
         loc='upper center',
     )  # , framealpha=0.5)
 

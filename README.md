@@ -223,13 +223,13 @@ cd ~/dev/ros2_workspaces/ws_sdpf_ros2
 source install/setup.bash
 
 export EXP_SERIES_NAME=<name_of_this_series_of_experiment>
-# e.g., export EXP_SERIES_NAME=exp_october_12_2024
+# e.g., export EXP_SERIES_NAME=ur5_circular_30-07-2025
 
 ros2 launch sdpf_bringup run_exp.launch.py \
     scenario:=admittance_ur5_phri trajectory_type:=circular \
     record_bags:=true \
     bag_path:=rosbags/$EXP_SERIES_NAME/ \
-    pf_method:=SDPF
+    pf_method:=SIPF
 
 # CTRL + C at the end of the simulation (+- 15 seconds)
 
@@ -237,7 +237,7 @@ ros2 launch sdpf_bringup run_exp.launch.py \
     scenario:=admittance_ur5_phri trajectory_type:=circular \
     record_bags:=true \
     bag_path:=rosbags/$EXP_SERIES_NAME/ \
-    pf_method:=SIPF
+    pf_method:=SIPF+
 
 # CTRL + C at the end of the simulation (+- 15 seconds)
 
