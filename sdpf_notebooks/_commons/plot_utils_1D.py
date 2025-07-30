@@ -108,6 +108,7 @@ def plot_K(simulation_data, controller_sim_datasets, num_columns=3):
         ax.grid(which='minor', linewidth=0.1)
 
     ax1.set_xlim((0., np.max(simulation_data['time'])))
+    ax1.set_ylim((0., ax1.get_ylim()[1] * 1.1))  # Add some space above the max K value
 
     # Annotation phases
     annotation_rel_hight = 0.9
@@ -213,6 +214,8 @@ def plot_K_and_D(simulation_data, controller_sim_datasets, num_columns=3):
 
     fig_profile.align_ylabels([ax1, ax2])
     ax1.set_xlim((0., np.max(simulation_data['time'])))
+    ax1.set_ylim((0., ax1.get_ylim()[1] * 1.1))  # Add some space above the max K value
+    ax2.set_ylim((0., ax2.get_ylim()[1] * 1.1))  # Add some space above the max K value
 
     # Annotation phases
     annotation_rel_hight = 0.86
@@ -317,6 +320,8 @@ def plot_M_and_D(simulation_data, controller_sim_datasets, num_columns=3):
 
     fig_profile.align_ylabels([ax1, ax2])
     ax1.set_xlim((0., np.max(simulation_data['time'])))
+    ax1.set_ylim((0., ax1.get_ylim()[1] * 1.1))  # Add some space above the max K value
+    ax2.set_ylim((0., ax2.get_ylim()[1] * 1.1))  # Add some space above the max K value
 
     # Annotation phases
     annotation_rel_hight = 0.86
@@ -391,6 +396,7 @@ def plot_M(simulation_data, controller_sim_datasets, num_columns=3):
     ax1.grid(which='major')
     ax1.grid(which='minor', linewidth=0.1)
     ax1.set_xlim((0., np.max(simulation_data['time'])))
+    ax1.set_ylim((0., ax1.get_ylim()[1] * 1.1))  # Add some space above the max K value
 
     # Annotation phases
     annotation_rel_hight = 0.9
@@ -1041,6 +1047,7 @@ def plot_K_z_and_beta(
 
     fig_K_z_beta.align_ylabels([ax1, ax2, ax3])
     ax1.set_xlim((0., np.max(simulation_data['time'])))
+    ax1.set_ylim((0., ax1.get_ylim()[1] * 1.1))  # Add some space above the max K value
 
     return fig_K_z_beta, (ax1, ax2, ax3)
 

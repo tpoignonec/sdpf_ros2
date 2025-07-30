@@ -272,6 +272,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
         ax.grid(which='minor', linewidth=0.1)
 
     ax1.set_xlim((0., np.max(crop_time_serie(experimental_data['SDPF']['desired_compliant_frame'], 'time'))))
+    ax1.set_ylim((0., ax1.get_ylim()[1] * 1.1))  # Add some space above the max K value
 
     if SAVE_FIGS :
         multi_format_savefig(
@@ -450,6 +451,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
 
     fig_stiff_and_state_meas.align_ylabels([ax1, ax2, ax3])
     ax1.set_xlim((0., np.max(crop_time_serie(experimental_data['SDPF']['desired_compliant_frame'], 'time'))))
+    ax1.set_ylim((0., ax1.get_ylim()[1] * 1.1))  # Add some space above the max K value
 
 
     # -------------------------------

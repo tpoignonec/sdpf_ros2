@@ -407,6 +407,10 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
     ax2.set_ylabel(r'$K_y$' + '\n' + r'\small{(N.m$^{-1}$)}')
     ax2.set_xlabel(r'time (s)')
 
+
+    ax1.set_ylim((0., ax1.get_ylim()[1] * 1.1))  # Add some space above the max K value
+    ax2.set_ylim((0., ax2.get_ylim()[1] * 1.1))  # Add some space above the max K value
+
     # extra setup
     # ------------
     ax1.legend(

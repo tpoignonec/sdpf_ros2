@@ -14,7 +14,7 @@ z_max = 1.0
 
 SAVE_FIGS = True
 export_figs_dir = "export_figures/simulations_SIPF_vs_SDPF_vs_integrals"
-plot_SIPF_W4 = True
+plot_SIPF_W4 = False
 
 # ##################################
 
