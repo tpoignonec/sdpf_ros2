@@ -202,7 +202,7 @@ annotate_regions = plot_utils_1D.annotate_regions
 
 
 # %% Plot all results
-num_columns = 3
+num_columns = 3 if plot_SIPF_W4 else 2
 fig_profile, axs_profile = plot_utils_1D.plot_K_and_D(
     simulation_data, controller_sim_datasets, num_columns=num_columns)
 
