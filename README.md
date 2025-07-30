@@ -113,7 +113,7 @@ cd ~/dev/ros2_workspaces/ws_sdpf_ros2
 source install/setup.bash
 
 ros2 launch sdpf_bringup run_exp.launch.py \
-    scenario:=impedance_ft_elastic trajectory_type:=static \
+    scenario:=impedance_ft_elastic  control_rate:=500. trajectory_type:=static \
     pf_method:=SIPF # SIPF / SIPF+ / SDPF / etc.
 ```
 
@@ -121,7 +121,7 @@ or with a circular trajectory
 
 ```bash
 ros2 launch sdpf_bringup run_exp.launch.py \
-    scenario:=impedance_ft_elastic trajectory_type:=circular \
+    scenario:=impedance_ft_elastic  control_rate:=500. trajectory_type:=circular \
     pf_method:=SIPF # SIPF / SIPF+ / SDPF / etc.
 ```
 
@@ -135,7 +135,7 @@ export EXP_SERIES_NAME=<name_of_this_series_of_experiment>
 # e.g., export EXP_SERIES_NAME=exp_october_12_2024
 
 ros2 launch sdpf_bringup run_exp.launch.py \
-    scenario:=impedance_ft_elastic trajectory_type:=static \
+    scenario:=impedance_ft_elastic control_rate:=500. trajectory_type:=static \
     record_bags:=true \
     bag_path:=rosbags/$EXP_SERIES_NAME/ \
     pf_method:=SIPF
@@ -143,7 +143,7 @@ ros2 launch sdpf_bringup run_exp.launch.py \
 # CTRL + C at the end of the simulation (+- 15 seconds)
 
 ros2 launch sdpf_bringup run_exp.launch.py \
-    scenario:=impedance_ft_elastic trajectory_type:=static \
+    scenario:=impedance_ft_elastic control_rate:=500. trajectory_type:=static \
     record_bags:=true \
     bag_path:=rosbags/$EXP_SERIES_NAME/ \
     pf_method:=SIPF+
