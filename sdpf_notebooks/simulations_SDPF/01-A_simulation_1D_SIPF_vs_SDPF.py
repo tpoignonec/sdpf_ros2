@@ -8,10 +8,16 @@
 # ##################################
 
 epsilon_stability = 0.0
+plot_SIPF_W4 = False  # Set to False to not plot SIPF W4 results
 
 SAVE_FIGS = True
 export_figs_dir = "export_figures/simulations_SIPF_vs_SDPF"
-plot_SIPF_W4 = True
+
+if plot_SIPF_W4:
+    print("Plotting SIPF W4 results")
+else:
+    print("Not plotting SIPF W4 results, only SIPF W2 and SDPF")
+
 # ##################################
 
 import matplotlib
@@ -149,25 +155,30 @@ for controller_sim_data in [controller_SIPF_W2_sim_data] + SDPF_controllers_sim_
 # ##  Main results: SIPF vs. SDPF
 
 # %% Plot all results
+ncols = 4 if plot_SIPF_W4 else 3
 fig_profile, axs_profile = plot_utils_1D.plot_K_and_D(
-    simulation_data, controller_sim_datasets, num_columns=3)
+    simulation_data, controller_sim_datasets, num_columns=ncols)
+
+fig_K, axs_K = plot_utils_1D.plot_K(
+    simulation_data, controller_sim_datasets, num_columns=ncols)
 
 fig_state_meas, axs_state_meas = plot_utils_1D.plot_cartesian_state(
-    simulation_data, controller_sim_datasets, num_columns=3)
+    simulation_data, controller_sim_datasets, num_columns=ncols)
 
 fig_z_z_dot_beta, axs_z_z_dot_beta = plot_utils_1D.plot_z_dot_z_and_beta(
-    simulation_data, controller_sim_datasets, num_columns=3)
+    simulation_data, controller_sim_datasets, num_columns=ncols)
 
 fig_z_z_dot_beta_annotated, axs_z_z_dot_beta_annotated = \
     plot_utils_1D.plot_z_dot_z_and_beta(
         simulation_data,
         controller_sim_datasets,
-        num_columns=3,
-        restrict_z_dot_y_range=True
+        num_columns=ncols,
+        restrict_z_dot_y_range=True,
+        annotate_nominal_peaks=True
     )
 
 fig_vic_errors, axs_vic_errors = plot_utils_1D.plot_vic_tracking_errors(
-    simulation_data, controller_sim_datasets, num_columns=3)
+    simulation_data, controller_sim_datasets, num_columns=ncols)
 
 # %% Export figures
 
@@ -182,20 +193,24 @@ if SAVE_FIGS :
         fig_name = "impedance_profiles" + prepend_to_figname
     )
     multi_format_savefig(
+        figure = fig_K,
+        dir_name = export_figs_dir,
+        fig_name = "stiffness_only_profiles" + prepend_to_figname
+    )
+    multi_format_savefig(
         figure = fig_state_meas,
         dir_name = export_figs_dir,
         fig_name = "pos_vel_and_force" + prepend_to_figname
     )
-    # No need for prepend, SIPF_W4 is already ignored by default
     multi_format_savefig(
         figure = fig_z_z_dot_beta,
         dir_name = export_figs_dir,
-        fig_name = "z_dot_z_and_beta"
+        fig_name = "z_dot_z_and_beta" + prepend_to_figname
     )
     multi_format_savefig(
         figure = fig_z_z_dot_beta_annotated,
         dir_name = export_figs_dir,
-        fig_name = "z_dot_z_and_beta(annotated)"
+        fig_name = "z_dot_z_and_beta(annotated)" + prepend_to_figname
     )
     multi_format_savefig(
         figure = fig_vic_errors,

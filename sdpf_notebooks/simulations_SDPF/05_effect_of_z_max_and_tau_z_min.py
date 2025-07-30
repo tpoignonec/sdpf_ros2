@@ -10,7 +10,7 @@ epsilon_stability = 0.0
 
 # list of parameter values to test
 tau_delay_adaptive_z_min_list = [1., 5., 10.]
-z_max_list = [0.05, 0.1, 0.2, 0.3]
+z_max_list = [0.1, 0.2, 0.5]
 
 SAVE_FIGS = True
 export_figs_dir = "export_figures/effect_of_z_max_and_tau_z"
@@ -101,6 +101,21 @@ axs[0].legend(
     loc='upper center',
 )  # , framealpha=0.5)
 
+fig_K_z_and_beta, axs_bis = plot_utils_1D.plot_K_z_and_beta(
+    simulation_data,
+    controller_sim_datasets,
+    num_columns=len(tau_delay_adaptive_z_min_list),
+    plot_z_min=True,
+    plot_z_max=False
+)
+
+axs_bis[0].legend(
+    title=r'Time constant for the filtered variable $\bar{z}(t)$',
+    ncol=len(tau_delay_adaptive_z_min_list),
+    bbox_to_anchor=(0.5, 2.0),
+    loc='upper center',
+)  # , framealpha=0.5)
+
 # -------------------------------
 # EXPORT TO FILES
 # -------------------------------
@@ -109,6 +124,12 @@ if SAVE_FIGS :
         figure = fig_z_z_dot_beta,
         dir_name = export_figs_dir,
         fig_name = "effect_of_tau_filtered_z"
+    )
+
+    multi_format_savefig(
+        figure = fig_K_z_and_beta,
+        dir_name = export_figs_dir,
+        fig_name = "effect_of_tau_filtered_z_K_z_and_beta"
     )
 
 # %% [markdown]
@@ -159,6 +180,20 @@ axs[0].legend(
     loc='upper center',
 )  # , framealpha=0.5)
 
+fig_K_z_and_beta, axs_bis = plot_utils_1D.plot_K_z_and_beta(
+    simulation_data,
+    controller_sim_datasets,
+    num_columns=4,
+    plot_z_min=False,
+    plot_z_max=True
+)
+
+axs_bis[0].legend(
+    title=r'Upper bound $z_{max}$ on $z(t)$',
+    ncol=4,
+    bbox_to_anchor=(0.5, 2.0),
+    loc='upper center',
+)  # , framealpha=0.5)
 
 # -------------------------------
 # EXPORT TO FILES
@@ -168,6 +203,11 @@ if SAVE_FIGS :
         figure = fig_z_z_dot_beta,
         dir_name = export_figs_dir,
         fig_name = "effect_of_z_max"
+    )
+    multi_format_savefig(
+        figure = fig_K_z_and_beta,
+        dir_name = export_figs_dir,
+        fig_name = "effect_of_z_max_K_z_and_beta"
     )
 
 # Show figure in GUI if is main() script

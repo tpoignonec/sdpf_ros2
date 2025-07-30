@@ -98,6 +98,7 @@ placeholder_dataset = {
 
 controller_sim_datasets = [
     vanilla_VIC_controller_sim_data,
+    placeholder_dataset,
     placeholder_dataset
 ] + SDPF_controllers_sim_datasets
 
@@ -134,7 +135,8 @@ fig_z_z_dot_beta_annotated, axs_z_z_dot_beta_annotated = \
         simulation_data,
         controller_sim_datasets,
         num_columns=2,
-        restrict_z_dot_y_range=True
+        restrict_z_dot_y_range=True,
+        annotate_nominal_peaks=True
     )
 
 plot_z_dot_and_beta, _ = plot_utils_1D.plot_z_dot_and_beta(
@@ -144,7 +146,8 @@ plot_z_dot_and_beta_annotated, _ = plot_utils_1D.plot_z_dot_and_beta(
     simulation_data,
     controller_sim_datasets,
     num_columns=2,
-    restrict_z_dot_y_range=True
+    restrict_z_dot_y_range=True,
+    annotate_nominal_peaks=True
 )
 
 fig_vic_errors, axs_vic_errors = plot_utils_1D.plot_vic_tracking_errors(

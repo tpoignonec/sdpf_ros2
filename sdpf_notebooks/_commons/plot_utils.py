@@ -1,5 +1,6 @@
 import itertools
 import matplotlib.pyplot as plt
+import numpy as np
 import os
 
 from scipy.signal import find_peaks
@@ -18,6 +19,31 @@ def get_color_list():  # noqa:D103
 def flip(items, ncol):  # noqa:D103
     # https://stackoverflow.com/questions/10101141/matplotlib-legend-add-items-across-columns-instead-of-down
     return itertools.chain(*[items[i::ncol] for i in range(ncol)])
+
+
+def auto_adjust_ylim_for_xlim(ax, y_margin=0.05):
+    """
+    Automatically adjust y-limits based on current x-limits
+    """
+    xlim = ax.get_xlim()
+
+    # Get all line data
+    all_y_data = []
+    for line in ax.get_lines():
+        x_data = line.get_xdata()
+        y_data = line.get_ydata()
+
+        # Filter data within current x-limits
+        mask = (x_data >= xlim[0]) & (x_data <= xlim[1])
+        if np.any(mask):
+            visible_y = y_data[mask]
+            all_y_data.extend(visible_y)
+
+    if all_y_data:
+        y_min, y_max = np.min(all_y_data), np.max(all_y_data)
+        y_range = y_max - y_min
+        margin = y_range * y_margin if y_range > 0 else 0.1
+        ax.set_ylim(y_min - margin, y_max + margin)
 
 
 def highlight_regions(simulation_data, ax):  # noqa:D103

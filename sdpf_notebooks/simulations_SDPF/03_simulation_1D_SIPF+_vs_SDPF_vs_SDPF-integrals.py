@@ -13,7 +13,7 @@ tau_delay_adaptive_z_min = 3.0
 z_max = 1.0
 
 SAVE_FIGS = True
-export_figs_dir = "export_figures/simulations_SIPF_vs_SDPF"
+export_figs_dir = "export_figures/simulations_SIPF_vs_SDPF_vs_integrals"
 plot_SIPF_W4 = True
 
 # ##################################
@@ -201,25 +201,31 @@ annotate_regions = plot_utils_1D.annotate_regions
 
 
 # %% Plot all results
+num_columns = 3
 fig_profile, axs_profile = plot_utils_1D.plot_K_and_D(
-    simulation_data, controller_sim_datasets, num_columns=3)
+    simulation_data, controller_sim_datasets, num_columns=num_columns)
+
+fig_K_only, axs_K_only = plot_utils_1D.plot_K(
+    simulation_data, controller_sim_datasets, num_columns=num_columns)
 
 fig_state_meas, axs_state_meas = plot_utils_1D.plot_cartesian_state(
-    simulation_data, controller_sim_datasets, num_columns=3)
+    simulation_data, controller_sim_datasets, num_columns=num_columns)
 
 fig_z_z_dot_beta, axs_z_z_dot_beta = plot_utils_1D.plot_z_dot_z_and_beta(
-    simulation_data, controller_sim_datasets, num_columns=4)
+    simulation_data, controller_sim_datasets, num_columns=num_columns)
 
-fig_z_z_dot_beta_annotated, axs_z_z_dot_beta_annotated = \
+fig_z_z_dot_beta_clipped, axs_z_z_dot_beta_clipped = \
     plot_utils_1D.plot_z_dot_z_and_beta(
         simulation_data,
         controller_sim_datasets,
-        num_columns=3,
-        restrict_z_dot_y_range=True
+        num_columns=num_columns,
+        restrict_z_dot_y_range=True,
+        annotate_nominal_peaks=False
     )
+axs_z_z_dot_beta_clipped[0].set_ylim((-2, 3))
 
 fig_vic_errors, axs_vic_errors = plot_utils_1D.plot_vic_tracking_errors(
-    simulation_data, controller_sim_datasets, num_columns=4)
+    simulation_data, controller_sim_datasets, num_columns=num_columns)
 
 # %% Export figures
 
@@ -234,6 +240,11 @@ if SAVE_FIGS :
         fig_name = "impedance_profiles" + prepend_to_figname
     )
     multi_format_savefig(
+        figure = fig_K_only,
+        dir_name = export_figs_dir,
+        fig_name = "K_only" + prepend_to_figname
+    )
+    multi_format_savefig(
         figure = fig_state_meas,
         dir_name = export_figs_dir,
         fig_name = "pos_vel_and_force" + prepend_to_figname
@@ -245,9 +256,9 @@ if SAVE_FIGS :
         fig_name = "z_dot_z_and_beta"
     )
     multi_format_savefig(
-        figure = fig_z_z_dot_beta_annotated,
+        figure = fig_z_z_dot_beta_clipped,
         dir_name = export_figs_dir,
-        fig_name = "z_dot_z_and_beta(annotated)"
+        fig_name = "z_dot_z_and_beta(clipped)"
     )
     multi_format_savefig(
         figure = fig_vic_errors,

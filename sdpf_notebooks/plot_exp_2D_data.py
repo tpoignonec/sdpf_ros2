@@ -15,6 +15,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
 
     import os
     import sys
+    import plot_utils
 
     parent_folder = os.path.abspath(os.path.join(__file__, os.pardir))
     commons_module_path = os.path.abspath(os.path.join(parent_folder, '_commons/'))
@@ -64,26 +65,27 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
     label_SDPF_integral = r'SDPF, $z(t) \geq 0$'
     label_SDPF_adaptive = r'SDPF, $z(t) \geq z_{min}(t)$'
 
-    color_list = plt.rcParams['axes.prop_cycle'].by_key()['color']
+    color_list = plot_utils.get_color_list()
+    print(f'Color list: {color_list}')
     dataset_info_list = [
-        {
-            'tag': 'SDPF',
-            'path_to_bag': datasets_path_root + 'SDPF/SDPF_0.mcap',
-            'label': label_SDPF,
-            'color': color_list[0],
-            'linestyle': '-'
-        },
         {
             'tag': 'SIPF',
             'path_to_bag': datasets_path_root + 'SIPF/SIPF_0.mcap',
             'label': label_SIPF_W2,
-            'color': color_list[1],
+            'color': color_list[0],
             'linestyle': '-'
         },
         {
             'tag': 'SIPF+',
             'path_to_bag': datasets_path_root + 'SIPF+/SIPF+_0.mcap',
             'label': label_SIPF_W4,
+            'color': color_list[1],
+            'linestyle': '-'
+        },
+        {
+            'tag': 'SDPF',
+            'path_to_bag': datasets_path_root + 'SDPF/SDPF_0.mcap',
+            'label': label_SDPF,
             'color': color_list[2],
             'linestyle': '-'
         },
@@ -91,7 +93,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
         #     'tag': 'SDPF_adaptive',
         #     'path_to_bag': datasets_path_root + 'SDPF-adaptive/SDPF-adaptive_0.mcap',
         #     'label': label_SDPF_adaptive,
-        #     'color': color_list[3],
+        #     'color': color_list[4],
         #     'linestyle': ':'
         # }
     ]
