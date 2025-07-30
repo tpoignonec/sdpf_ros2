@@ -37,6 +37,8 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
     if commons_module_path not in sys.path:
         sys.path.append(commons_module_path)
 
+    import plot_utils
+
     # Define topics
 
     vic_state_topic_name = '/cartesian_vic_controller/status'
@@ -61,35 +63,47 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
     label_SDPF_integral = r'SDPF, $z(t) \geq 0$'
     label_SDPF_adaptive = r'SDPF, $z(t) \geq z_{min}(t)$'
 
-    color_list = plt.rcParams['axes.prop_cycle'].by_key()['color']
+    color_list = plot_utils.get_color_list()
+    print(f'Color list: {color_list}')
+
+    plot_utils.set_linestyle_list()
+    linestyle_list = plot_utils.get_linestyle_list()
+    print(f'Linestyle list: {linestyle_list}')
     dataset_info_list = [
+        # {
+        #     'tag': 'SIPF',
+        #     'path_to_bag': datasets_path_root + 'SIPF/SIPF_0.mcap',
+        #     'label': label_SIPF_W2,
+        #     'color': color_list[0],
+        #     'linestyle': '-'
+        # },
         {
             'tag': 'SIPF+',
             'path_to_bag': datasets_path_root + 'SIPF+/SIPF+_0.mcap',
             'label': label_SIPF_W4,
-            'color': color_list[0],
-            'linestyle': '-'
+            'color': color_list[1],
+            'linestyle': linestyle_list[1]
         },
         {
             'tag': 'SDPF',
             'path_to_bag': datasets_path_root + 'SDPF/SDPF_0.mcap',
             'label': label_SDPF,
-            'color': color_list[1],
-            'linestyle': '-'
-        },
-        {
-            'tag': 'SDPF_integral',
-            'path_to_bag': datasets_path_root + 'SDPF-integral/SDPF-integral_0.mcap',
-            'label': label_SDPF_integral,
             'color': color_list[2],
-            'linestyle': '--'
+            'linestyle': linestyle_list[2]
         },
+        # {
+        #     'tag': 'SDPF_integral',
+        #     'path_to_bag': datasets_path_root + 'SDPF-integral/SDPF-integral_0.mcap',
+        #     'label': label_SDPF_integral,
+        #     'color': color_list[3],
+        #     'linestyle': linestyle_list[3]
+        # },
         {
             'tag': 'SDPF_adaptive',
             'path_to_bag': datasets_path_root + 'SDPF-adaptive/SDPF-adaptive_0.mcap',
             'label': label_SDPF_adaptive,
-            'color': color_list[3],
-            'linestyle': ':'
+            'color': color_list[4],
+            'linestyle': linestyle_list[4]
         }
     ]
 
@@ -481,7 +495,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
                 crop_time_serie(dataset['diagnostic_data'], 'z_dot'),
                 label = dataset['label'],
                 color = dataset['color'],
-                # linestyle = dataset['linestyle']
+                linestyle = dataset['linestyle']
             )
 
     ax1.set_ylabel(r'$w$' + ' ' + r'\small{(J.s${}^{-1}$)}')
@@ -533,7 +547,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
                 crop_time_serie(dataset['diagnostic_data'], 'beta'),
                 label = dataset['label'],
                 color = dataset['color'],
-                # linestyle = dataset['linestyle']
+                linestyle = dataset['linestyle']
             )
 
     ax3.set_ylabel(r'$\beta$' + ' ' + r'\small{(unitless)}')
@@ -561,6 +575,19 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
             figure = fig_z_z_dot_beta,
             dir_name = export_figs_dir,
             fig_name = "z_dot_z_and_beta"
+        )
+
+    # Zoom on first 2 secs
+    from plot_utils import auto_adjust_ylim_for_xlim
+    for ax in [ax1, ax2, ax3]:
+        ax.set_xlim((0., 2.0))
+        auto_adjust_ylim_for_xlim(ax)
+
+    if SAVE_FIGS :
+        multi_format_savefig(
+            figure = fig_z_z_dot_beta,
+            dir_name = export_figs_dir,
+            fig_name = "z_dot_z_and_beta-first_2_secs"
         )
 
 

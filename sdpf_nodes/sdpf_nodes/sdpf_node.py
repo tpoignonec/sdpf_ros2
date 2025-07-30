@@ -29,6 +29,7 @@ class SdpfNode(PassivityFilterNodeBase):
         super().declare_parameter('beta_max', 100.0)
         super().declare_parameter('solver', 'LP')
         super().declare_parameter('passivation_method', 'w_lower_bound')
+        super().declare_parameter('epsilon_stability', 0.0)
 
     def init_controller(self):
         # Retrieve and check node parameters
@@ -50,7 +51,6 @@ class SdpfNode(PassivityFilterNodeBase):
         assert (solver_type in ['QP', 'LP'])
         self.get_logger().info(f'solver_type : {solver_type}')
         self.undeclare_parameter('solver')
-
 
         passivation_method = self.get_parameter('passivation_method').get_parameter_value().string_value
         assert (passivation_method in valid_passivation_methods)
@@ -134,7 +134,7 @@ class SdpfNode(PassivityFilterNodeBase):
         self._diagnostic_data = {
             "z_dot": self._controller_SDPF.controller_log['z_dot'][0],
             "z": self._controller_SDPF.controller_log['z'][0],
-            "z_min": 0.0,
+            "z_min": self._controller_SDPF.controller_log['z_min'][0],
             "beta": self._controller_SDPF.controller_log['beta'][0],
             "storage_V": self._controller_SDPF.controller_log['V'][0],
         }

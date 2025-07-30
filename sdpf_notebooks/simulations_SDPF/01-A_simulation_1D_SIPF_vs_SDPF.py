@@ -7,11 +7,17 @@
 # Simulation settings
 # ##################################
 
-epsilon_stability = 1e-3
+epsilon_stability = 0.0
+plot_SIPF_W4 = False  # Set to False to not plot SIPF W4 results
 
 SAVE_FIGS = True
 export_figs_dir = "export_figures/simulations_SIPF_vs_SDPF"
-plot_SIPF_W4 = True
+
+if plot_SIPF_W4:
+    print("Plotting SIPF W4 results")
+else:
+    print("Not plotting SIPF W4 results, only SIPF W2 and SDPF")
+
 # ##################################
 
 import matplotlib
@@ -37,8 +43,10 @@ if commons_module_path not in sys.path:
     print (f'adding {commons_module_path} to PYTHON_PATH...')
     sys.path.append(commons_module_path)
 
+import plot_utils
 import plot_utils_1D
-plot_utils_1D.ensure_dir_exists(export_figs_dir)
+plot_utils.ensure_dir_exists(export_figs_dir)
+plot_utils.set_linestyle_list()  # Set default linestyle cycle
 
 # Base simulation scenario
 import simulation_scenarios
@@ -48,7 +56,7 @@ simulation_data = simulation_scenarios.make_simulation_data('scenario_1')  # 'sc
 
 simulate_controller_and_package_data = nb_commons_1D.simulate_controller_and_package_data
 
-alpha_value = (np.min(simulation_data['D_d']) - epsilon_stability) / np.min(simulation_data['M_d'])
+alpha_value = (np.min(simulation_data['D_d']) - epsilon_stability) / np.max(simulation_data['M_d'])
 print(f"alpha = {alpha_value}")
 #%%
 # ---------------------
@@ -148,17 +156,30 @@ for controller_sim_data in [controller_SIPF_W2_sim_data] + SDPF_controllers_sim_
 # ##  Main results: SIPF vs. SDPF
 
 # %% Plot all results
+ncols = 4 if plot_SIPF_W4 else 3
 fig_profile, axs_profile = plot_utils_1D.plot_K_and_D(
-    simulation_data, controller_sim_datasets, num_columns=3)
+    simulation_data, controller_sim_datasets, num_columns=ncols)
+
+fig_K, axs_K = plot_utils_1D.plot_K(
+    simulation_data, controller_sim_datasets, num_columns=ncols)
 
 fig_state_meas, axs_state_meas = plot_utils_1D.plot_cartesian_state(
-    simulation_data, controller_sim_datasets, num_columns=3)
+    simulation_data, controller_sim_datasets, num_columns=ncols)
 
 fig_z_z_dot_beta, axs_z_z_dot_beta = plot_utils_1D.plot_z_dot_z_and_beta(
-    simulation_data, controller_sim_datasets, num_columns=3)
+    simulation_data, controller_sim_datasets, num_columns=ncols)
+
+fig_z_z_dot_beta_annotated, axs_z_z_dot_beta_annotated = \
+    plot_utils_1D.plot_z_dot_z_and_beta(
+        simulation_data,
+        controller_sim_datasets,
+        num_columns=ncols,
+        restrict_z_dot_y_range=True,
+        annotate_nominal_peaks=True
+    )
 
 fig_vic_errors, axs_vic_errors = plot_utils_1D.plot_vic_tracking_errors(
-    simulation_data, controller_sim_datasets, num_columns=3)
+    simulation_data, controller_sim_datasets, num_columns=ncols)
 
 # %% Export figures
 
@@ -173,15 +194,24 @@ if SAVE_FIGS :
         fig_name = "impedance_profiles" + prepend_to_figname
     )
     multi_format_savefig(
+        figure = fig_K,
+        dir_name = export_figs_dir,
+        fig_name = "stiffness_only_profiles" + prepend_to_figname
+    )
+    multi_format_savefig(
         figure = fig_state_meas,
         dir_name = export_figs_dir,
         fig_name = "pos_vel_and_force" + prepend_to_figname
     )
-    # No need for prepend, SIPF_W4 is already ignored by default
     multi_format_savefig(
         figure = fig_z_z_dot_beta,
         dir_name = export_figs_dir,
-        fig_name = "z_dot_z_and_beta"
+        fig_name = "z_dot_z_and_beta" + prepend_to_figname
+    )
+    multi_format_savefig(
+        figure = fig_z_z_dot_beta_annotated,
+        dir_name = export_figs_dir,
+        fig_name = "z_dot_z_and_beta(annotated)" + prepend_to_figname
     )
     multi_format_savefig(
         figure = fig_vic_errors,
@@ -193,11 +223,12 @@ if SAVE_FIGS :
 if __name__ == '__main__':
     import sys
     try:
-        # Put matplotlib.pyplot in interactive mode so that the plots are shown in a background thread.
+        # Put matplotlib.pyplot in interactive mode so that the plots
+        # are shown in a background thread.
         plt.ion()
-        while(True):
+        while (True):
             plt.show(block=True)
 
     except KeyboardInterrupt:
-        print ("Caught KeyboardInterrupt, terminating workers")
+        print("Caught KeyboardInterrupt, terminating workers")
         sys.exit(0)

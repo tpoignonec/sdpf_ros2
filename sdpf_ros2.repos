@@ -31,3 +31,8 @@ repositories:
       type: git
       url: https://github.com/ICube-Robotics/nml_bag_ros2.git
       version: main
+
+  external/ft_tools_ros2:
+    type: git
+    url: https://github.com/tpoignonec/ft_tools_ros2.git
+    version: main

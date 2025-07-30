@@ -9,9 +9,11 @@ Ts = 0.001
 t = np.linspace(0, 10, int(10*1/Ts))
 
 t_1 = 4
+t_1_bis = 5
 t_2 = 6
 
 t1_idx = 1 + int(t_1*1/Ts)
+t1_bis_idx = 1 + int(t_1_bis*1/Ts)
 t2_idx = 1 + int(t_2*1/Ts)
 
 dissipation_rate = 0.14
@@ -28,11 +30,15 @@ for idx in range(1, t1_idx+1):
 
 active_usage = z[t1_idx] - z_bar[t1_idx]
 
-z[t1_idx:t2_idx+1] = z[t1_idx] - active_usage
+z[t1_idx:t1_bis_idx+1] = z[t1_idx] - active_usage * (t[t1_idx:t1_bis_idx+1] - t[t1_idx])
+z[t1_bis_idx:t2_idx+1] = z[t1_bis_idx]
 z[t2_idx:] = z[t2_idx] + dissipation_rate * (t[t2_idx:] - t_2)
 
 
 for idx in range(1, t.shape[0]):
+    z_bar[idx] = coef_filter_z * z_bar[idx-1] + (1-coef_filter_z) * z[idx]
+    if z[idx] < z_bar[idx]:
+        z[idx] = z[idx-1]
     z_bar[idx] = coef_filter_z * z_bar[idx-1] + (1-coef_filter_z) * z[idx]
 
 

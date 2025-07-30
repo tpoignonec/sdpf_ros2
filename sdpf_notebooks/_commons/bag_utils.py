@@ -1,6 +1,3 @@
-import scipy
-import numpy as np
-
 """Utils to extract data from the VIC and passivity filter ros2 msgs
 
 How to use this module?
@@ -17,11 +14,13 @@ vic_state_data = get_vic_state(rosbag_data, topic_name=<vic_state_topic_name>)
     3) use it :) See example "plot_exp_data.py" in this package.
 """
 
+import numpy as np
+
 # Standard msg extraction utils
 
+
 def unflatten_multiarray(flattened_multiarray, dims=None):
-    """
-    Unflatten a flattened 2D numpy array into a 2D numpy array given the dimensions.
+    """Unflatten a flattened 2D numpy array into a 2D numpy array.
 
     Args:
         flattened_multiarray (numpy.ndarray): The flattened 2D numpy array.
@@ -37,38 +36,59 @@ def unflatten_multiarray(flattened_multiarray, dims=None):
     # TODO(tpoignonec): make sure the data is indeed row-major...
     return flattened_multiarray.reshape(dims[0], dims[1], order='C')
 
+
 def extract_matrix(msg, dims=None):
-    """
-    Unflatten a flattened float multiarray ROS2 msg array into a 2D numpy array given the dimensions.
+    """Extract a multiarray ROS2 msg array to a 2D numpy array
 
     Args:
-        msg (dict): A FloatMultiArray message containing a 'data' key with a flattened 2D array.
-        dims (tuple, optional): The dimensions of the resulting 2D array. Defaults to None (assumes square!)
+        msg (dict): A FloatMultiArray message containing a 'data' key with a
+          flattened 2D array.
+        dims (tuple, optional): The dimensions of the resulting 2D array.
+          Defaults to None (assumes square!)
 
     Returns:
         numpy.ndarray: The unflattened 2D numpy array.
     """
     return unflatten_multiarray(np.array(msg['data'], dims))
 
+
 def extract_2D_matrix(msg):
-    """ Specialization of extract_matrix() with dims = (2, 2) """
-    return unflatten_multiarray(np.array(msg['data']), (2, 2))
+    """Specialization of extract_matrix() with dims = (2, 2)."""
+    if len(msg['data']) == 4:  # 2x2 matrix
+        return unflatten_multiarray(np.array(msg['data']), (2, 2))
+    else:
+        raise ValueError(
+            f"Unexpected data shape {len(
+                msg['data'])} for 2D matrix extraction.")
+
 
 def extract_3D_matrix(msg):
-    """ Specialization of extract_matrix() with dims = (3, 3) """
-    return unflatten_multiarray(np.array(msg['data']), (3, 3))
+    """Specialization of extract_matrix() with dims = (3, 3)."""
+    data = np.array(msg['data'])
+    if data.shape[0] == 9:  # 3x3 matrix
+        return unflatten_multiarray(np.array(msg['data']), (3, 3))
+    elif data.shape[0] == 36:  # 6x6 matrix
+        return extract_3D_matrix_from_6D(msg)
+    else:
+        raise ValueError(
+            f"Unexpected data shape {data.shape} for 3D matrix extraction.")
+
 
 def extract_3D_matrix_from_6D(msg):
-    """ Specialization of extract_matrix() with dims = (6, 6) . Return the upper left 3x3 block. """
+    """Specialization of extract_matrix() with dims = (6, 6).
+
+    Return the upper left 3x3 block.
+    """
     array_6x6 = unflatten_multiarray(np.array(msg['data']), (6, 6))
     return array_6x6[:3, :3]
 
+
 def extract_pose_from_msg(msg):
-    """
-    Extract the position from a Pose ROS2 msg.
+    """Extract the position from a Pose ROS2 msg.
 
     Args:
-        msg (dict): A Pose message containing a 'position' key with a 3D vector.
+        msg (dict): A Pose message containing a 'position' key with
+            a 3D vector.
 
     Returns:
         numpy.ndarray: The position as a 3-element numpy array.
@@ -79,9 +99,9 @@ def extract_pose_from_msg(msg):
         msg['position']['z']
     ])
 
+
 def extract_velocity_from_msg(msg):
-    """
-    Extract the velocity from a Twist ROS2 msg.
+    """Extract the velocity from a Twist ROS2 msg.
 
     Args:
         msg (dict): A Twist message containing a 'linear' key with a 3D vector.
@@ -95,10 +115,9 @@ def extract_velocity_from_msg(msg):
         msg['linear']['z']
     ])
 
+
 def extract_acc_from_msg(msg):
-    # Using twist msg under the hood
-    """
-    Extract the acceleration from a Twist or Accel ROS2 msg.
+    """Extract the acceleration from a Twist or Accel ROS2 msg.
 
     Args:
         msg (dict): A Twist / Accel message containing a 'linear' key with a 3D vector.
@@ -108,9 +127,9 @@ def extract_acc_from_msg(msg):
     """
     return extract_velocity_from_msg(msg)
 
+
 def extract_wrench_from_msg(msg):
-    """
-    Extract the wrench from a Wrench ROS2 msg.
+    """Extract the wrench from a Wrench ROS2 msg.
 
     Args:
         msg (dict): A Wrench message containing a 'force' key with a 3D vector.
@@ -124,8 +143,9 @@ def extract_wrench_from_msg(msg):
         msg['force']['z']
     ])
 
+
 # Reader utils
-def get_simulation_time(rosbag_raw_data, topic_name=None):
+def get_simulation_time(rosbag_raw_data, topic_name=None):  # noqa: D103
     data_dict = {
         'ros_time': [],
         'time': []
@@ -140,19 +160,26 @@ def get_simulation_time(rosbag_raw_data, topic_name=None):
     data_dict['time'] = np.array(data_dict['time'])
     return data_dict
 
+
 def get_vic_state(rosbag_raw_data, topic_name=None):
-    """
-    Reads a rosbag and returns a dictionary containing the Vic controller state:
+    """Extract the Vic controller state from a rosbag.
+
+    Reads a rosbag, returns a dictionary containing the Vic controller state:
         - ros_time: The ROS timestamp of each message
         - position: The Cartesian position of the robot end-effector
         - velocity: The Cartesian velocity of the robot end-effector
         - acceleration: The Cartesian acceleration of the robot end-effector
-        - wrench: The wrench (force and torque) exerted by the robot end-effector
+        - wrench: The wrench (force and torque) exerted by the robot
+            end-effector
         - natural_inertia: The natural inertia of the robot
-        - desired_position: The desired Cartesian position of the robot end-effector
-        - desired_velocity: The desired Cartesian velocity of the robot end-effector
-        - desired_acceleration: The desired Cartesian acceleration of the robot end-effector
-        - desired_wrench: The desired wrench (force and torque) exerted by the robot end-effector
+        - desired_position: The desired Cartesian position of the robot
+            end-effector
+        - desired_velocity: The desired Cartesian velocity of the robot
+            end-effector
+        - desired_acceleration: The desired Cartesian acceleration of the
+            robot end-effector
+        - desired_wrench: The desired wrench (force and torque) exerted by
+            the robot end-effector
         - stiffness: The rendered stiffness of the robot
         - damping: The rendered damping of the robot
         - inertia: The rendered inertia of the robot
@@ -160,7 +187,8 @@ def get_vic_state(rosbag_raw_data, topic_name=None):
     Note: message type is "cartesian_control_msgs::VicControllerState"
 
     Args:
-        rosbag_raw_data (list): A list of dictionaries containing the ROS messages
+        rosbag_raw_data (list): A list of dictionaries containing the
+            ROS messages
         topic_name (str): The name of the topic to read from the rosbag
 
     Returns:
@@ -173,7 +201,7 @@ def get_vic_state(rosbag_raw_data, topic_name=None):
         'acceleration': [],
         'wrench': [],
         'natural_inertia': [],
-        'desired_positon': [],
+        'desired_position': [],
         'desired_velocity': [],
         'desired_acceleration': [],
         'desired_wrench': [],
@@ -187,19 +215,30 @@ def get_vic_state(rosbag_raw_data, topic_name=None):
             data_dict['ros_time'] += [msg_data['time_ns']]
             # Retrieve the robot state
             data_dict['position'] += [extract_pose_from_msg(msg_data['pose'])]
-            data_dict['velocity'] += [extract_velocity_from_msg(msg_data['velocity'])]
-            data_dict['acceleration'] += [extract_acc_from_msg(msg_data['acceleration'])]
-            data_dict['wrench'] += [extract_wrench_from_msg(msg_data['wrench'])]
-            data_dict['natural_inertia'] += [extract_3D_matrix_from_6D(msg_data['natural_inertia'])]
+            data_dict['velocity'] += [extract_velocity_from_msg(
+                msg_data['velocity'])]
+            data_dict['acceleration'] += [extract_acc_from_msg(
+                msg_data['acceleration'])]
+            data_dict['wrench'] += [extract_wrench_from_msg(
+                msg_data['wrench'])]
+            data_dict['natural_inertia'] += [extract_3D_matrix_from_6D(
+                msg_data['natural_inertia'])]
             # Retrieve the desired Cartesian trajectory
-            data_dict['desired_position'] = extract_pose_from_msg(msg_data['desired_pose'])
-            data_dict['desired_velocity'] = extract_velocity_from_msg(msg_data['desired_velocity'])
-            data_dict['desired_acceleration'] = extract_acc_from_msg(msg_data['desired_acceleration'])
-            data_dict['desired_wrench'] = extract_wrench_from_msg(msg_data['desired_wrench'])
+            data_dict['desired_position'] += [extract_pose_from_msg(
+                msg_data['desired_pose'])]
+            data_dict['desired_velocity'] += [extract_velocity_from_msg(
+                msg_data['desired_velocity'])]
+            data_dict['desired_acceleration'] += [extract_acc_from_msg(
+                msg_data['desired_acceleration'])]
+            data_dict['desired_wrench'] += [extract_wrench_from_msg(
+                msg_data['desired_wrench'])]
             # Retrieve the rendered compliance
-            data_dict['stiffness'] += [extract_3D_matrix_from_6D(msg_data['rendered_stiffness'])]
-            data_dict['damping'] += [extract_3D_matrix_from_6D(msg_data['rendered_damping'])]
-            data_dict['inertia'] += [extract_3D_matrix_from_6D(msg_data['rendered_inertia'])]
+            data_dict['stiffness'] += [extract_3D_matrix_from_6D(
+                msg_data['rendered_stiffness'])]
+            data_dict['damping'] += [extract_3D_matrix_from_6D(
+                msg_data['rendered_damping'])]
+            data_dict['inertia'] += [extract_3D_matrix_from_6D(
+                msg_data['rendered_inertia'])]
 
     data_dict['ros_time'] = np.array(data_dict['ros_time'])
 
@@ -211,7 +250,8 @@ def get_vic_state(rosbag_raw_data, topic_name=None):
 
     data_dict['desired_position'] = np.array(data_dict['desired_position'])
     data_dict['desired_velocity'] = np.array(data_dict['desired_velocity'])
-    data_dict['desired_acceleration'] = np.array(data_dict['desired_acceleration'])
+    data_dict['desired_acceleration'] = np.array(
+        data_dict['desired_acceleration'])
     data_dict['desired_wrench'] = np.array(data_dict['desired_wrench'])
 
     data_dict['stiffness'] = np.array(data_dict['stiffness'])
@@ -220,14 +260,21 @@ def get_vic_state(rosbag_raw_data, topic_name=None):
 
     return data_dict
 
+
 def get_reference_compliant_frame_trajectory(rosbag_raw_data, topic_name=None):
-    """
-    Reads a rosbag and returns a dictionary containing the desired Cartesian trajectory and the desired compliance sent to the VIC:
+    """Get the reference compliant frame trajectory from a rosbag.
+
+    Reads a rosbag and returns a dictionary containing the desired Cartesian
+    trajectory and the desired compliance sent to the VIC:
         - ros_time: The ROS timestamp of each message
-        - desired_position: The desired Cartesian position of the robot end-effector
-        - desired_velocity: The desired Cartesian velocity of the robot end-effector
-        - desired_acceleration: The desired Cartesian acceleration of the robot end-effector
-        - desired_wrench: The desired wrench (force and torque) exerted by the robot end-effector
+        - desired_position: The desired Cartesian position of the robot
+            end-effector
+        - desired_velocity: The desired Cartesian velocity of the robot
+            end-effector
+        - desired_acceleration: The desired Cartesian acceleration of the
+            robot end-effector
+        - desired_wrench: The desired wrench (force and torque) exerted by the
+            robot end-effector
         - desired_inertia: The desired inertia of the robot
         - desired_stiffness: The desired stiffness of the robot
         - desired_damping: The desired damping of the robot
@@ -235,11 +282,13 @@ def get_reference_compliant_frame_trajectory(rosbag_raw_data, topic_name=None):
     Note: message type is "cartesian_control_msgs::CompliantFrameTrajectory"
 
     Args:
-        rosbag_raw_data (list): A list of dictionaries containing the ROS messages
+        rosbag_raw_data (list): A list of dictionaries containing the
+            ROS messages
         topic_name (str): The name of the topic to read from the rosbag
 
     Returns:
-        dict: A dictionary containing the desired Cartesian trajectory and the desired compliance
+        dict: A dictionary containing the desired Cartesian trajectory and the
+            desired compliance
     """
     data_dict = {
         'ros_time': [],
@@ -258,22 +307,30 @@ def get_reference_compliant_frame_trajectory(rosbag_raw_data, topic_name=None):
 
             # Retrieve the desired Cartesian trajectory
             cartesian_trajectory_point = msg_data['cartesian_trajectory_points'][0]
-            data_dict['desired_position'] += [extract_pose_from_msg(cartesian_trajectory_point['pose'])]
-            data_dict['desired_velocity'] += [extract_velocity_from_msg(cartesian_trajectory_point['velocity'])]
-            data_dict['desired_acceleration'] += [extract_acc_from_msg(cartesian_trajectory_point['acceleration'])]
-            data_dict['desired_wrench'] += [extract_wrench_from_msg(cartesian_trajectory_point['wrench'])]
+            data_dict['desired_position'] += [extract_pose_from_msg(
+                cartesian_trajectory_point['pose'])]
+            data_dict['desired_velocity'] += [extract_velocity_from_msg(
+                cartesian_trajectory_point['velocity'])]
+            data_dict['desired_acceleration'] += [extract_acc_from_msg(
+                cartesian_trajectory_point['acceleration'])]
+            data_dict['desired_wrench'] += [extract_wrench_from_msg(
+                cartesian_trajectory_point['wrench'])]
 
             # Retrieve the desired compliance
             compliance_at_point = msg_data['compliance_at_points'][0]
-            data_dict['desired_inertia'] += [extract_3D_matrix_from_6D(compliance_at_point['inertia'])]
-            data_dict['desired_stiffness'] += [extract_3D_matrix_from_6D(compliance_at_point['stiffness'])]
-            data_dict['desired_damping'] += [extract_3D_matrix_from_6D(compliance_at_point['damping'])]
+            data_dict['desired_inertia'] += [extract_3D_matrix_from_6D(
+                compliance_at_point['inertia'])]
+            data_dict['desired_stiffness'] += [extract_3D_matrix_from_6D(
+                compliance_at_point['stiffness'])]
+            data_dict['desired_damping'] += [extract_3D_matrix_from_6D(
+                compliance_at_point['damping'])]
 
     data_dict['ros_time'] = np.array(data_dict['ros_time'])
 
     data_dict['desired_position'] = np.array(data_dict['desired_position'])
     data_dict['desired_velocity'] = np.array(data_dict['desired_velocity'])
-    data_dict['desired_acceleration'] = np.array(data_dict['desired_acceleration'])
+    data_dict['desired_acceleration'] = np.array(
+        data_dict['desired_acceleration'])
     data_dict['desired_wrench'] = np.array(data_dict['desired_wrench'])
 
     data_dict['desired_inertia'] = np.array(data_dict['desired_inertia'])
@@ -284,7 +341,8 @@ def get_reference_compliant_frame_trajectory(rosbag_raw_data, topic_name=None):
 
 
 def get_compliant_frame(rosbag_raw_data, topic_name=None):
-    """
+    """Get the desired compliance from a rosbag.
+
     Reads a rosbag and returns a dictionary containing the desired compliance:
         - ros_time: The ROS timestamp of each message
         - inertia: The desired inertia of the robot
@@ -294,7 +352,8 @@ def get_compliant_frame(rosbag_raw_data, topic_name=None):
     Note: message type is "cartesian_control_msgs::CartesianCompliant"
 
     Args:
-        rosbag_raw_data (list): A list of dictionaries containing the ROS messages
+        rosbag_raw_data (list): A list of dictionaries containing the
+            ROS messages
         topic_name (str): The name of the topic to read from the rosbag
 
     Returns:
@@ -325,15 +384,18 @@ def get_compliant_frame(rosbag_raw_data, topic_name=None):
 
 
 def get_diagnostic_data(rosbag_raw_data, topic_name=None):
-    """
-    Reads a rosbag and returns a dictionary containing the data from a diagnostic topic:
+    """Get the diagnostic data from a rosbag.
+
+    Reads a rosbag and returns a dictionary containing the data from a
+    diagnostic topic:
         - ros_time: The ROS timestamp of each message
         - <key>: The value of the diagnostic data with the corresponding key
 
     Note: message type is "cartesian_control_msgs::KeyValues"
 
     Args:
-        rosbag_raw_data (list): A list of dictionaries containing the ROS messages
+        rosbag_raw_data (list): A list of dictionaries containing the
+            ROS messages
         topic_name (str): The name of the topic to read from the rosbag
 
     Returns:

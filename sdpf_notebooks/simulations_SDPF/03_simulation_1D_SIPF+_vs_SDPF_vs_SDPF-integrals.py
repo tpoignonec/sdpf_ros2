@@ -7,13 +7,13 @@
 # Simulation settings
 # ##################################
 
-epsilon_stability = 1e-3
+epsilon_stability = 0.0
 
 tau_delay_adaptive_z_min = 3.0
 z_max = 1.0
 
 SAVE_FIGS = True
-export_figs_dir = "export_figures/simulations_SIPF_vs_SDPF"
+export_figs_dir = "export_figures/simulations_SIPF_vs_SDPF_vs_integrals"
 plot_SIPF_W4 = True
 
 # ##################################
@@ -39,8 +39,10 @@ commons_module_path = os.path.abspath(os.path.join(parent_folder, os.pardir, '_c
 if commons_module_path not in sys.path:
     sys.path.append(commons_module_path)
 
+import plot_utils
 import plot_utils_1D
-plot_utils_1D.ensure_dir_exists(export_figs_dir)
+plot_utils.ensure_dir_exists(export_figs_dir)
+plot_utils.set_linestyle_list()  # Set default linestyle cycle
 
 # Base simulation scenario
 import simulation_scenarios
@@ -52,7 +54,7 @@ simulation_data = \
     simulation_scenarios.make_simulation_data('scenario_1')
     # simulation_scenarios.make_simulation_data('scenario_1_K_only')
 
-alpha_value = (np.min(simulation_data['D_d']) - epsilon_stability) / np.min(simulation_data['M_d'])
+alpha_value = (np.min(simulation_data['D_d']) - epsilon_stability) / np.max(simulation_data['M_d'])
 print(f"alpha = {alpha_value}")
 
 # ---------------------
@@ -189,9 +191,9 @@ for controller_sim_data in [controller_SIPF_W2_sim_data] + SDPF_controllers_sim_
         controller_sim_data['controller'].controller_log['z_dot'].reshape((-1,))
     ) * simulation_data['Ts']
 
-color_list = plot_utils_1D.get_color_list()
+color_list = plot_utils.get_color_list()
+flip = plot_utils.flip
 
-flip = plot_utils_1D.flip
 highlight_regions = plot_utils_1D.highlight_regions
 annotate_regions = plot_utils_1D.annotate_regions
 
@@ -200,17 +202,31 @@ annotate_regions = plot_utils_1D.annotate_regions
 
 
 # %% Plot all results
+num_columns = 3
 fig_profile, axs_profile = plot_utils_1D.plot_K_and_D(
-    simulation_data, controller_sim_datasets, num_columns=3)
+    simulation_data, controller_sim_datasets, num_columns=num_columns)
+
+fig_K_only, axs_K_only = plot_utils_1D.plot_K(
+    simulation_data, controller_sim_datasets, num_columns=num_columns)
 
 fig_state_meas, axs_state_meas = plot_utils_1D.plot_cartesian_state(
-    simulation_data, controller_sim_datasets, num_columns=3)
+    simulation_data, controller_sim_datasets, num_columns=num_columns)
 
 fig_z_z_dot_beta, axs_z_z_dot_beta = plot_utils_1D.plot_z_dot_z_and_beta(
-    simulation_data, controller_sim_datasets, num_columns=4)
+    simulation_data, controller_sim_datasets, num_columns=num_columns)
+
+fig_z_z_dot_beta_clipped, axs_z_z_dot_beta_clipped = \
+    plot_utils_1D.plot_z_dot_z_and_beta(
+        simulation_data,
+        controller_sim_datasets,
+        num_columns=num_columns,
+        restrict_z_dot_y_range=True,
+        annotate_nominal_peaks=False
+    )
+axs_z_z_dot_beta_clipped[0].set_ylim((-2, 3))
 
 fig_vic_errors, axs_vic_errors = plot_utils_1D.plot_vic_tracking_errors(
-    simulation_data, controller_sim_datasets, num_columns=4)
+    simulation_data, controller_sim_datasets, num_columns=num_columns)
 
 # %% Export figures
 
@@ -225,6 +241,11 @@ if SAVE_FIGS :
         fig_name = "impedance_profiles" + prepend_to_figname
     )
     multi_format_savefig(
+        figure = fig_K_only,
+        dir_name = export_figs_dir,
+        fig_name = "K_only" + prepend_to_figname
+    )
+    multi_format_savefig(
         figure = fig_state_meas,
         dir_name = export_figs_dir,
         fig_name = "pos_vel_and_force" + prepend_to_figname
@@ -236,6 +257,11 @@ if SAVE_FIGS :
         fig_name = "z_dot_z_and_beta"
     )
     multi_format_savefig(
+        figure = fig_z_z_dot_beta_clipped,
+        dir_name = export_figs_dir,
+        fig_name = "z_dot_z_and_beta(clipped)"
+    )
+    multi_format_savefig(
         figure = fig_vic_errors,
         dir_name = export_figs_dir,
         fig_name = "vic_errors" + prepend_to_figname
@@ -245,11 +271,10 @@ if SAVE_FIGS :
 if __name__ == '__main__':
     import sys
     try:
-        # Put matplotlib.pyplot in interactive mode so that the plots are shown in a background thread.
         plt.ion()
-        while(True):
+        while (True):
             plt.show(block=True)
 
     except KeyboardInterrupt:
-        print ("Caught KeyboardInterrupt, terminating workers")
+        print('Caught KeyboardInterrupt, terminating workers')
         sys.exit(0)

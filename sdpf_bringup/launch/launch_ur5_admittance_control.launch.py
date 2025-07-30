@@ -1,4 +1,4 @@
-# Copyright 2024 ICube Laboratory, University of Strasbourg
+# Copyright 2025 ICube Laboratory, University of Strasbourg
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 # Author: Thibault Poignonec
 
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 from launch_ros.substitutions import FindPackageShare
 
 from launch import LaunchDescription
@@ -30,12 +31,20 @@ def generate_launch_description():
     this_package_name = 'sdpf_bringup'
 
     # Initialize Arguments
-    use_fake_hardware = LaunchConfiguration('use_fake_hardware', default='false')
+    use_fake_hardware = LaunchConfiguration(
+        'use_fake_hardware', default='false')
     launch_rviz = LaunchConfiguration('launch_rviz', default='true')
 
-    controllers_file = PathJoinSubstitution(
-        [FindPackageShare(this_package_name), 'config', 'impedance_controllers_config.yaml']
+    config_dir = PathJoinSubstitution(
+        [FindPackageShare(this_package_name), 'config', 'ur5']
     )
+
+    controllers_file = PathJoinSubstitution([
+        config_dir,
+        'controllers.yaml'
+    ])
+
+    robot_ip = '192.155.1.102'
 
     # Generate URDF
     robot_description_content = Command(
@@ -44,29 +53,43 @@ def generate_launch_description():
             ' ',
             PathJoinSubstitution(
                 [
-                    FindPackageShare(this_package_name),
-                    'config',
-                    'fd.config.xacro',
+                    config_dir,
+                    'ur_config.urdf.xacro'
                 ]
             ),
-            ' use_fake_hardware:=', use_fake_hardware,
+            ' ',
+            'name:=',
+            'ur',
+            ' ',
+            'robot_ip:=',
+            robot_ip,
+            ' ',
+            'headless_mode:=',
+            'true',
+            ' ',
+            'use_fake_hardware:=',
+            use_fake_hardware,
+            ' ',
         ]
     )
 
-    robot_description = {'robot_description': robot_description_content}
+    robot_description = {
+        'robot_description':
+        ParameterValue(robot_description_content, value_type=str)
+    }
 
     # rviz
     rviz_config_file = PathJoinSubstitution(
-       [FindPackageShare(this_package_name), "rviz", "display_robot.rviz"]
+       [config_dir, 'display_robot.rviz']
     )
 
     rviz_node = Node(
-        package="rviz2",
+        package='rviz2',
         condition=IfCondition(launch_rviz),
-        executable="rviz2",
-        name="rviz2",
-        output="log",
-        arguments=["-d", rviz_config_file],  # + ['--ros-args', '--log-level', 'DEBUG'],
+        executable='rviz2',
+        name='rviz2',
+        output='log',
+        arguments=['-d', rviz_config_file],
         parameters=[
             robot_description,
         ],
@@ -104,32 +127,20 @@ def generate_launch_description():
         output='screen'
     )
 
-    load_inertia_broadcaster = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'fd_inertia_broadcaster'],
-        output='screen'
-    )
-
     load_force_torque_sensor_broadcaster = ExecuteProcess(
         cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
              'force_torque_sensor_broadcaster'],
         output='screen'
     )
 
-    load_impedance_controller = ExecuteProcess(
+    load_cartesian_vic_controller = ExecuteProcess(
         cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
              'cartesian_vic_controller'],
         output='screen'
     )
 
     controllers_loaders = [
-        load_inertia_broadcaster,
-        RegisterEventHandler(
-            event_handler=OnProcessExit(
-                target_action=load_inertia_broadcaster,
-                on_exit=[load_impedance_controller],
-            )
-        ),
+        load_cartesian_vic_controller,
         load_joint_state_broadcaster,
         load_force_torque_sensor_broadcaster,
     ]
@@ -141,7 +152,8 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'use_fake_hardware',
             default_value='false',
-            description='Indicate whether robot is running with mock hardware mirroring command to its states.',
+            description='Indicate whether robot is running with '
+            'mock hardware mirroring command to its states.',
         )
     )
 

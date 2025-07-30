@@ -1,6 +1,6 @@
 controller_manager:
   ros__parameters:
-    update_rate: 1000  # Hz
+    update_rate: 500  # Hz
 
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
@@ -11,7 +11,7 @@ controller_manager:
     cartesian_vic_controller:
       type: cartesian_vic_controller/CartesianVicController
 
-    fd_ee_broadcaster:
+    fd_interaction_point_broadcaster:
       type: ee_pose_broadcaster/EePoseBroadcaster
 
     fd_inertia_broadcaster:
@@ -20,7 +20,7 @@ controller_manager:
 force_torque_sensor_broadcaster:
   ros__parameters:
     sensor_name: fd_ft_sensor
-    frame_id: fd_interaction_point
+    frame_id: fd_ft_sensor
 
 cartesian_vic_controller:
   ros__parameters:
@@ -38,10 +38,10 @@ cartesian_vic_controller:
       - fd_yaw
 
     filters:
-      state_position_filter_cuttoff_freq: -1.0
-      state_velocity_filter_cuttoff_freq: -100.0
-      command_filter_cuttoff_freq: -1.0
-      ft_sensor_filter_cuttoff_freq: 30.0
+      state_position_filter_cuttoff_freq: 200.0
+      state_velocity_filter_cuttoff_freq: 200.0
+      command_filter_cuttoff_freq: 200.0
+      ft_sensor_filter_cuttoff_freq: 10.0
 
     dynamics:
       plugin_name: dynamics_interface_fd/DynamicsInterfaceFd
@@ -55,7 +55,7 @@ cartesian_vic_controller:
       is_enabled: true
       name: "fd_ft_sensor"
       frame:
-        id: fd_interaction_point
+        id: fd_ft_sensor
 
     external_torque_sensor:
       is_enabled: false
@@ -93,7 +93,7 @@ cartesian_vic_controller:
       use_natural_robot_inertia: false
 
       selected_axes: [true, true, true, true, true, true]
-      inertia: [1., .2, .2, .1, .1, .1] # NOT USED IF "use_natural_robot_inertia" is TRUE...
+      inertia: [0.5, 0.5, 0.5, 0.1, 0.1, 0.1] # NOT USED IF "use_natural_robot_inertia" is TRUE...
       damping_ratio: [0.9, 0.9, 0.9, 0.9, 0.9, 0.9]
       stiffness:
         - 200.0

@@ -1,5 +1,4 @@
-# import numpy as np
-# import os
+"""Main launch file to run the SDPF experiments."""
 
 from launch import LaunchDescription
 from launch.actions import ExecuteProcess, DeclareLaunchArgument
@@ -8,42 +7,87 @@ from launch.substitutions import EqualsSubstitution, LaunchConfiguration
 from launch_ros.actions import Node
 
 
-def generate_launch_description():
+def generate_launch_description():  # noqa: D103
     # ========================================
     # Declare launch parameters
     # ========================================
     declared_arguments = []
     declared_arguments.append(
         DeclareLaunchArgument(
+            'scenario',
+            default_value='admittance_ur5_phri',
+            description='Scenario to run, e.g., "admittance_ur5_phri".'
+            + ' or "impedance_ft_elastic". Default is "admittance_ur5_phri".'
+        )
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            'trajectory_type',
+            default_value='static',
+            description='Type of trajectory to follow, e.g., "circular".'
+            + ' or "static". Default is "static".'
+        )
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            'interpolation_function',
+            default_value='tanh_alternating',
+            description='Interpolation function to use, e.g., "sinus",'
+            + ' "cosinus", "step", or "tanh_alternating".'
+            + ' Default is "tanh_alternating".'
+        )
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
             'pf_method',
-            description='Used passivation method among "SIPF", "SIPF+", "SDPF", "SDPF-integral", "SDPF-adaptive".',
+            description='Used passivation method among "SIPF", '
+            + '"SIPF+", "SDPF", "SDPF-integral", "SDPF-adaptive".',
+        )
+    )
+    declared_arguments.append(
+        DeclareLaunchArgument(
+            'control_rate',
+            default_value='200.0',
+            description='VIC passivation filter control rate in Hz.'
+            + ' Default is 200.0 Hz.'
         )
     )
     declared_arguments.append(
         DeclareLaunchArgument(
             'record_bags',
             default_value='false',
-            description='Run the ros2bag record process.',
+            description='Run the ros2bag record process, '
+            + 'set to "true" to record the data.'
+            + ' Default is "false".',
         )
     )
     declared_arguments.append(
         DeclareLaunchArgument(
             'bag_path',
-            default_value=['rosbags/new_recordings/'],
-            description='Output path for the ros2bag record process.',
+            default_value=['new_recordings/'],
+            description='Output path for the ros2bag record process.'
+            + ' Default is "new_recordings/".',
         )
     )
 
     record_bags = LaunchConfiguration('record_bags')
-    record_bag_path = [LaunchConfiguration('bag_path'), LaunchConfiguration('pf_method')]
+    record_bag_path = [
+        LaunchConfiguration('bag_path'),
+        LaunchConfiguration('pf_method')
+    ]
 
     # ========================================
     # Simulation global parameters
     # ========================================
     global_setting = {
         'verbose': False,
+        'control_rate': LaunchConfiguration('control_rate'),
         'beta_max': 100.0,
-        'epsilon_stability': 1e-3,
+        'epsilon_stability': 0.0,
+        'scenario': LaunchConfiguration('scenario'),
+        'trajectory_type': LaunchConfiguration('trajectory_type'),
+        'interpolation_function':
+            LaunchConfiguration('interpolation_function'),
     }
 
     # ========================================
@@ -51,9 +95,12 @@ def generate_launch_description():
     # ========================================
 
     # Docs:
-    #  - personal notes and comments: https://gist.github.com/tpoignonec/db9cdd14c3840fcb347e00f392688173
-    #  - MCAP as default ROS bag format: https://foxglove.dev/blog/mcap-as-the-ros2-default-bag-format
-    #  - storage-preset-profile: https://github.com/ros2/rosbag2/tree/rolling/rosbag2_storage_mcap/#writer-configuration
+    #  - personal notes and comments:
+    #       https://gist.github.com/tpoignonec/db9cdd14c3840fcb347e00f392688173
+    #  - MCAP as default ROS bag format:
+    #       https://foxglove.dev/blog/mcap-as-the-ros2-default-bag-format
+    #  - storage-preset-profile:
+    #       https://github.com/ros2/rosbag2/tree/rolling/rosbag2_storage_mcap/#writer-configuration
 
     rosbag_process = ExecuteProcess(
         cmd=[
@@ -63,9 +110,10 @@ def generate_launch_description():
             '--storage', 'mcap',
             '--all',
             '--output', record_bag_path,
-            # '--storage-preset-profile', 'fastwrite',  # faster, but not recommended for storage of data...
+            # '--storage-preset-profile', 'fastwrite'
+            #   -> faster, but not recommended for storage of data...
         ],
-        output="screen",
+        output='screen',
         condition=IfCondition(record_bags)
     )
 
@@ -87,7 +135,8 @@ def generate_launch_description():
                 'passivation_function': 'bednarczyk_W2'
             },
         ],
-        condition=IfCondition(EqualsSubstitution(LaunchConfiguration('pf_method'), 'SIPF'))
+        condition=IfCondition(
+            EqualsSubstitution(LaunchConfiguration('pf_method'), 'SIPF'))
     ),
 
     # Launch Maciej SIDP+ (using V4 storage)
@@ -103,7 +152,8 @@ def generate_launch_description():
                 'passivation_function': 'bednarczyk_W4'
             },
         ],
-        condition=IfCondition(EqualsSubstitution(LaunchConfiguration('pf_method'), 'SIPF+'))
+        condition=IfCondition(
+            EqualsSubstitution(LaunchConfiguration('pf_method'), 'SIPF+'))
     ),
 
     # Launch QP SDDF
@@ -119,7 +169,8 @@ def generate_launch_description():
                 'passivation_method': 'w_lower_bound'
             },
         ],
-        condition=IfCondition(EqualsSubstitution(LaunchConfiguration('pf_method'), 'SDPF'))
+        condition=IfCondition(
+            EqualsSubstitution(LaunchConfiguration('pf_method'), 'SDPF'))
     ),
 
     # Launch PPF SDDF, z_min = 0
@@ -136,7 +187,9 @@ def generate_launch_description():
                 'z_max': 1.0,
             },
         ],
-        condition=IfCondition(EqualsSubstitution(LaunchConfiguration('pf_method'), 'SDPF-integral'))
+        condition=IfCondition(
+            EqualsSubstitution(
+                LaunchConfiguration('pf_method'), 'SDPF-integral'))
     ),
 
     # Launch PPF SDDF, z_min adaptive
@@ -150,10 +203,12 @@ def generate_launch_description():
             global_setting,
             {
                 'passivation_method': 'z_adaptative_lower_bound',
-                'tau_delay_adaptive_z_min': 3.0,
+                'tau_delay_adaptive_z_min': 1.0,
             },
         ],
-        condition=IfCondition(EqualsSubstitution(LaunchConfiguration('pf_method'), 'SDPF-adaptive'))
+        condition=IfCondition(
+            EqualsSubstitution(
+                LaunchConfiguration('pf_method'), 'SDPF-adaptive'))
     ),
 
     # ========================================

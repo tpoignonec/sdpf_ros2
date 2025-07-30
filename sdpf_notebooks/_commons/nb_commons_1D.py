@@ -2,24 +2,32 @@ import matplotlib.pyplot as plt
 
 from tqdm import tqdm
 import numpy as np
-# import casadi as ca
-# import scipy.linalg
-# from copy import deepcopy
 
 # Build integrator system
-from vic_controllers.simulation import build_simulator, export_linear_mass_model
+from vic_controllers.simulation import (
+    build_simulator,
+    export_linear_mass_model
+)
 from vic_controllers.commons import MeasurementData, CompliantFrameTrajectory
 
 
-# see acados/examples/acados_python/pendulum_on_cart/sim/extensive_example_sim.py
-def simulate_controller(controller, simulation_data, N_horizon_controller=0, callback=None):
+def simulate_controller(
+        controller, simulation_data, N_horizon_controller=0, callback=None):
+    """Simulate a controller on a given simulation data."""
     # Extract simulation data
     N = simulation_data['N']
     X0 = simulation_data['x0_mass_spring_damper']
 
     # Build system symulator
-    linear_mass_model = export_linear_mass_model(inertia=np.array([[simulation_data['real_mass']]]), f_ext_as_param=True, dim=1)
-    acados_sim = build_simulator(linear_mass_model, time_step=simulation_data['Ts'])
+    linear_mass_model = export_linear_mass_model(
+        inertia=np.array([[simulation_data['real_mass']]]),
+        f_ext_as_param=True,
+        dim=1
+    )
+    acados_sim = build_simulator(
+        linear_mass_model,
+        time_step=simulation_data['Ts']
+    )
 
     # Prepare output data vector
     nx = linear_mass_model.x.size()[0]
@@ -57,16 +65,25 @@ def simulate_controller(controller, simulation_data, N_horizon_controller=0, cal
             trajectory_lenght=len(range_idx_horizon)
         )
         # Fill desired robot trajectory
-        ref_compliant_frame_traj.p_desired = simulation_data['X_d'][range_idx_horizon, 0].reshape(-1, 1)
-        ref_compliant_frame_traj.p_dot_desired = simulation_data['X_d'][range_idx_horizon, 1].reshape(-1, 1)
-        ref_compliant_frame_traj.p_ddot_desired = simulation_data['X_d'][range_idx_horizon, 2].reshape(-1, 1)
+        ref_compliant_frame_traj.p_desired = \
+            simulation_data['X_d'][range_idx_horizon, 0].reshape(-1, 1)
+        ref_compliant_frame_traj.p_dot_desired = \
+            simulation_data['X_d'][range_idx_horizon, 1].reshape(-1, 1)
+        ref_compliant_frame_traj.p_ddot_desired = \
+            simulation_data['X_d'][range_idx_horizon, 2].reshape(-1, 1)
         # Fill desired robot compliance
-        ref_compliant_frame_traj.K_desired = simulation_data['K_d'][range_idx_horizon].reshape(-1, 1, 1)
-        ref_compliant_frame_traj.K_dot_desired = simulation_data['K_d_dot'][range_idx_horizon].reshape(-1, 1, 1)
-        ref_compliant_frame_traj.D_desired = simulation_data['D_d'][range_idx_horizon].reshape(-1, 1, 1)
-        ref_compliant_frame_traj.D_dot_desired = simulation_data['D_d_dot'][range_idx_horizon].reshape(-1, 1, 1)
-        ref_compliant_frame_traj.M_desired = simulation_data['M_d'][range_idx_horizon].reshape(-1, 1, 1)
-        ref_compliant_frame_traj.M_dot_desired = simulation_data['M_d_dot'][range_idx_horizon].reshape(-1, 1, 1)
+        ref_compliant_frame_traj.K_desired = \
+            simulation_data['K_d'][range_idx_horizon].reshape(-1, 1, 1)
+        ref_compliant_frame_traj.K_dot_desired = \
+            simulation_data['K_d_dot'][range_idx_horizon].reshape(-1, 1, 1)
+        ref_compliant_frame_traj.D_desired = \
+            simulation_data['D_d'][range_idx_horizon].reshape(-1, 1, 1)
+        ref_compliant_frame_traj.D_dot_desired = \
+            simulation_data['D_d_dot'][range_idx_horizon].reshape(-1, 1, 1)
+        ref_compliant_frame_traj.M_desired = \
+            simulation_data['M_d'][range_idx_horizon].reshape(-1, 1, 1)
+        ref_compliant_frame_traj.M_dot_desired = \
+            simulation_data['M_d_dot'][range_idx_horizon].reshape(-1, 1, 1)
 
         # Simulate time step
         simU[i, :] = controller.compute_control(
@@ -77,53 +94,75 @@ def simulate_controller(controller, simulation_data, N_horizon_controller=0, cal
         )
         sim_f_ext[i, :] = measurements.f_ext
 
-        acados_sim.set("x", simX[i, :])
-        acados_sim.set("u", simU[i, :])
-        acados_sim.set("p", measurements.f_ext)
+        acados_sim.set('x', simX[i, :])
+        acados_sim.set('u', simU[i, :])
+        acados_sim.set('p', measurements.f_ext)
         status = acados_sim.solve()
         if status != 0:
             raise Exception(f'acados returned status {status}.')
         # Save state (at k+1)
         if (i < N-1):
             simX[i+1, :] = acados_sim.get("x")
-        # Evaluate user code (e.g., to log current prediction horizon of NMPC controllers)
+        # Evaluate user code
+        # e.g., to log current prediction horizon of NMPC
         if callback is not None:
             callback()
     return simU, simX, sim_f_ext
 
-def simulate_controller_and_package_data(controller_handle, sim_data, label_str):
+
+def simulate_controller_and_package_data(  # noqa: D103
+        controller_handle, sim_data, label_str):
     _simU, _simX, _simFext = simulate_controller(controller_handle, sim_data)
     return {
-        'is_vanilla' : False,
-        'is_placeholder' : False,
-        'U' : _simU,
-        'X' : _simX,
-        'Fext' : _simFext,
-        'label' : label_str,
-        'controller' : controller_handle
+        'is_vanilla': False,
+        'is_placeholder': False,
+        'U': _simU,
+        'X': _simX,
+        'Fext': _simFext,
+        'label': label_str,
+        'controller': controller_handle
     }
 
-def get_vanilla_VIC_controller_sim_data(simulation_data, alpha_est_z_dot):
+
+def get_vanilla_VIC_controller_sim_data(  # noqa: D103
+        simulation_data, alpha_est_z_dot, epsilon_stability=0.0):
+
+    assert alpha_est_z_dot > 0.0  # alpha must be positive
+    assert epsilon_stability >= 0.0  # epsilon_stability must be non-negative
+
     from vic_controllers.commons import VanillaVicController
-    vanilla_VIC_controller = VanillaVicController({'dim' : 1})
-    vanilla_VIC_controller_sim_data = simulate_controller_and_package_data(vanilla_VIC_controller, simulation_data, 'No passivation')
+    vanilla_VIC_controller = VanillaVicController({'dim': 1})
+    vanilla_VIC_controller_sim_data = simulate_controller_and_package_data(
+        vanilla_VIC_controller, simulation_data, 'No passivation')
     vanilla_VIC_controller_sim_data['is_vanilla'] = True
 
     z_dot_vanilla = np.zeros((simulation_data['N'],))
 
     temp_alpha = alpha_est_z_dot
+    matrix_dim = 1  # 1D case
     for idx in range(simulation_data['N']):
-        temp_err_pos = simulation_data['X_d'][idx, 0] - vanilla_VIC_controller_sim_data['X'][idx, 0]
-        temp_err_vel = simulation_data['X_d'][idx, 1] - vanilla_VIC_controller_sim_data['X'][idx, 1]
-        temp_C_dot_value = simulation_data['K_d_dot'][idx] + temp_alpha * simulation_data['D_d_dot'][idx]
+        temp_err_pos = simulation_data['X_d'][idx, 0] \
+            - vanilla_VIC_controller_sim_data['X'][idx, 0]
+        temp_err_vel = simulation_data['X_d'][idx, 1] \
+            - vanilla_VIC_controller_sim_data['X'][idx, 1]
+        # Compute z_dot
         z_dot_vanilla[idx] = \
             temp_err_vel.T * (
-                simulation_data['D_d'][idx] - temp_alpha * simulation_data['M_d'][idx]
-                ) * temp_err_vel \
+                simulation_data['D_d'][idx] \
+                - temp_alpha * simulation_data['M_d'][idx]
+                - 0.5 * simulation_data['M_d_dot'][idx]
+                - epsilon_stability * np.eye(matrix_dim)
+            ) * temp_err_vel \
             + temp_err_pos.T * (
-                temp_alpha * simulation_data['K_d'][idx] - 0.5 * temp_C_dot_value
-                ) * temp_err_pos
-        del temp_C_dot_value
+                - temp_alpha * simulation_data['M_d_dot'][idx]
+                - temp_alpha * epsilon_stability * np.eye(matrix_dim)
+            ) * temp_err_vel \
+            + temp_err_pos.T * (
+                temp_alpha * simulation_data['K_d'][idx]
+                - 0.5 * simulation_data['K_d_dot'][idx]
+                - 0.5 * temp_alpha * simulation_data['D_d_dot'][idx]
+                - temp_alpha * (epsilon_stability**2) * np.eye(matrix_dim)
+            ) * temp_err_pos
     del temp_alpha
     vanilla_VIC_controller_sim_data['z_dot'] = z_dot_vanilla
     # Compute z_integral
@@ -133,32 +172,33 @@ def get_vanilla_VIC_controller_sim_data(simulation_data, alpha_est_z_dot):
 
     return vanilla_VIC_controller_sim_data
 
-def plot_results_bednarczyk(simulation_data, controller_handle):
+
+def plot_results_bednarczyk(simulation_data, controller_handle):  # noqa: D103
     plt.figure()
     plt.subplot(2, 1, 1)
     plt.plot(
         simulation_data['time'],
         controller_handle.controller_log['K_diag'],
-        label="K"
+        label='K'
     )
     plt.plot(
         simulation_data['time'],
         simulation_data['K_d'],
-        "--",
-        label="K_d"
+        '--',
+        label='K_d'
     )
     plt.legend()
     plt.subplot(2, 1, 2)
     plt.plot(
         simulation_data['time'],
         controller_handle.controller_log['D_diag'],
-        label="D"
+        label='D'
     )
     plt.plot(
         simulation_data['time'],
         simulation_data['D_d'],
-        "--",
-        label="D_d"
+        '--',
+        label='D_d'
     )
     plt.legend()
 
@@ -168,13 +208,13 @@ def plot_results_bednarczyk(simulation_data, controller_handle):
         plt.plot(
             simulation_data['time'],
             controller_handle.controller_log['V2'],
-            label="Storage function V2"
+            label='Storage function V2'
         )
     if controller_handle.settings['passivation_function'] == 'bednarczyk_W4':
         plt.plot(
             simulation_data['time'],
             controller_handle.controller_log['V4'],
-            label="Storage function V4"
+            label='Storage function V4'
         )
     plt.legend()
 
@@ -182,11 +222,11 @@ def plot_results_bednarczyk(simulation_data, controller_handle):
     plt.plot(
         simulation_data['time'],
         controller_handle.controller_log['gamma'],
-        label="gamma"
+        label='gamma'
     )
     plt.plot(
         simulation_data['time'],
         controller_handle.controller_log['gamma_target'],
-        label="gamma_target"
+        label='gamma_target'
     )
     plt.legend()

@@ -8,7 +8,7 @@ from rclpy.node import Node
 # from geometry_msgs.msg import Transform
 
 import numpy as np
-# from scipy.spatial.transform import Rotation
+from scipy.spatial.transform import Rotation
 # import copy
 
 from vic_controllers.commons import CompliantFrameTrajectory
@@ -23,6 +23,35 @@ from cartesian_control_msgs.msg import (
     KeyValues as KeyValuesMsg
 )
 from std_msgs.msg import Float64 as FloatMsg
+
+from .interpolation_functions import (
+    fct_sinus,
+    fct_cosinus,
+    fct_step,
+    fct_tanh_alternating
+)
+
+def T_mat_func(euler_xyz):
+    """Maps the angular velocity to the euler angle rates."""
+    return np.array([
+        [1,
+         np.sin(euler_xyz[0]) * np.tan(euler_xyz[1]),
+         np.cos(euler_xyz[0]) * np.tan(euler_xyz[1])],
+        [0,
+         np.cos(euler_xyz[0]),
+         -np.sin(euler_xyz[0])],
+        [0,
+         np.sin(euler_xyz[0]) / np.cos(euler_xyz[1]),
+         np.cos(euler_xyz[0]) / np.cos(euler_xyz[1])]
+    ])
+
+def T_inv_mat_func(euler_xyz):
+    """Maps the euler angle rates to the angular velocity."""
+    return np.array([
+        [1, 0, -np.sin(euler_xyz[1])],
+        [0, np.cos(euler_xyz[0]), np.sin(euler_xyz[0]) * np.cos(euler_xyz[1])],
+        [0, -np.sin(euler_xyz[0]), np.cos(euler_xyz[0]) * np.cos(euler_xyz[1])]
+    ])
 
 
 def spawn_pf_node(node):
@@ -45,25 +74,79 @@ def spawn_pf_node(node):
 
 
 class PassivityFilterNodeBase(Node):
-
     def __init__(
         self,
-        name='PassivityFilterNode',
-        dim=3,
-        control_rate=500,
-        fixed_M=np.eye(3)*0.2
+        name='PassivityFilterNode'
     ):
         super().__init__(name)
-        self._dim = dim
-        self._control_rate = control_rate
-        self._Ts = 1/control_rate
-        self._t_max = 9.0
+        self._dim = None
+
+        self.declare_parameter('control_rate', 200.)
+        assert self.get_parameter('control_rate').value > 0, \
+            'Invalid control rate!'
+        self._control_rate = self.get_parameter('control_rate').value
+        self._Ts = 1/self._control_rate
+
+        self.get_logger().info(
+            f'VIC passivation filter control rate: {self._control_rate} Hz'
+            + f' (Ts = {self._Ts} seconds)'
+        )
 
         self.declare_parameter('base_frame', 'fd_base')
         self.declare_parameter('ee_frame', 'fd_ee')
         self.declare_parameter(
             'vic_controller_name',
             'cartesian_vic_controller'
+        )
+
+        # Scenario setting
+        self.declare_parameter('scenario', 'impedance_ft_elastic')
+        assert self.get_parameter('scenario').value in [
+            'impedance_ft_elastic',
+            'admittance_ur5_phri',
+        ], 'Invalid scenario name!'
+
+        self.declare_parameter(
+            'trajectory_type',
+            'static'
+        )
+        assert self.get_parameter('trajectory_type').value in [
+            'static',
+            'circular'
+        ], 'Invalid trajectory type!'
+
+        self.declare_parameter('interpolation_function', 'cosinus')
+        assert self.get_parameter('interpolation_function').value in [
+            'sinus',
+            'cosinus',
+            'step',
+            'tanh_alternating'
+        ], 'Invalid interpolation function!'
+
+        self._trajectory_type = self.get_parameter('trajectory_type').value
+
+        interpolation_function_name = \
+            self.get_parameter('interpolation_function').value
+        if interpolation_function_name == 'sinus':
+            self._interpolation_function = fct_sinus
+        elif interpolation_function_name == 'cosinus':
+            self._interpolation_function = fct_cosinus
+        elif interpolation_function_name == 'step':
+            self._interpolation_function = fct_step
+        elif interpolation_function_name == 'tanh_alternating':
+            self._interpolation_function = fct_tanh_alternating
+        else:
+            raise ValueError(
+                'Invalid interpolation function name: {}'.format(
+                    interpolation_function_name
+                )
+            )
+
+        self.get_logger().info(
+            f'Scenario: {self.get_parameter("scenario").value}, '
+            f'Trajectory type: {self._trajectory_type}, '
+            f'Interpolation function: {
+                self.get_parameter("interpolation_function").value}'
         )
 
         vic_controller_name = self.get_parameter('vic_controller_name').value
@@ -77,31 +160,60 @@ class PassivityFilterNodeBase(Node):
         simulation_time_topic_name = 'simulation_time'
 
         # Inertia setting
-        self._max_inertia_lambda = 1.0
-        if fixed_M is None:
-            self._match_natural_inertia = True
-        else:
-            self._match_natural_inertia = False
-            self._desired_inertia = fixed_M
-            self._max_inertia_lambda = np.max(fixed_M)
+        self._match_natural_inertia = False
 
-        # Impedance traj. setting
-        self._K_min_diag = np.array([10.0, 200.0, 200.0])
-        self._K_max_diag = np.array([200.0, 200.0, 200.0])
-        self._damping_ratios = np.array([0.1, 0.1, 0.1])
-        self._D_min_diag = 2 * self._damping_ratios*np.sqrt(
-            self._K_min_diag * self._max_inertia_lambda
-        )
-        fixed_D = True
-        if fixed_D:
-            self._D_max_diag = self._D_min_diag
-        else:
-            self._D_max_diag = 2 * self._damping_ratios*np.sqrt(
-                self._max_inertia_lambda * self._K_max_diag
+        # For UR5 PHRI scenario
+        self._t_max = 0.0  # seconds, to be set below...
+        if (self.get_parameter('scenario').value == 'admittance_ur5_phri'):
+            self._dim = 6
+            self._t_max = 15
+            self._period_var_impedance = self._t_max / 3  # seconds
+            self._desired_inertia = np.diag(np.array([
+                5.0, 5.0, 5.0,
+                0.5, 0.5, 0.5
+            ]))
+            self._K_min_diag = np.array(
+                [50.0, 50.0, 200.0, 20.0, 20.0, 20.0])
+            self._K_max_diag = np.array(
+                [200.0, 200.0, 200.0, 20.0, 20.0, 20.0])
+
+            self._damping_ratios = np.array([0.3] * 6)
+            self._max_inertia_lambda = np.max(self._desired_inertia)
+
+            self._D_min_diag = 2 * self._damping_ratios * np.sqrt(
+                self._K_min_diag * self._max_inertia_lambda
             )
+            self._D_max_diag = self._D_min_diag.copy()
+            # self._D_max_diag = 2 * self._damping_ratios * np.sqrt(
+            #     self._max_inertia_lambda * self._K_max_diag
+            # )
+        elif (self.get_parameter('scenario').value == 'impedance_ft_elastic'):
+            self._dim = 3
+            self._t_max = 10
+            self._period_var_impedance = self._t_max / 2  # seconds
+            # Impedance traj. setting
+            self._desired_inertia = np.diag(np.array(
+                [0.7] * 3
+            ))
+            self._K_min_diag = np.array([50.0, 500.0, 500.0])
+            self._K_max_diag = np.array([500.0, 500.0, 500.0])
+            self._max_inertia_lambda = np.max(self._desired_inertia)
+            self._damping_ratios = np.array([0.2] * 3)
+            self._D_min_diag = 2 * self._damping_ratios * np.sqrt(
+                self._K_min_diag * self._max_inertia_lambda
+            )
+            # self._D_max_diag = self._D_min_diag.copy()
+            self._D_max_diag = 2 * self._damping_ratios * np.sqrt(
+                self._K_max_diag * self._max_inertia_lambda
+            )
+        else:
+            raise ValueError('Invalid scenario name! (got {})'.format(
+                self.get_parameter('scenario').value
+            ))
+
         # Attention !!!
         # alpha = min(eig(D))/max(eig(M)) --> see "get_dummy_reference()"
-        self._max_M = self._max_inertia_lambda
+        self._max_M = np.max(np.diag(self._desired_inertia))
         self._min_d = np.min(self._D_min_diag)
 
         self.get_logger().info('Setting up comms...')
@@ -127,7 +239,9 @@ class PassivityFilterNodeBase(Node):
             5
         )
         # Init data
-        self.measurement_data = MeasurementData(dimension=3)
+        assert (self._dim is not None) and (self._dim > 0), \
+            'Invalid dimension!'
+        self.measurement_data = MeasurementData(dimension=self._dim)
         self.filtered_compliance_traj = CompliantFrameTrajectory(
             dimension=self._dim,
             trajectory_lenght=1
@@ -146,10 +260,10 @@ class PassivityFilterNodeBase(Node):
         )
 
     def init_controller(self):
-        raise NotImplementedError("Abstract class!")
+        raise NotImplementedError('Abstract class!')
 
     def compute_control(self):
-        raise NotImplementedError("Abstract class!")
+        raise NotImplementedError('Abstract class!')
 
     @property
     def current_time(self):
@@ -166,23 +280,80 @@ class PassivityFilterNodeBase(Node):
             self.process_measurements(self._latest_vic_state_msg)
 
     def process_measurements(self, state_msg):
-        self.measurement_data.p = np.array([
-            state_msg.pose.position.x,
-            state_msg.pose.position.y,
-            state_msg.pose.position.z
-        ])
-        self.measurement_data.p_dot = np.array([
-            state_msg.velocity.linear.x,
-            state_msg.velocity.linear.y,
-            state_msg.velocity.linear.z
-        ])
-        self.measurement_data.f_ext = np.array([
-            state_msg.wrench.force.x,
-            state_msg.wrench.force.y,
-            state_msg.wrench.force.z
-        ])
-        self.inertia_robot = np.array(
-            state_msg.natural_inertia.data).reshape((6, 6)).astype(float)[:3, :3]
+        if self._dim == 6:
+            euler_xyz = Rotation.from_quat([
+                state_msg.pose.orientation.x,
+                state_msg.pose.orientation.y,
+                state_msg.pose.orientation.z,
+                state_msg.pose.orientation.w
+            ]).as_euler('xyz', degrees=True)
+
+            T_mat = T_mat_func(euler_xyz)
+            T_inv_mat = T_inv_mat_func(euler_xyz)
+            euler_rates = np.dot(
+                T_mat,
+                np.array([
+                    state_msg.velocity.angular.x,
+                    state_msg.velocity.angular.y,
+                    state_msg.velocity.angular.z
+                ])
+            )
+            euler_repr_torques = np.dot(
+                T_inv_mat.T,
+                np.array([
+                    state_msg.wrench.torque.x,
+                    state_msg.wrench.torque.y,
+                    state_msg.wrench.torque.z
+                ])
+            )
+            self.measurement_data.p = np.array([
+                state_msg.pose.position.x,
+                state_msg.pose.position.y,
+                state_msg.pose.position.z,
+                euler_xyz[0],
+                euler_xyz[1],
+                euler_xyz[2]
+            ])
+            self.measurement_data.p_dot = np.array([
+                state_msg.velocity.linear.x,
+                state_msg.velocity.linear.y,
+                state_msg.velocity.linear.z,
+                euler_rates[0],
+                euler_rates[1],
+                euler_rates[2]
+            ])
+            self.measurement_data.f_ext = np.array([
+                state_msg.wrench.force.x,
+                state_msg.wrench.force.y,
+                state_msg.wrench.force.z,
+                euler_repr_torques[0],
+                euler_repr_torques[1],
+                euler_repr_torques[2]
+            ])
+            self.inertia_robot = np.array(
+                state_msg.natural_inertia.data).reshape((6, 6)).astype(float)
+        elif self._dim == 3:
+            self.measurement_data.p = np.array([
+                state_msg.pose.position.x,
+                state_msg.pose.position.y,
+                state_msg.pose.position.z
+            ])
+            self.measurement_data.p_dot = np.array([
+                state_msg.velocity.linear.x,
+                state_msg.velocity.linear.y,
+                state_msg.velocity.linear.z
+            ])
+            self.measurement_data.f_ext = np.array([
+                state_msg.wrench.force.x,
+                state_msg.wrench.force.y,
+                state_msg.wrench.force.z
+            ])
+            self.inertia_robot = np.array(
+                state_msg.natural_inertia.data).reshape((6, 6)).astype(float)[:3, :3]
+        else:
+            raise ValueError(
+                f'Invalid dimension {self._dim} for the passivity filter node!'
+            )
 
     def initialize(self):
         # Init controller
@@ -233,9 +404,61 @@ class PassivityFilterNodeBase(Node):
         )
         raise SystemExit           # <--- here is we exit the node
 
+    def get_cartesian_data_point(self, current_t, type='static'):
+        """
+        Returns a dummy cartesian data point.
+        This is used to generate the reference trajectory.
+        """
+        if (self.get_parameter('scenario').value == 'admittance_ur5_phri'):
+            center = np.array([
+                0.133,
+                0.52,
+                0.52,
+                0.0, 0.0, 0.0
+            ])
+            radius = 0.15  # meters
+            period = self._t_max  # seconds
+        elif (self.get_parameter('scenario').value == 'impedance_ft_elastic'):
+            if self._trajectory_type == 'static':
+                center = np.array([
+                    - 0.04, 0.0, 0.0
+                ])
+            else:
+                center = np.array([
+                    0.015, 0.0, 0.0
+                ])
+            radius = 0.015
+            period = self._t_max  # seconds
+        else:
+            raise ValueError('Invalid scenario name!')
+
+        if (type == 'static'):
+            p = center
+            dp = np.array(center.shape[0] * [0.0])
+            ddp = np.array(center.shape[0] * [0.0])
+            return p, dp, ddp
+        elif (type == 'circular'):
+            # Circular trajectory
+            angle = np.pi + 2 * np.pi * current_t / period  # 2 seconds period
+            p = center + radius * np.array([
+                np.cos(angle),
+                np.sin(angle)
+            ] + (center.shape[0] - 2) * [0.0])
+            dp = radius * np.array([
+                -np.sin(angle) * (2 * np.pi / period),
+                np.cos(angle) * (2 * np.pi / period)
+            ] + (center.shape[0] - 2) * [0.0])
+            ddp = radius * np.array([
+                -np.cos(angle) * (2 * np.pi / period)**2,
+                -np.sin(angle) * (2 * np.pi / period)**2
+            ] + (center.shape[0] - 2) * [0.0])
+            return p, dp, ddp
+        else:
+            raise ValueError('Invalid trajectory type!')
+
     def get_dummy_reference(self, current_t):
         ref_compliant_frame_traj = CompliantFrameTrajectory(
-            dimension=3,
+            dimension=self._dim,
             trajectory_lenght=self._N
         )
 
@@ -245,61 +468,46 @@ class PassivityFilterNodeBase(Node):
         def duplicate_matrix(matrix): return np.repeat(
             matrix[np.newaxis, :, :], self._N, axis=0)
 
-        # Dummy desired trajectory
-        '''
-        penetration_dist = 0.01
-        angle_support = 20 * np.pi/180.0
-        p_A = np.array([
-            -0.032223711649693246,
-            -0.017756821923915533 - penetration_dist * np.cos(angle_support),
-            0.015449580905827431 - penetration_dist * np.sin(angle_support)
-        ])
-        p_B = p_A + np.array([
-            0.5,
-            0.0,
-            0.0
-        ])
-        '''
-        p_A = np.array([
-            -0.02, 0.0, 0.0
-        ])
-
-        def get_cartesian_data_point(time):
-            p = p_A
-            dp = np.zeros((3,))
-            ddp = np.zeros((3,))
-            return p, dp, ddp
-
         # Dummy compliance
         K_min = np.diag(self._K_min_diag)
         K_max = np.diag(self._K_max_diag)
         D_min = np.diag(self._D_min_diag)
         D_max = np.diag(self._D_max_diag)
 
-        w = 2*np.pi/2
-
         def get_K_and_D(time):
-            gamma = 0.5 * (1 - np.cos(w*time))
-            K_d = K_min + (K_max - K_min)*gamma
-            D_d = D_min + (D_max - D_min)*gamma
+            gamma = self._interpolation_function(
+                time,
+                period=self._period_var_impedance,
+                delay=0,
+                derivative=0
+            )
+            K_d = K_min + (K_max - K_min) * gamma
+            D_d = D_min + (D_max - D_min) * gamma
             return K_d, D_d
 
         def get_K_dot_and_D_dot(time):
-            gamma_dot = w * 0.5 * np.sin(w*time)
-            K_d_dot = (K_max - K_min)*gamma_dot
-            D_d_dot = (D_max - D_min)*gamma_dot
+            gamma_dot = self._interpolation_function(
+                time,
+                period=self._period_var_impedance,
+                delay=0,
+                derivative=1
+            )
+            K_d_dot = (K_max - K_min) * gamma_dot
+            D_d_dot = (D_max - D_min) * gamma_dot
             return K_d_dot, D_d_dot
 
-        ref_compliant_frame_traj.p_desired = np.zeros((self._N, 3))
-        ref_compliant_frame_traj.p_dot_desired = np.zeros((self._N, 3))
-        ref_compliant_frame_traj.p_ddot_desired = np.zeros((self._N, 3))
-        ref_compliant_frame_traj.K_desired = np.zeros((self._N, 3, 3))
-        ref_compliant_frame_traj.D_desired = np.zeros((self._N, 3, 3))
+        ref_compliant_frame_traj.p_desired = np.zeros((self._N, self._dim))
+        ref_compliant_frame_traj.p_dot_desired = np.zeros((self._N, self._dim))
+        ref_compliant_frame_traj.p_ddot_desired = np.zeros((self._N, self._dim))
+        ref_compliant_frame_traj.K_desired = np.zeros(
+            (self._N, self._dim, self._dim))
+        ref_compliant_frame_traj.D_desired = np.zeros(
+            (self._N, self._dim, self._dim))
 
         for stage in range(self._N):
-            future_t = current_t + float(stage)*self._Ts
+            future_t = current_t + float(stage) * self._Ts
             # Set cartesian traj.
-            p, dp, ddp = get_cartesian_data_point(future_t)
+            p, dp, ddp = self.get_cartesian_data_point(future_t, type=self._trajectory_type)
             ref_compliant_frame_traj.p_desired[stage, :] = p
             ref_compliant_frame_traj.p_dot_desired[stage, :] = dp
             ref_compliant_frame_traj.p_ddot_desired[stage, :] = ddp
@@ -314,15 +522,8 @@ class PassivityFilterNodeBase(Node):
             )
         else:
             ref_compliant_frame_traj.M_desired = duplicate_matrix(
-                self._max_inertia_lambda * np.eye(3)
+                self._desired_inertia
             )
-
-        # ref_compliant_frame_traj.M_dot_desired = \
-        #   duplicate_matrix(np.zeros((3, 3)))
-        # ref_compliant_frame_traj.K_dot_desired = \
-        #   duplicate_matrix(np.zeros((3, 3)))
-        # ref_compliant_frame_traj.D_dot_desired = \
-        #   duplicate_matrix(np.zeros((3, 3)))
 
         return ref_compliant_frame_traj
 
@@ -399,17 +600,17 @@ class PassivityFilterNodeBase(Node):
             return nd_array.reshape([1, -1])[0].tolist()
 
         M = np.eye(6)
-        M[0:3, 0:3] = self._filtered_M_d
+        M[0:self._dim, 0:self._dim] = self._filtered_M_d
         compliance_point.inertia.data = package_array(M)
 
         # Fill stiffness
         K = np.zeros((6, 6))
-        K[0:3, 0:3] = self._filtered_K_d
+        K[0:self._dim, 0:self._dim] = self._filtered_K_d
         compliance_point.stiffness.data = package_array(K)
 
         # Fill damping
         D = np.zeros((6, 6))
-        D[0:3, 0:3] = self._filtered_D_d
+        D[0:self._dim, 0:self._dim] = self._filtered_D_d
         compliance_point.damping.data = package_array(D)
 
 
