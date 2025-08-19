@@ -70,26 +70,26 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
     linestyle_list = plot_utils.get_linestyle_list()
     print(f'Linestyle list: {linestyle_list}')
     dataset_info_list = [
-        # {
-        #     'tag': 'SIPF',
-        #     'path_to_bag': datasets_path_root + 'SIPF/SIPF_0.mcap',
-        #     'label': label_SIPF_W2,
-        #     'color': color_list[0],
-        #     'linestyle': '-'
-        # },
         {
-            'tag': 'SIPF+',
-            'path_to_bag': datasets_path_root + 'SIPF+/SIPF+_0.mcap',
-            'label': label_SIPF_W4,
-            'color': color_list[1],
-            'linestyle': linestyle_list[1]
+            'tag': 'SIPF',
+            'path_to_bag': datasets_path_root + 'SIPF/SIPF_0.mcap',
+            'label': label_SIPF_W2,
+            'color': color_list[0],
+            'linestyle': '-'
         },
+        # {
+        #     'tag': 'SIPF+',
+        #     'path_to_bag': datasets_path_root + 'SIPF+/SIPF+_0.mcap',
+        #     'label': label_SIPF_W4,
+        #     'color': color_list[1],
+        #     'linestyle': linestyle_list[1]
+        # },
         {
             'tag': 'SDPF',
             'path_to_bag': datasets_path_root + 'SDPF/SDPF_0.mcap',
             'label': label_SDPF,
             'color': color_list[2],
-            'linestyle': linestyle_list[2]
+            'linestyle': (0, (3, 3))  # linestyle_list[2]
         },
         # {
         #     'tag': 'SDPF_integral',
@@ -103,7 +103,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
             'path_to_bag': datasets_path_root + 'SDPF-adaptive/SDPF-adaptive_0.mcap',
             'label': label_SDPF_adaptive,
             'color': color_list[4],
-            'linestyle': linestyle_list[4]
+            'linestyle': (3, (3, 3))  # linestyle_list[4]
         }
     ]
 

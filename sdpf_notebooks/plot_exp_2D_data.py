@@ -71,33 +71,33 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
     linestyle_list = plot_utils.get_linestyle_list()
     print(f'Linestyle list: {linestyle_list}')
     dataset_info_list = [
-        # {
-        #     'tag': 'SIPF',
-        #     'path_to_bag': datasets_path_root + 'SIPF/SIPF_0.mcap',
-        #     'label': label_SIPF_W2,
-        #     'color': color_list[0],
-        #     'linestyle': linestyle_list[0]
-        # },
         {
-            'tag': 'SIPF+',
-            'path_to_bag': datasets_path_root + 'SIPF+/SIPF+_0.mcap',
-            'label': label_SIPF_W4,
-            'color': color_list[1],
-            'linestyle': linestyle_list[1]
+            'tag': 'SIPF',
+            'path_to_bag': datasets_path_root + 'SIPF/SIPF_0.mcap',
+            'label': label_SIPF_W2,
+            'color': color_list[0],
+            'linestyle': linestyle_list[0]
         },
+        # {
+        #     'tag': 'SIPF+',
+        #     'path_to_bag': datasets_path_root + 'SIPF+/SIPF+_0.mcap',
+        #     'label': label_SIPF_W4,
+        #     'color': color_list[1],
+        #     'linestyle': linestyle_list[1]
+        # },
         {
             'tag': 'SDPF',
             'path_to_bag': datasets_path_root + 'SDPF/SDPF_0.mcap',
             'label': label_SDPF,
             'color': color_list[2],
-            'linestyle': linestyle_list[2]
+            'linestyle': (0, (3, 3))  # linestyle_list[2]
         },
         {
             'tag': 'SDPF_adaptive',
             'path_to_bag': datasets_path_root + 'SDPF-adaptive/SDPF-adaptive_0.mcap',
             'label': label_SDPF_adaptive,
             'color': color_list[4],
-            'linestyle': linestyle_list[4]
+            'linestyle': (3, (3, 3))  # linestyle_list[4]
         }
     ]
 
@@ -315,7 +315,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
             crop_time_serie(dataset['vic_state'], 'position')[:, [idx_Y]],
             label=dataset['label'],
             color=dataset['color'],
-            linestyle=dataset['linestyle']
+            # linestyle=dataset['linestyle']
         )
 
     # Plot start / stop
@@ -474,7 +474,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
             crop_time_serie(dataset['vic_state'], 'time'), norm_error_XY,
             label = dataset['label'],
             color = dataset['color'],
-            linestyle = dataset['linestyle']
+            # linestyle = dataset['linestyle']
         )
     ax1.set_ylabel(r'$||e||$' + '\n' + r'\small{(m)}')
 
@@ -490,7 +490,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
             crop_time_serie(dataset['vic_state'], 'time'), norm_velocity_error_XY,
             label = dataset['label'],
             color = dataset['color'],
-            linestyle = dataset['linestyle']
+            # linestyle = dataset['linestyle']
         )
     ax2.set_ylabel(r'$||\dot{e}||$' + '\n' + r'\small{(m.s${}^{-1}$)}')
 
@@ -505,7 +505,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
             crop_time_serie(dataset['vic_state'], 'time'), f_ext_norm_XY,
             label = dataset['label'],
             color = dataset['color'],
-            linestyle = dataset['linestyle']
+            # linestyle = dataset['linestyle']
         )
 
     ax3.set_ylabel(r'$||f_{ext}||$' + '\n' + r'\small{(N)}')
@@ -587,7 +587,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
                 crop_time_serie(dataset['diagnostic_data'], 'z'),
                 label = '__no-label-for_' + dataset['label'],
                 color = dataset['color'],
-                linestyle = dataset['linestyle']
+                # linestyle = dataset['linestyle']
             )
     if 'SDPF_adaptive' in experimental_data:
         ax2.plot(
