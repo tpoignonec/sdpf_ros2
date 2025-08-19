@@ -9,7 +9,7 @@
 
 epsilon_stability = 0.0
 
-tau_delay_adaptive_z_min = 3.0
+tau_delay_adaptive_z_min = 5.0
 z_max = 1.0
 
 SAVE_FIGS = True
@@ -168,13 +168,13 @@ placeholder_dataset = {
 
 if plot_SIPF_W4:
     controller_sim_datasets = [
-        vanilla_VIC_controller_sim_data,
+        # vanilla_VIC_controller_sim_data,
         placeholder_dataset,
         controller_SIPF_W4_sim_data
     ] + SDPF_controllers_sim_datasets
 else:
     controller_sim_datasets = [
-        vanilla_VIC_controller_sim_data,
+        # vanilla_VIC_controller_sim_data,
         placeholder_dataset,
         placeholder_dataset
     ] + SDPF_controllers_sim_datasets
@@ -202,7 +202,7 @@ annotate_regions = plot_utils_1D.annotate_regions
 
 
 # %% Plot all results
-num_columns = 3 if plot_SIPF_W4 else 2
+num_columns = 2 if plot_SIPF_W4 else 3
 fig_profile, axs_profile = plot_utils_1D.plot_K_and_D(
     simulation_data, controller_sim_datasets, num_columns=num_columns)
 

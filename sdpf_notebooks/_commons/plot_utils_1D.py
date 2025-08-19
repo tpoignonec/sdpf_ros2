@@ -46,8 +46,11 @@ def plot_K(simulation_data, controller_sim_datasets, num_columns=3):
         if (controller_sim_data['is_vanilla'] == True):
             vanilla_VIC_controller_sim_data = controller_sim_data
             break
-    assert (vanilla_VIC_controller_sim_data is not None)
-    label_nominal = vanilla_VIC_controller_sim_data['label']
+    if (vanilla_VIC_controller_sim_data is None):
+        print("WARNING!!! No vanilla dataset provided!")
+        label_nominal = '_nominal'
+    else:
+        label_nominal = vanilla_VIC_controller_sim_data['label']
 
     # -------------------------
     # Impedance profile
@@ -123,8 +126,11 @@ def plot_K_and_D(simulation_data, controller_sim_datasets, num_columns=3):
         if (controller_sim_data['is_vanilla'] == True):
             vanilla_VIC_controller_sim_data = controller_sim_data
             break
-    assert (vanilla_VIC_controller_sim_data is not None)
-    label_nominal = vanilla_VIC_controller_sim_data['label']
+    if (vanilla_VIC_controller_sim_data is None):
+        print("WARNING!!! No vanilla dataset provided!")
+        label_nominal = '_nominal'
+    else:
+        label_nominal = vanilla_VIC_controller_sim_data['label']
 
     # -------------------------
     # Impedance profile
@@ -229,8 +235,11 @@ def plot_M_and_D(simulation_data, controller_sim_datasets, num_columns=3):
         if (controller_sim_data['is_vanilla'] == True):
             vanilla_VIC_controller_sim_data = controller_sim_data
             break
-    assert (vanilla_VIC_controller_sim_data is not None)
-    label_nominal = vanilla_VIC_controller_sim_data['label']
+    if (vanilla_VIC_controller_sim_data is None):
+        print("WARNING!!! No vanilla dataset provided!")
+        label_nominal = '_nominal'
+    else:
+        label_nominal = vanilla_VIC_controller_sim_data['label']
 
     # -------------------------
     # Impedance profile
@@ -336,8 +345,11 @@ def plot_M(simulation_data, controller_sim_datasets, num_columns=3):
         if (controller_sim_data['is_vanilla'] == True):
             vanilla_VIC_controller_sim_data = controller_sim_data
             break
-    assert (vanilla_VIC_controller_sim_data is not None)
-    label_nominal = vanilla_VIC_controller_sim_data['label']
+    if (vanilla_VIC_controller_sim_data is None):
+        print("WARNING!!! No vanilla dataset provided!")
+        label_nominal = '_nominal'
+    else:
+        label_nominal = vanilla_VIC_controller_sim_data['label']
 
     # -------------------------
     # Impedance profile
@@ -411,8 +423,11 @@ def plot_cartesian_state(simulation_data, controller_sim_datasets, num_columns=3
         if (controller_sim_data['is_vanilla'] == True):
             vanilla_VIC_controller_sim_data = controller_sim_data
             break
-    assert (vanilla_VIC_controller_sim_data is not None)
-    label_nominal = vanilla_VIC_controller_sim_data['label']
+    if (vanilla_VIC_controller_sim_data is None):
+        print("WARNING!!! No vanilla dataset provided!")
+        label_nominal = '_nominal'
+    else:
+        label_nominal = vanilla_VIC_controller_sim_data['label']
 
     # ----------------------------------
     # Position/velocity errors + force
@@ -438,11 +453,9 @@ def plot_cartesian_state(simulation_data, controller_sim_datasets, num_columns=3
     # ax2.sharex(ax1)
     # ax3.sharex(ax1)
 
-    plot_ref = True
-
     # plot reference
     # -------------------
-    if plot_ref:
+    if vanilla_VIC_controller_sim_data is not None:
         # Position
         ax1.plot(
             simulation_data['time'],
@@ -550,6 +563,7 @@ def plot_z_dot_and_beta(
             break
     if(vanilla_VIC_controller_sim_data is None):
         print("WARNING!!! No vanilla dataset provided!")
+        label_nominal = '_nominal'
     else:
         label_nominal = vanilla_VIC_controller_sim_data['label']
         z_dot_vanilla = vanilla_VIC_controller_sim_data['z_dot']
