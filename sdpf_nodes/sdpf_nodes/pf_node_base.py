@@ -181,7 +181,7 @@ class PassivityFilterNodeBase(Node):
             self._max_inertia_lambda = np.max(self._desired_inertia)
 
             self._D_min_diag = 2 * self._damping_ratios * np.sqrt(
-                self._K_min_diag * self._max_inertia_lambda
+                self._K_min_diag * np.diag(self._desired_inertia)
             )
             self._D_max_diag = self._D_min_diag.copy()
             # self._D_max_diag = 2 * self._damping_ratios * np.sqrt(
@@ -200,7 +200,7 @@ class PassivityFilterNodeBase(Node):
             self._max_inertia_lambda = np.max(self._desired_inertia)
             self._damping_ratios = np.array([0.2] * 3)
             self._D_min_diag = 2 * self._damping_ratios * np.sqrt(
-                self._K_min_diag * self._max_inertia_lambda
+                self._K_min_diag * np.diag(self._desired_inertia)
             )
             # self._D_max_diag = self._D_min_diag.copy()
             self._D_max_diag = 2 * self._damping_ratios * np.sqrt(
