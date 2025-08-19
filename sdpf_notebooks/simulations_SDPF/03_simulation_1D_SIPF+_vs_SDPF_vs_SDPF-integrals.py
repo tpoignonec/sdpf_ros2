@@ -14,7 +14,7 @@ z_max = 1.0
 
 SAVE_FIGS = True
 export_figs_dir = "export_figures/simulations_SIPF_vs_SDPF_vs_integrals"
-plot_SIPF_W4 = False
+plot_SIPF_W4 = True
 
 # ##################################
 
@@ -126,7 +126,9 @@ controller_SDPF_integral = SdpfController({
     'N_logging' : simulation_data['N'],
 })
 
-controller_SDPF_integral_sim_data = simulate_controller_and_package_data(controller_SDPF_integral, simulation_data, 'SDPF integral')
+label_SDPF_integral = r'SDPF, $z(t) \geq 0$'
+
+controller_SDPF_integral_sim_data = simulate_controller_and_package_data(controller_SDPF_integral, simulation_data, label_SDPF_integral)
 
 # ------------------------------------------------------
 # Our controller SDPF, with ADAPTIVE integral condition
@@ -144,7 +146,8 @@ controller_SDPF_adaptive = SdpfController({
     'N_logging' : simulation_data['N'],
 })
 
-controller_SDPF_adaptive_sim_data = simulate_controller_and_package_data(controller_SDPF_adaptive, simulation_data, 'SDPF adaptive')
+label_SDPF_adaptive = r'SDPF, $z(t) \geq z_{min}(t)$'
+controller_SDPF_adaptive_sim_data = simulate_controller_and_package_data(controller_SDPF_adaptive, simulation_data, label_SDPF_adaptive)
 
 
 # %% [markdown]

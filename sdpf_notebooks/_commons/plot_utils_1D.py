@@ -102,7 +102,7 @@ def plot_K(simulation_data, controller_sim_datasets, num_columns=3):
     legend_height = 1.4 if len(legend_labels) > num_columns else 1.25
     ax1.legend(
         ncol=num_columns,
-        bbox_to_anchor=(0.5, legend_height),
+        bbox_to_anchor=(0.45, legend_height),
         loc='upper center'
     )
 
@@ -201,7 +201,7 @@ def plot_K_and_D(simulation_data, controller_sim_datasets, num_columns=3):
     ax2.set_xlabel(r'time (s)')
     ax1.legend(
         ncol=num_columns,
-        bbox_to_anchor=(0.5, 1.45),
+        bbox_to_anchor=(0.45, 1.45),
         loc='upper center'
     )
     '''
@@ -209,7 +209,7 @@ def plot_K_and_D(simulation_data, controller_sim_datasets, num_columns=3):
     ax1.legend(
         flip(handles, 2), flip(labels, 2),
         ncol=num_columns,
-        bbox_to_anchor=(0.5, 1.45),
+        bbox_to_anchor=(0.45, 1.45),
         loc='upper center'
     )
     '''
@@ -310,7 +310,7 @@ def plot_M_and_D(simulation_data, controller_sim_datasets, num_columns=3):
     ax2.set_xlabel(r'time (s)')
     ax1.legend(
         ncol=num_columns,
-        bbox_to_anchor=(0.5, 1.45),
+        bbox_to_anchor=(0.45, 1.45),
         loc='upper center'
     )
     '''
@@ -318,7 +318,7 @@ def plot_M_and_D(simulation_data, controller_sim_datasets, num_columns=3):
     ax1.legend(
         flip(handles, 2), flip(labels, 2),
         ncol=num_columns,
-        bbox_to_anchor=(0.5, 1.45),
+        bbox_to_anchor=(0.45, 1.45),
         loc='upper center'
     )
     '''
@@ -401,7 +401,7 @@ def plot_M(simulation_data, controller_sim_datasets, num_columns=3):
     ax1.set_xlabel(r'time (s)')
     ax1.legend(
         ncol=num_columns,
-        bbox_to_anchor=(0.5, 1.25),
+        bbox_to_anchor=(0.45, 1.25),
         loc='upper center'
     )
 
@@ -523,7 +523,7 @@ def plot_cartesian_state(simulation_data, controller_sim_datasets, num_columns=3
 
     ax1.legend(
         ncol=num_columns,
-        bbox_to_anchor=(0.5, 1.6),
+        bbox_to_anchor=(0.45, 1.6),
         loc='upper center'
     )
     '''
@@ -531,7 +531,7 @@ def plot_cartesian_state(simulation_data, controller_sim_datasets, num_columns=3
     ax1.legend(
         flip(handles, 2), flip(labels, 2),
         ncol=num_columns,
-        bbox_to_anchor=(0.5, 1.6),
+        bbox_to_anchor=(0.45, 1.6),
         loc='upper center'
     )
     '''
@@ -657,7 +657,7 @@ def plot_z_dot_and_beta(
 
     # ax1.legend(
     #     ncol=num_columns,
-    #     bbox_to_anchor=(0.5, 1.6),
+    #     bbox_to_anchor=(0.45, 1.6),
     #     loc='upper center',
     # )  # , framealpha=0.5)
 
@@ -842,7 +842,7 @@ def plot_z_dot_z_and_beta(
 
     ax1.legend(
         ncol=num_columns,
-        bbox_to_anchor=(0.5, legend_height),
+        bbox_to_anchor=(0.45, legend_height),
         loc='upper center',
     )  # , framealpha=0.5)
 
@@ -1055,7 +1055,7 @@ def plot_K_z_and_beta(
 
     ax1.legend(
         ncol=num_columns,
-        bbox_to_anchor=(0.5, 1.6),
+        bbox_to_anchor=(0.45, 1.6),
         loc='upper center',
     )  # , framealpha=0.5)
 
@@ -1237,7 +1237,7 @@ def plot_K_z_dot_z_and_beta(
 
     ax0.legend(
         ncol=num_columns,
-        bbox_to_anchor=(0.5, 2.0),
+        bbox_to_anchor=(0.45, 2.0),
         loc='upper center',
     )  # , framealpha=0.5)
 
@@ -1370,7 +1370,7 @@ def plot_vic_tracking_errors(simulation_data, controller_sim_datasets, num_colum
     ax4.set_ylabel(r'$ \| \tilde{K} e \|^2$' + '\n' + r'\small{(N)}')
     ax1.legend(
         ncol=num_columns,
-        bbox_to_anchor=(0.5, 1.45),
+        bbox_to_anchor=(0.45, 1.45),
         loc='upper center'
     )
     for ax in [ax1, ax2, ax3, ax4]:
