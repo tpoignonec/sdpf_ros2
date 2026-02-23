@@ -497,7 +497,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
                 crop_time_serie(dataset['diagnostic_data'], 'z_dot'),
                 label = dataset['label'],
                 color = dataset['color'],
-                linestyle = dataset['linestyle']
+                # linestyle = dataset['linestyle']
             )
 
     ax1.set_ylabel(r'$w$' + ' ' + r'\small{(J.s${}^{-1}$)}')
@@ -512,7 +512,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
                 crop_time_serie(dataset['diagnostic_data'], 'z'),
                 label = '__no-label-for_' + dataset['label'],
                 color = dataset['color'],
-                linestyle = dataset['linestyle']
+                # linestyle = dataset['linestyle']
             )
     ax2.plot(
         crop_time_serie(experimental_data['SDPF_adaptive']['diagnostic_data'], 'time'),
@@ -549,7 +549,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
                 crop_time_serie(dataset['diagnostic_data'], 'beta'),
                 label = dataset['label'],
                 color = dataset['color'],
-                linestyle = dataset['linestyle']
+                # linestyle = dataset['linestyle']
             )
 
     ax3.set_ylabel(r'$\beta$' + ' ' + r'\small{(unitless)}')
