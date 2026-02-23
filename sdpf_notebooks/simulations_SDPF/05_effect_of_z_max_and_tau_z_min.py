@@ -80,7 +80,7 @@ for tau_delay_adaptive_z_min in tau_delay_adaptive_z_min_list:
         'N_logging' : simulation_data['N'],
     })
     _controller_SDPF_sim_data = simulate_controller_and_package_data(
-        _controller_SDPF, simulation_data, str(tau_delay_adaptive_z_min))
+        _controller_SDPF, simulation_data, str(tau_delay_adaptive_z_min) + ' s')
 
     _controller_SDPF_sim_data['tau_delay_value'] = tau_delay_adaptive_z_min
 
