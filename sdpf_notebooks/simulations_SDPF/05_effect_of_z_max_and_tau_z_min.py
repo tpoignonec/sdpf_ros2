@@ -157,7 +157,7 @@ for z_max in z_max_list:
         'N_logging' : simulation_data['N'],
     })
     _controller_SDPF_sim_data = simulate_controller_and_package_data(
-        _controller_SDPF, simulation_data, str(z_max))
+        _controller_SDPF, simulation_data, str(z_max) + " J")
 
     _controller_SDPF_sim_data['z_max'] = z_max
 

@@ -44,7 +44,7 @@ for idx in range(1, t.shape[0]):
 
 fig = plt.figure( figsize=(plt.rcParams["figure.figsize"][0], plt.rcParams["figure.figsize"][1]*0.4))
 plt.plot(t, z, label = r'${z}(t)$')
-plt.plot(t, z_bar, '--', label = r'$z_{min}(t) = \bar{z}(t)$')
+plt.plot(t, z_bar, '--', label = r'$\bar{z}(t)$')
 
 
 plt.gca().fill_between(

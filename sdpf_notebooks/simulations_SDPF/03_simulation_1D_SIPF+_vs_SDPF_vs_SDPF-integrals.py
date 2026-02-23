@@ -108,7 +108,8 @@ controller_SDPF = SdpfController({
     'N_logging' : simulation_data['N'],
 })
 
-controller_SDPF_sim_data = simulate_controller_and_package_data(controller_SDPF, simulation_data, 'SDPF')
+label_SDPF_instantaneous = r'SDPF, $w(t) \geq 0$'
+controller_SDPF_sim_data = simulate_controller_and_package_data(controller_SDPF, simulation_data, label_SDPF_instantaneous)
 
 # ---------------------------------------------
 # Our controller SDPF, with integral condition
