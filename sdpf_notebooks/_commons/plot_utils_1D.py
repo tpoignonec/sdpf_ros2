@@ -94,7 +94,7 @@ def plot_K(simulation_data, controller_sim_datasets, num_columns=3):
 
     # extra setup
     # ------------
-    ax1.set_ylabel(r'$K$' + '\n' + r'\small{(N.m$^{-1}$)}')
+    ax1.set_ylabel(r'$K$' + r'{$\,$\tiny (N.m$^{-1}$)}')
     ax1.set_xlabel(r'time (s)')
 
 
@@ -196,8 +196,8 @@ def plot_K_and_D(simulation_data, controller_sim_datasets, num_columns=3):
 
     # extra setup
     # ------------
-    ax1.set_ylabel(r'$K$' + '\n' + r'\small{(N.m$^{-1}$)}')
-    ax2.set_ylabel(r'$D$' + '\n' + r'\small{(N.m$^{-1}$.s)}')
+    ax1.set_ylabel(r'$K$' + r'{$\,$\tiny (N.m$^{-1}$)}')
+    ax2.set_ylabel(r'$D$' + r'{$\,$\tiny (N.m$^{-1}$.s)}')
     ax2.set_xlabel(r'time (s)')
     ax1.legend(
         ncol=num_columns,
@@ -305,8 +305,8 @@ def plot_M_and_D(simulation_data, controller_sim_datasets, num_columns=3):
 
     # extra setup
     # ------------
-    ax1.set_ylabel(r'$M$' + '\n' + r'\small{(Kg)}')
-    ax2.set_ylabel(r'$D$' + '\n' + r'\small{(N.m$^{-1}$.s)}')
+    ax1.set_ylabel(r'$M$' + r'{$\,$\tiny (Kg)}')
+    ax2.set_ylabel(r'$D$' + r'{$\,$\tiny (N.m$^{-1}$.s)}')
     ax2.set_xlabel(r'time (s)')
     ax1.legend(
         ncol=num_columns,
@@ -397,7 +397,7 @@ def plot_M(simulation_data, controller_sim_datasets, num_columns=3):
 
     # extra setup
     # ------------
-    ax1.set_ylabel(r'$M$' + '\n' + r'\small{(Kg)}')
+    ax1.set_ylabel(r'$M$' + r'{$\,$\tiny (Kg)}')
     ax1.set_xlabel(r'time (s)')
     ax1.legend(
         ncol=num_columns,
@@ -642,12 +642,11 @@ def plot_z_dot_and_beta(
             controller_sim_data['controller'].controller_log['beta'].reshape((-1,)),
             label = controller_sim_data['label']
         )
-    ax1.set_ylabel(r'$w(\beta, t)$' + '\n' + r'\small{(J.s${}^{-1}$)}')
+    ax1.set_ylabel(r'$w$' + r'{$\,$\tiny (J.s${}^{-1}$)}')
+    ax2.set_ylabel(r'$\beta$' + r'{$\,$\tiny (unitless)}')
 
-    ax2.set_ylabel(r'$\beta$' + '\n' + r'\small{(unitless)}')
-
-    # ax2.set_ylabel(r'${\displaystyle \int_0^t w\left(\beta(\tau), \tau\right) d\tau}$')  # r'\small{(J)}')
-    # ax2.set_ylabel(r'$\int_0^t w$' + '\n' + r'\small{(J)}')
+    # ax2.set_ylabel(r'${\displaystyle \int_0^t w\left(\beta(\tau), \tau\right) d\tau}$')  # r'{$\,$\tiny (J)}')
+    # ax2.set_ylabel(r'$\int_0^t w$' + '\n' + r'{$\,$\tiny (J)}')
     ax2.set_xlabel(r'Time(s)')
 
     # extra setup
@@ -818,18 +817,19 @@ def plot_z_dot_z_and_beta(
             controller_sim_data['controller'].controller_log['beta'].reshape((-1,)),
             label = controller_sim_data['label']
         )
-    ax1.set_ylabel(r'$w(\beta, t)$' + '\n' + r'\small{(J.s${}^{-1}$)}')
+    ax1.set_ylabel(r'$w$' + r'{$\,$\tiny (J.s${}^{-1}$)}')
+    ax2.set_ylabel(r'$z$' + r'{$\,$\tiny (J)}')
 
-    ax2.set_ylabel(
-        r'{\setlength{\fboxrule}{0pt} \fbox{ \phantom{${\displaystyle \int_0^t}$} ${\int_0^t w\left(.\right) d\tau}$}}'
-        + '\n'
-        + r'\small{(J)}'
-    )
+    # ax2.set_ylabel(
+    #     r'{\setlength{\fboxrule}{0pt} \fbox{ \phantom{${\displaystyle \int_0^t}$} ${\int_0^t w\left(.\right) d\tau}$}}'
+    #     + '\n'
+    #     + r'{$\,$\tiny (J)}'
+    # )
 
-    ax3.set_ylabel(r'$\beta$' + '\n' + r'\small{(unitless)}')
+    ax3.set_ylabel(r'$\beta$' + r'{$\,$\tiny (unitless)}')
 
-    # ax2.set_ylabel(r'${\displaystyle \int_0^t w\left(\beta(\tau), \tau\right) d\tau}$')  # r'\small{(J)}')
-    # ax2.set_ylabel(r'$\int_0^t w$' + '\n' + r'\small{(J)}')
+    # ax2.set_ylabel(r'${\displaystyle \int_0^t w\left(\beta(\tau), \tau\right) d\tau}$')  # r'{$\,$\tiny (J)}')
+    # ax2.set_ylabel(r'$\int_0^t w$' + '\n' + r'{$\,$\tiny (J)}')
     ax3.set_xlabel(r'Time(s)')
 
     # extra setup
@@ -1035,17 +1035,19 @@ def plot_K_z_and_beta(
         )
         i += 1
 
-    ax1.set_ylabel(r'$K(t)$' + '\n' + r'\small{(J.s${}^{-1}$)}')
-    ax2.set_ylabel(
-        r'{\setlength{\fboxrule}{0pt} \fbox{ \phantom{${\displaystyle \int_0^t}$} ${\int_0^t w\left(.\right) d\tau}$}}'
-        + '\n'
-        + r'\small{(J)}'
-    )
+    ax1.set_ylabel(r'$K$' + r'{$\,$\tiny (J.s${}^{-1}$)}')
+    ax2.set_ylabel(r'$z$' + r'{$\,$\tiny (J)}')
 
-    ax3.set_ylabel(r'$\beta$' + '\n' + r'\small{(unitless)}')
+    # ax2.set_ylabel(
+    #     r'{\setlength{\fboxrule}{0pt} \fbox{ \phantom{${\displaystyle \int_0^t}$} ${\int_0^t w\left(.\right) d\tau}$}}'
+    #     + '\n'
+    #     + r'{$\,$\tiny (J)}'
+    # )
 
-    # ax2.set_ylabel(r'${\displaystyle \int_0^t w\left(\beta(\tau), \tau\right) d\tau}$')  # r'\small{(J)}')
-    # ax2.set_ylabel(r'$\int_0^t w$' + '\n' + r'\small{(J)}')
+    ax3.set_ylabel(r'$\beta$' + r'{$\,$\tiny (unitless)}')
+
+    # ax2.set_ylabel(r'${\displaystyle \int_0^t w\left(\beta(\tau), \tau\right) d\tau}$')  # r'{$\,$\tiny (J)}')
+    # ax2.set_ylabel(r'$\int_0^t w$' + '\n' + r'{$\,$\tiny (J)}')
     ax3.set_xlabel(r'Time(s)')
 
     # extra setup
@@ -1223,16 +1225,16 @@ def plot_K_z_dot_z_and_beta(
         i += 1
 
     # Labels & legend
-    ax0.set_ylabel(r'$K(t)$')  # + ' ' + r'\small{(J.s${}^{-1}$)}')
-    ax1.set_ylabel(r'$w(\beta, t)$')  # + ' ' + r'\small{(J.s${}^{-1}$)}')
+    ax0.set_ylabel(r'$K$')  # + ' ' + r'{$\,$\tiny (J.s${}^{-1}$)}')
+    ax1.set_ylabel(r'$w$')  # + ' ' + r'{$\,$\tiny (J.s${}^{-1}$)}')
     ax2.set_ylabel(
-        r'$z(t)$'  # = \int_0^t w(\cdot) d\tau$'
+        r'$z$'  # = \int_0^t w(\cdot) d\tau$'
         # r'{\setlength{\fboxrule}{0pt} \fbox{ \phantom{${\displaystyle \int_0^t}$} ${\int_0^t w\left(\beta(\tau), \tau\right) d\tau}$}}'
         # + '\n'
         # + ' '
-        # + r'\small{(J)}'
+        # + r'{$\,$\tiny (J)}'
     )
-    ax3.set_ylabel(r'$\beta$')  # + ' ' + r'\small{(unitless)}')
+    ax3.set_ylabel(r'$\beta$')  # + ' ' + r'{$\,$\tiny (unitless)}')
     ax3.set_xlabel(r'time (s)')
 
     ax0.legend(
@@ -1364,10 +1366,10 @@ def plot_vic_tracking_errors(simulation_data, controller_sim_datasets, num_colum
     # ------------
     ax2.set_xlabel(r'Time (s)')
 
-    ax1.set_ylabel(r'\small{$ \| \tilde{M} \ddot{e} + \tilde{D} \dot{e} + \tilde{K} e\|^2$}' + '\n' + r'\small{(N)}')
-    ax2.set_ylabel(r'$ \| \tilde{M} \ddot{e} \|^2$' + '\n' + r'\small{(N)}')
-    ax3.set_ylabel(r'$ \| \tilde{D} \dot{e} \|^2$' + '\n' + r'\small{(N)}')
-    ax4.set_ylabel(r'$ \| \tilde{K} e \|^2$' + '\n' + r'\small{(N)}')
+    ax1.set_ylabel(r'{$\,$\tiny $ \| \tilde{M} \ddot{e} + \tilde{D} \dot{e} + \tilde{K} e\|^2$}' + '\n' + r'{$\,$\tiny (N)}')
+    ax2.set_ylabel(r'$ \| \tilde{M} \ddot{e} \|^2$' + '\n' + r'{$\,$\tiny (N)}')
+    ax3.set_ylabel(r'$ \| \tilde{D} \dot{e} \|^2$' + '\n' + r'{$\,$\tiny (N)}')
+    ax4.set_ylabel(r'$ \| \tilde{K} e \|^2$' + '\n' + r'{$\,$\tiny (N)}')
     ax1.legend(
         ncol=num_columns,
         bbox_to_anchor=(0.45, 1.45),
