@@ -255,7 +255,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
             linestyle = dataset['linestyle']
         )
 
-    ax1.set_ylabel(r'$K_x$' + '\n' + r'\small{(N.m$^{-1}$)}')
+    ax1.set_ylabel(r'$K_x$' + '\n' + r'{\tiny(N.m$^{-1}$)}')
 
     # extra setup
     # ------------
@@ -408,7 +408,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
             linestyle = dataset['linestyle']
         )
 
-    ax1.set_ylabel(r'$K_x$')  # + '\n' + r'\small{(N.m$^{-1}$)}')
+    ax1.set_ylabel(r'$K_x$')  # + '\n' + r'{\tiny(N.m$^{-1}$)}')
 
     # Position
     # -------------------
@@ -500,7 +500,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
                 # linestyle = dataset['linestyle']
             )
 
-    ax1.set_ylabel(r'$w$' + ' ' + r'\small{(J.s${}^{-1}$)}')
+    ax1.set_ylabel(r'$w$' + ' ' + r'{\tiny(J.s${}^{-1}$)}')
 
     # -------------------------
     # Integral of z_dot
@@ -529,14 +529,14 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
         # r'{\setlength{\fboxrule}{0pt} \fbox{ \phantom{${\displaystyle \int_0^t}$} ${\int_0^t w\left(\beta(\tau), \tau\right) d\tau}$}}'
         # + '\n'
         + ' '
-        + r'\small{(J)}'
+        + r'{\tiny(J)}'
     )
 
 
     # ax2.legend(loc='lower right')
 
-    # ax2.set_ylabel(r'${\displaystyle \int_0^t w\left(\beta(\tau), \tau\right) d\tau}$')  # r'\small{(J)}')
-    # ax2.set_ylabel(r'$\int_0^t w$' + '\n' + r'\small{(J)}')
+    # ax2.set_ylabel(r'${\displaystyle \int_0^t w\left(\beta(\tau), \tau\right) d\tau}$')  # r'{\tiny(J)}')
+    # ax2.set_ylabel(r'$\int_0^t w$' + '\n' + r'{\tiny(J)}')
     # ax.set_xlabel(r'Time(s)')
 
     # -------------------------
@@ -552,7 +552,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
                 # linestyle = dataset['linestyle']
             )
 
-    ax3.set_ylabel(r'$\beta$' + ' ' + r'\small{(unitless)}')
+    ax3.set_ylabel(r'$\beta$' + ' ' + r'{\tiny(unitless)}')
     ax3.set_xlabel(r'time (s)')
 
     # extra setup

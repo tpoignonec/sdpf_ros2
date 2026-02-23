@@ -343,8 +343,8 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
         }
     )
 
-    ax1.set_xlabel(r'$p_x$' + ' ' + r'\small{(m)}')
-    ax1.set_ylabel(r'$p_y$' + ' ' + r'\small{(m)}')
+    ax1.set_xlabel(r'$p_x$' + ' ' + r'{\tiny(m)}')
+    ax1.set_ylabel(r'$p_y$' + ' ' + r'{\tiny(m)}')
 
     # extra setup
     ncol_legend_traj_XY = 2
@@ -403,8 +403,8 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
                 linestyle = dataset['linestyle']
             )
 
-    ax1.set_ylabel(r'$K_x$' + '\n' + r'\small{(N.m$^{-1}$)}')
-    ax2.set_ylabel(r'$K_y$' + '\n' + r'\small{(N.m$^{-1}$)}')
+    ax1.set_ylabel(r'$K_x$' + '\n' + r'{\tiny(N.m$^{-1}$)}')
+    ax2.set_ylabel(r'$K_y$' + '\n' + r'{\tiny(N.m$^{-1}$)}')
     ax2.set_xlabel(r'time (s)')
 
 
@@ -476,7 +476,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
             color = dataset['color'],
             # linestyle = dataset['linestyle']
         )
-    ax1.set_ylabel(r'$||e||$' + '\n' + r'\small{(m)}')
+    ax1.set_ylabel(r'$||e||$' + '\n' + r'{\tiny(m)}')
 
     # Velocity
     # ----------------
@@ -492,7 +492,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
             color = dataset['color'],
             # linestyle = dataset['linestyle']
         )
-    ax2.set_ylabel(r'$||\dot{e}||$' + '\n' + r'\small{(m.s${}^{-1}$)}')
+    ax2.set_ylabel(r'$||\dot{e}||$' + '\n' + r'{\tiny(m.s${}^{-1}$)}')
 
     # Force
     # -----------------------
@@ -508,7 +508,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
             # linestyle = dataset['linestyle']
         )
 
-    ax3.set_ylabel(r'$||f_{ext}||$' + '\n' + r'\small{(N)}')
+    ax3.set_ylabel(r'$||f_{ext}||$' + '\n' + r'{\tiny(N)}')
     ax3.set_xlabel(r'time (s)')
 
 
@@ -575,7 +575,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
                 # linestyle = dataset['linestyle']
             )
 
-    ax1.set_ylabel(r'$w$' + '\n' + r'\small{(J.s${}^{-1}$)}')
+    ax1.set_ylabel(r'$w$' + '\n' + r'{\tiny(J.s${}^{-1}$)}')
 
     # -------------------------
     # Integral of z_dot
@@ -607,14 +607,14 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
         # r'{\setlength{\fboxrule}{0pt} \fbox{ \phantom{${\displaystyle \int_0^t}$} ${\int_0^t w\left(\beta(\tau), \tau\right) d\tau}$}}'
         # + '\n'
         + '\n'
-        + r'\small{(J)}'
+        + r'{\tiny(J)}'
     )
 
 
     # ax2.legend(loc='lower right')
 
-    # ax2.set_ylabel(r'${\displaystyle \int_0^t w\left(\beta(\tau), \tau\right) d\tau}$')  # r'\small{(J)}')
-    # ax2.set_ylabel(r'$\int_0^t w$' + '\n' + r'\small{(J)}')
+    # ax2.set_ylabel(r'${\displaystyle \int_0^t w\left(\beta(\tau), \tau\right) d\tau}$')  # r'{\tiny(J)}')
+    # ax2.set_ylabel(r'$\int_0^t w$' + '\n' + r'{\tiny(J)}')
     # ax.set_xlabel(r'Time(s)')
 
     # -------------------------
@@ -630,7 +630,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
                 # linestyle = dataset['linestyle']
             )
 
-    ax3.set_ylabel(r'$\beta$' + '\n' + r'\small{(unitless)}')
+    ax3.set_ylabel(r'$\beta$' + '\n' + r'{\tiny(unitless)}')
     ax3.set_xlabel(r'time (s)')
 
     # extra setup
