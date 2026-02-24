@@ -79,6 +79,9 @@ python3 05_effect_of_z_max_and_tau_z_min.py
 python3 06_effect_of_alpha_and_epsilon.py
 ```
 
+> [!note] SIPF+ plots
+> For `01-A_simulation_1D_SIPF_vs_SDPF.py` and `03_simulation_1D_SIPF+_vs_SDPF_vs_SDPF-integrals.py`, run two times, with the flag `plot_SIPF_W4` to `True` and then `False` to get all the paper figures.
+
 # How to launch the experiment?
 
 ## Variable impedance control with Omega3 haptic interface
