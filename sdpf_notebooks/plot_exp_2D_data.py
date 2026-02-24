@@ -333,7 +333,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
     )
     from plot_utils import annotate
     annotate(
-        ax1, 'Start/Stop', (start_XY[0] + 0.1, start_XY[1]),
+        ax1, 'Start/End', (start_XY[0] + 0.1, start_XY[1]),
         bgc='none',
         extra_text_kwargs={
             'ha': 'left',
@@ -345,6 +345,30 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
 
     ax1.set_xlabel(r'$p_x$' + ' ' + r'{\tiny(m)}')
     ax1.set_ylabel(r'$p_y$' + ' ' + r'{\tiny(m)}')
+
+    # Add counterclockwise annotation
+    def annotate_counterclockwise_arrow(ax):
+        center = (0.12, 0.52)  # (xc, yc)
+        radius = 0.1
+        rad_start = np.pi * 1.1
+        rad_end = np.pi * 1.5
+
+        # 3. Calculate coordinates
+        x_start = center[0] + radius * np.cos(rad_start)
+        y_start = center[1] + radius * np.sin(rad_start)
+
+        x_end = center[0] + radius * np.cos(rad_end)
+        y_end = center[1] + radius * np.sin(rad_end)
+        from matplotlib.patches import FancyArrowPatch
+        # Create a curved arrow between two points
+        arrow = FancyArrowPatch(
+            (x_start, y_start), (x_end, y_end),
+            connectionstyle="arc3,rad="+str(radius * 2),
+            arrowstyle='->',
+            color='black',
+            lw=0.5, mutation_scale=10)
+        return ax.add_patch(arrow)
+    annotate_counterclockwise_arrow(ax1)
 
     # extra setup
     ncol_legend_traj_XY = 2
@@ -476,7 +500,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
             color = dataset['color'],
             # linestyle = dataset['linestyle']
         )
-    ax1.set_ylabel(r'$||e||$' + '\n' + r'{\tiny(m)}')
+    ax1.set_ylabel(r'$||e||$' + ' ' + r'{\tiny(m)}')
 
     # Velocity
     # ----------------
@@ -492,7 +516,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
             color = dataset['color'],
             # linestyle = dataset['linestyle']
         )
-    ax2.set_ylabel(r'$||\dot{e}||$' + '\n' + r'{\tiny(m.s${}^{-1}$)}')
+    ax2.set_ylabel(r'$||\dot{e}||$' + ' ' + r'{\tiny(m.s${}^{-1}$)}')
 
     # Force
     # -----------------------
@@ -508,7 +532,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
             # linestyle = dataset['linestyle']
         )
 
-    ax3.set_ylabel(r'$||f_{ext}||$' + '\n' + r'{\tiny(N)}')
+    ax3.set_ylabel(r'$||f_{ext}||$' + ' ' + r'{\tiny(N)}')
     ax3.set_xlabel(r'time (s)')
 
 
@@ -575,7 +599,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
                 # linestyle = dataset['linestyle']
             )
 
-    ax1.set_ylabel(r'$w$' + '\n' + r'{\tiny(J.s${}^{-1}$)}')
+    ax1.set_ylabel(r'$w$' + ' ' + r'{\tiny(J.s${}^{-1}$)}')
 
     # -------------------------
     # Integral of z_dot
@@ -606,7 +630,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
         r'$z$'  # = \int_0^t w(\cdot) d\tau$'
         # r'{\setlength{\fboxrule}{0pt} \fbox{ \phantom{${\displaystyle \int_0^t}$} ${\int_0^t w\left(\beta(\tau), \tau\right) d\tau}$}}'
         # + '\n'
-        + '\n'
+        + ' '
         + r'{\tiny(J)}'
     )
 
@@ -630,7 +654,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
                 # linestyle = dataset['linestyle']
             )
 
-    ax3.set_ylabel(r'$\beta$' + '\n' + r'{\tiny(unitless)}')
+    ax3.set_ylabel(r'$\beta$' + ' ' + r'{\tiny(unitless)}')
     ax3.set_xlabel(r'time (s)')
 
     # extra setup

@@ -255,7 +255,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
             linestyle = dataset['linestyle']
         )
 
-    ax1.set_ylabel(r'$K_x$' + '\n' + r'{\tiny(N.m$^{-1}$)}')
+    ax1.set_ylabel(r'$K_x$' + ' ' + r'{\tiny(N.m$^{-1}$)}')
 
     # extra setup
     # ------------
@@ -315,7 +315,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
             color = dataset['color'],
             linestyle = dataset['linestyle']
         )
-    ax1.set_ylabel(r'$p_x$')
+    ax1.set_ylabel(r'$p_x$' + ' ' + r'{\tiny(m)}')
 
     # Velocity
     # ----------------
@@ -327,7 +327,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
             color = dataset['color'],
             linestyle = dataset['linestyle']
         )
-    ax2.set_ylabel(r'$\dot{p}_x$')
+    ax2.set_ylabel(r'$\dot{p}_x$' + ' ' + r'{\tiny(m.s${}^{-1}$)}')
 
     # Force
     # -----------------------
@@ -340,7 +340,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
             linestyle = dataset['linestyle']
         )
 
-    ax3.set_ylabel(r'$f_{ext, x}$')
+    ax3.set_ylabel(r'$f_{ext, x}$' + ' ' + r'{\tiny(N)}')
     ax3.set_xlabel(r'time (s)')
 
 
@@ -408,7 +408,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
             linestyle = dataset['linestyle']
         )
 
-    ax1.set_ylabel(r'$K_x$')  # + '\n' + r'{\tiny(N.m$^{-1}$)}')
+    ax1.set_ylabel(r'$K_x$' + ' ' + r'{\tiny(N.m$^{-1}$)}')
 
     # Position
     # -------------------
@@ -420,7 +420,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
             color = dataset['color'],
             linestyle = dataset['linestyle']
         )
-    ax2.set_ylabel(r'$p_x$')
+    ax2.set_ylabel(r'$p_x$' + ' ' + r'{\tiny(m)}')
 
     # Force
     # -----------------------
@@ -433,7 +433,7 @@ def export_exp_figs(sub_dataset = 'new_recordings'):
             linestyle = dataset['linestyle']
         )
 
-    ax3.set_ylabel(r'$f_{ext, x}$')
+    ax3.set_ylabel(r'$f_{ext, x}$' + ' ' + r'{\tiny(N)}')
     ax3.set_xlabel(r'time (s)')
 
 
